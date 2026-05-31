@@ -13,14 +13,15 @@
 > `.env.local` 에 `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` 를 채운다.
 > (이 전제가 안 돼 있어도 N1 은 진행 가능 — env 없으면 더미 폴백 유지.)
 
-- [ ] **N1. `@supabase/ssr` 도입 + 서버/브라우저 클라이언트 분리.**
-      `src/lib/supabase.ts` 는 유지하고, SSR/서버 컴포넌트용 헬퍼를 같은 `src/lib/` 안에 추가.
-      env 가 없으면 지금처럼 `null` 반환 → 더미 폴백 유지 (생성 흐름을 막지 않는다).
-- [ ] **N2. 이메일 매직링크 로그인.** `/auth/sign-in`, `/auth/callback`, 세션 읽기 헬퍼.
-- [ ] **N3. Thread 상세(`/threads/[id]`)를 Supabase 실데이터로 읽기.**
+- [x] **N2(변형). 이메일/비밀번호 인증 (클라이언트 측).** 회원가입·로그인·로그아웃·현재 사용자·`/create` 가드 완료.
+      프로필은 `handle_new_user` 트리거가 생성 (D-010). 파일: `src/features/auth/*`, `src/app/login|signup`, `src/components/ui/*`.
+- [ ] **N3. Thread 상세(`/threads/[id]`)를 Supabase 실데이터로 읽기.**  ← **다음 작업**
       해당 행이 없으면 더미로 폴백. 가장 정보가 풍부한 라우트라 파급 효과가 큼.
 - [ ] **N4. Explore 를 Supabase 실데이터로 읽기.**
       검색은 `title` / `aliases` 에 대한 `ilike`. 타입 탭 유지.
+- [ ] **N1(이월). `@supabase/ssr` 도입 + 서버 세션 읽기.**
+      현재 인증은 클라이언트 세션(localStorage). 서버 컴포넌트/가드에서 세션이 필요해지면 이 과제로 전환.
+      `src/lib/supabase.ts` 유지, SSR 헬퍼는 같은 `src/lib/` 안에서 확장.
 
 ## Next — 그 다음 (Now 가 비면 여기서 하나 올린다)
 
@@ -64,7 +65,7 @@ M3/M4/M5 백로그는 아래 "마일스톤 백로그" 참조.
 ### M2 — Supabase 실제 연결 (진행 중 — `## Now` 가 이 마일스톤)
 
 - [ ] Supabase 프로젝트 생성 + 스키마 적용  *(프로젝트는 생성됨: gqvjpfoxktueiclhpjlu)*
-- [ ] Auth (이메일 매직링크)
+- [x] Auth (이메일/비밀번호, 클라이언트 측) — 회원가입/로그인/로그아웃/현재 사용자/Create 가드
 - [ ] `threads` CRUD 서버 액션
 - [ ] `perspectives` CRUD 서버 액션
 - [ ] `records` CRUD 서버 액션

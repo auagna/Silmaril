@@ -21,7 +21,7 @@ export const THREAD_TYPES: ThreadType[] = [
   "organization", "company", "media", "book", "film", "music",
 ];
 
-export const THREAD_TYPE_LABEL: Record<ThreadType, string> = {
+export const THREAD_TYPE_LABEL: { [K in ThreadType]: string } = {
   person:       "인물",
   work:         "작품",
   movement:     "사조",
@@ -43,7 +43,7 @@ export type ThreadStatus =
   | "merged"
   | "archived";
 
-export const THREAD_STATUS_LABEL: Record<ThreadStatus, string> = {
+export const THREAD_STATUS_LABEL: { [K in ThreadStatus]: string } = {
   local:     "로컬",
   community: "커뮤니티",
   verified:  "검증됨",
@@ -66,7 +66,7 @@ export type RelationKind =
   | "derived_from"
   | "belongs_to";
 
-export const RELATION_LABEL: Record<RelationKind, string> = {
+export const RELATION_LABEL: { [K in RelationKind]: string } = {
   influenced_by:   "영향을 받음",
   created:         "만듦",
   member_of:       "소속",

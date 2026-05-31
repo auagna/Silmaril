@@ -11,8 +11,23 @@
 
 ## 현재 상태 (2026-06-01)
 
-**M0 (Foundation) 완료, M1 (더미 기반 UI) 완료. M2 (Supabase 연결) 미착수.**
-**교대 프로토콜(`CLAUDE.md`/`AGENTS.md`) 수립 완료.**
+**M0 (Foundation) 완료, M1 (더미 기반 UI) 완료. 교대 프로토콜 수립 완료.**
+**M2 진행 중 — Supabase Auth (클라이언트 측) 구현 완료.**
+
+### 이번에 추가된 것 (Auth)
+- 회원가입 `/signup`, 로그인 `/login`, 로그아웃(Nav 우측), 현재 사용자 조회.
+- `/create` 는 로그인 사용자만 접근 (`AuthGuard`, 클라이언트 가드).
+- 프로필(`public.users`)은 **DB 트리거 `handle_new_user` 가 자동 생성** — `username→handle`, `name→display_name` (D-010). 클라이언트는 users 에 insert 안 함.
+- UI 프리미티브 `src/components/ui/{Button,Input,Card}` 추가 (ink 톤).
+- **검증:** `npm run build` 성공(10 라우트), `npx tsc --noEmit` 통과.
+- **부수 수정:** `domain.ts` 의 엔티티명 `Record` 가 전역 `Record<K,V>` 를 가려 라벨 맵이 깨지던 기존 버그 수정(매핑 타입으로 교체). Next 14.2.5 → 14.2.35 보안 패치.
+
+### ⚠️ 사람이 할 일 (Auth 동작 위해, Supabase 대시보드)
+1. **트리거 갱신 (1회, 권장):** `schema.sql` 의 `handle_new_user()` 를 username 인식 버전으로 바꿨다.
+   이미 옛 버전을 적용했으므로, SQL Editor 에서 `schema.sql` 의 `create or replace function public.handle_new_user() ... $$;` 블록(약 84~103행)만 복사해 다시 Run.
+   (안 해도 가입은 됨 — 단 handle 이 `u_xxxx` 자동값이 됨.)
+2. **이메일 확인 OFF (개발 편의):** Authentication → Providers → Email → "Confirm email" 끄기.
+   켜져 있으면 가입 후 메일 확인 전까지 로그인 불가 (이 경우 가입은 `/login` 으로 보냄).
 
 ### 무엇이 동작하는가
 - Next.js App Router 스켈레톤. `/`, `/explore`, `/create`, `/map`, `/profile`, `/threads/[id]` 라우트가 더미 데이터로 동작.
@@ -30,7 +45,8 @@
 
 ## 다음 작업 = `TASKS.md` 의 `## Now` 첫 항목
 
-다음 에이전트는 **N1. `@supabase/ssr` 도입 + 서버/브라우저 클라이언트 분리** 부터 시작한다.
+다음 에이전트는 **N3. Thread 상세(`/threads/[id]`) 를 Supabase 실데이터로 읽기** 부터 시작한다.
+(N2 인증은 완료. N1(@supabase/ssr) 은 서버 세션이 필요해질 때로 이월.)
 (상세·순서는 `TASKS.md ## Now` 가 정본. 여기서는 맥락만.)
 
 **전제 (사람이 1회):**

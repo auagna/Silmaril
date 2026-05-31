@@ -4,6 +4,19 @@
 
 ---
 
+## 2026-06-01 · D-010 · 인증은 클라이언트 측 + 프로필은 DB 트리거가 생성
+
+- **맥락:** 외부에서 받은 Auth 스펙이 (a) `users` 에 `username`/`name`/`role:'user'` 를 클라이언트에서 insert, (b) `@/components/ui/*`·`AppShell` 가정, (c) `supabase` 싱글톤 import 였음. 그러나 우리 스키마는 `handle`/`display_name`, role enum 은 `member|partner|admin`(= 'user' 없음), 프로필은 `handle_new_user` 트리거가 이미 자동 생성.
+- **결정:**
+  - 프로필 행은 **DB 트리거가 단독 생성**. 클라이언트는 `users` 에 insert/ update 하지 않는다. (중복키·RLS 타이밍·enum 위반 회피) — `username`→`handle`, `name`→`display_name` 는 `signUp` 의 `options.data` 메타데이터로 넘기고, 트리거가 읽는다.
+  - role 은 컬럼 기본값 `member`. (가입 시 role 을 클라이언트가 지정하지 않는다.)
+  - 인증은 **클라이언트 세션(supabase-js, localStorage)** 으로 시작. 서버 컴포넌트 세션 읽기(`@supabase/ssr`)는 N1 과제로 남김.
+  - `/create` 가드는 현재 **클라이언트 가드(`AuthGuard`)**. SSR 가드는 N1 이후.
+  - 외부 스펙의 `AppShell` 은 도입하지 않음 — 루트 `layout.tsx` 가 이미 Nav+main 셸 제공. UI 프리미티브(`Button`/`Input`/`Card`)는 `src/components/ui/` 에 우리 ink 톤으로 생성.
+- **결과:** 빌드/타입체크 통과. 가입 흐름이 트리거와 충돌하지 않음. role/handle 무결성 유지.
+- **사람이 할 일(1회):** 이미 적용한 DB 의 트리거를 갱신본으로 교체(아래 HANDOFF 참조). 개발 편의를 위해 이메일 확인 OFF 권장.
+- **재고할 시점:** 서버 렌더에서 로그인 상태가 필요해지면 즉시 N1(`@supabase/ssr`) 로 전환.
+
 ## 2026-06-01 · D-009 · 두 에이전트(Claude Code + Codex) 교대 작업
 
 - **맥락:** 한 도구의 이용량이 소진되면 다른 도구로 작업을 이어가야 함. 두 도구가 서로의 진행 상태를 모름.

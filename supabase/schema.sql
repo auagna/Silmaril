@@ -94,8 +94,12 @@ begin
   insert into public.users (id, handle, display_name)
   values (
     new.id,
-    'u_' || substring(replace(new.id::text, '-', '') from 1 for 8),
-    coalesce(new.raw_user_meta_data->>'name', null)
+    -- 가입 시 넘긴 username을 handle로. 없으면 자동 생성. (role은 컬럼 기본값 'member')
+    coalesce(
+      nullif(new.raw_user_meta_data->>'username', ''),
+      'u_' || substring(replace(new.id::text, '-', '') from 1 for 8)
+    ),
+    nullif(new.raw_user_meta_data->>'name', '')
   )
   on conflict (id) do nothing;
   return new;

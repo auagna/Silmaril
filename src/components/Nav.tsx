@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AuthMenu } from "@/features/auth/AuthMenu";
 
 const items = [
   { href: "/",        label: "Home" },
@@ -25,6 +26,7 @@ export function Nav() {
               {it.label}
             </Link>
           ))}
+          <AuthMenu />
         </nav>
       </div>
     </header>

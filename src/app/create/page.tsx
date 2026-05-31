@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AuthGuard } from "@/features/auth/AuthGuard";
 
 const items = [
   {
@@ -30,6 +31,7 @@ const items = [
 
 export default function CreatePage() {
   return (
+    <AuthGuard>
     <div className="space-y-10">
       <header>
         <h1 className="font-serif text-3xl text-ink-900">무엇을 만들까요?</h1>
@@ -53,8 +55,9 @@ export default function CreatePage() {
       </div>
 
       <p className="text-xs text-ink-400">
-        ※ 인증 / 저장 기능은 M2에서 연결됩니다. 현재는 폼 라우트만 준비되어 있습니다.
+        ※ 로그인한 사용자만 이 페이지에 들어올 수 있습니다. 각 생성 폼은 이후 작업에서 연결됩니다.
       </p>
     </div>
+    </AuthGuard>
   );
 }
