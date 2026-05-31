@@ -11,8 +11,13 @@
 
 ## 현재 상태 (2026-06-01)
 
-**M0/M1 완료, 교대 프로토콜 수립 완료.**
-**M2 진행 중 — Supabase Auth(클라이언트) + Create Thread 완료.**
+**M0/M1 완료, 교대 프로토콜 수립 완료. M2 일부(Auth+Create Thread) 완료.**
+**⚠️ 개발 일시정지 (D-012). 현재는 UX 리서치 → 디자인 트랙.**
+
+### 이번에 추가된 것 (UX Research Sprint)
+- Lazyweb 증거 기반 4 스프린트 → `docs/ux-research/`: exploration / graph-navigation / collections / curator-system / **silmaril-ux-conclusion**.
+- 결론: 실마릴 = "디자이너 취향 지도"(≈Are.na). **UX Principles v1** + 패턴 10개 확정 (conclusion 문서).
+- Lazyweb 호출은 검증된 HTTP 채널 사용(네이티브 MCP 도구는 재시작 후 로드). 증거 데이터 동일.
 
 ### 이번에 추가된 것 (Create Thread)
 - `/create/thread` 실마리 생성 폼 (title/type/summary/body/status[local|community]).
@@ -54,18 +59,14 @@
 
 ## 다음 작업 = `TASKS.md` 의 `## Now` 첫 항목
 
-다음 에이전트는 **D1. 디자인 시스템 + 전역 셸 (UI/UX 패스)** 부터 시작한다. (사용자가 UI/UX 최우선으로 지정.)
+다음 에이전트는 **W1. Silmaril 모바일 와이어프레임 v1** 부터 시작한다. **개발 아님.**
 
-**진행 전 (사람):** Claude Code 재시작 → 프로젝트 `.mcp.json` 의 **lazyweb 서버 승인** → `mcp__lazyweb__*` 도구 로드 확인.
-**D1 방법 (네이티브 Lazyweb 도구로):**
-1. `lazyweb_list_categories` / `lazyweb_list_collections` 로 결 파악, `lazyweb_search` 로 'minimal knowledge base', 'calm dashboard', 'note/archive app', 'graph explorer' 등 레퍼런스 수집.
-2. 토큰 정리: 색(현재 ink + accent forest 유지/보정), 타이포(serif 디스플레이 + sans 본문), 간격 스케일, radius, Nav/레이아웃.
-3. 적용: `tailwind.config.ts`, `app/globals.css`, `components/Nav.tsx`, `components/ui/{Button,Input,Card}`. 화면 로직은 건드리지 말고 **토큰/셸만** 먼저.
-- 톤 기준: Apple HIG 여백·정돈 / Obsidian 탐험성 / Letterboxd 기록 / Wikipedia 정보구조.
-- Lazyweb 메모/주의: [[lazyweb-ui-reference]] — 토큰은 `~/.lazyweb/lazyweb_mcp_token` + gitignore된 `.mcp.json`. **공개 레포에 커밋 금지.**
-
-그 다음 N6 Perspective(페이지 하나·관점 여럿) → N3 상세 통합 → N4 Explore 실데이터.
-(N2 인증·N5 Create Thread 완료. N1(@supabase/ssr) 이월. 상세·순서는 `TASKS.md ## Now` 가 정본.)
+- 기준 문서: `docs/ux-research/silmaril-ux-conclusion.md` (UX Principles v1 + 패턴 10). 이게 상위 기준.
+- 화면 우선순위: 탐험 피드 → 실마리 상세(연결 우선) → 저장/컬렉션 → 로컬 그래프(보조) → 큐레이터/관점.
+- 산출물: lo-fi 와이어프레임(문서 또는 단일 HTML 목업). 절대 "예쁜 UI"가 아니라 **구조/흐름**을 잡는다.
+- 핵심 제약(원칙에서): 연결을 정보보다 먼저 / 저장은 한 탭 / 그래프는 보조 / 한 페이지·관점 레이어 / 생성 무브레이크.
+- 그 다음에야 D1(디자인 시스템·셸) → Figma → 코드. 개발 트랙(N6 Perspective 등)은 디자인 확정까지 대기.
+- Lazyweb: 추가 레퍼런스 필요 시 검증된 HTTP 채널 또는 재시작 후 `mcp__lazyweb__*`. 토큰은 [[lazyweb-ui-reference]] — **공개 레포 커밋 금지.**
 
 **전제 (사람이 1회):**
 - Supabase 프로젝트 **`gqvjpfoxktueiclhpjlu`** 가 생성됨 (URL: `https://gqvjpfoxktueiclhpjlu.supabase.co`).

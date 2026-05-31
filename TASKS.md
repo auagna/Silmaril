@@ -17,12 +17,20 @@
       프로필은 `handle_new_user` 트리거가 생성 (D-010).
 - [x] **N5. Create Thread.** `/create/thread` 폼 + `threadService.createThread`(slug 충돌 접미사) + slug 유틸.
       생성 후 `/threads/[slug]` 이동, 상세는 `ThreadLiveView` 실데이터 폴백 (D-011).
-- [ ] **D1. 디자인 시스템 + 전역 셸 (UI/UX 패스).**  ← **다음 작업 (최우선)**
-      디자이너 타겟인데 현재는 기능 위주 기본 폼. **Lazyweb 네이티브 도구**(`mcp__lazyweb__*`, 재시작+서버 승인 후 로드)로
-      레퍼런스(calm/minimal 지식·아카이브 앱, Obsidian/Letterboxd/Wikipedia 톤) 학습 → 토큰화.
-      대상: `tailwind.config.ts`(색/타이포/간격/radius), `app/globals.css`, `components/Nav.tsx`, `components/ui/*`.
-      앱 톤: Apple HIG 여백·정돈 / Obsidian 탐험성 / Letterboxd 기록 / Wikipedia 정보구조. (참고: [[lazyweb-ui-reference]])
-- [ ] **N6. Perspective 작성.**
+### 🔵 현재 트랙: UX 리서치 → 디자인 (개발 일시정지 — D-012)
+
+- [x] **UX Research Sprint** (Lazyweb 증거) — 탐험/그래프/컬렉션/큐레이터 4문서 + 결론 + **UX Principles v1**.
+      → `docs/ux-research/`. 핵심: 실마릴=디자이너 취향 지도(≈Are.na), 그래프는 로컬·보조, 저장=1급 동사.
+- [ ] **W1. Silmaril 모바일 와이어프레임 v1.**  ← **다음 작업 (개발 아님)**
+      `silmaril-ux-conclusion.md` 의 10패턴/8원칙을 화면으로. 우선순위:
+      탐험 피드 → 실마리 상세(연결 우선) → 저장/컬렉션 → 로컬 그래프(보조) → 큐레이터/관점.
+      산출물: lo-fi 와이어프레임(문서 또는 HTML) → 이후 Figma → 코드.
+- [ ] **D1. 디자인 시스템 + 전역 셸.** (와이어프레임 v1 확정 후) 색/타이포/간격/radius 토큰 + Nav/`ui/*`.
+      Lazyweb 네이티브 도구는 재시작+서버 승인 후 `mcp__lazyweb__*` 로 사용. (참고: [[lazyweb-ui-reference]])
+
+### ⚪ 개발 트랙 (디자인 확정까지 대기)
+
+- [ ] **N6. Perspective 작성.** (페이지 하나·관점 여럿 — 바이라인 레이어, Genius 모델)
       Thread 상세에 관점 목록 + 작성 폼(`PerspectiveCreateForm`). `thread_id`/작성자 연결, `visibility='public'` 로 생성.
       *(실마릴 핵심 차별점: 페이지는 하나, 관점은 여러 개.)*
 - [ ] **N3. Thread 상세(`/threads/[id]`)를 Supabase 실데이터로 통합.**
