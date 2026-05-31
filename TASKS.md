@@ -14,9 +14,14 @@
 > (이 전제가 안 돼 있어도 N1 은 진행 가능 — env 없으면 더미 폴백 유지.)
 
 - [x] **N2(변형). 이메일/비밀번호 인증 (클라이언트 측).** 회원가입·로그인·로그아웃·현재 사용자·`/create` 가드 완료.
-      프로필은 `handle_new_user` 트리거가 생성 (D-010). 파일: `src/features/auth/*`, `src/app/login|signup`, `src/components/ui/*`.
-- [ ] **N3. Thread 상세(`/threads/[id]`)를 Supabase 실데이터로 읽기.**  ← **다음 작업**
-      해당 행이 없으면 더미로 폴백. 가장 정보가 풍부한 라우트라 파급 효과가 큼.
+      프로필은 `handle_new_user` 트리거가 생성 (D-010).
+- [x] **N5. Create Thread.** `/create/thread` 폼 + `threadService.createThread`(slug 충돌 접미사) + slug 유틸.
+      생성 후 `/threads/[slug]` 이동, 상세는 `ThreadLiveView` 실데이터 폴백 (D-011).
+- [ ] **N6. Perspective 작성.**  ← **다음 작업**
+      Thread 상세에 관점 목록 + 작성 폼(`PerspectiveCreateForm`). `thread_id`/작성자 연결, `visibility='public'` 로 생성.
+      *(실마릴 핵심 차별점: 페이지는 하나, 관점은 여러 개.)*
+- [ ] **N3. Thread 상세(`/threads/[id]`)를 Supabase 실데이터로 통합.**
+      현재 더미 우선 + 미스 시 `ThreadLiveView` 폴백. 관점/연결/기록을 실데이터로 묶어 통합.
 - [ ] **N4. Explore 를 Supabase 실데이터로 읽기.**
       검색은 `title` / `aliases` 에 대한 `ilike`. 타입 탭 유지.
 - [ ] **N1(이월). `@supabase/ssr` 도입 + 서버 세션 읽기.**
@@ -26,8 +31,8 @@
 ## Next — 그 다음 (Now 가 비면 여기서 하나 올린다)
 
 - [ ] 저장(bookmark) / 좋아요(reaction) 토글 — 서버 액션 + `user_thread_activity` 기록.
-- [ ] 실마리 생성 폼 → `status='local'` 즉시 저장 (D-002: 본인 지도에 바로 반영).
-- [ ] 관점(Perspective) 작성 폼 — 특정 Thread 에 첨부.
+- [x] 실마리 생성 폼 → `status='local'`/`community` 즉시 저장 (D-002, D-011).
+- [ ] 관점(Perspective) 작성 폼 — 특정 Thread 에 첨부. ← 다음
 - [ ] 개인 기록(Record) 작성 폼 — Thread 첨부는 선택.
 - [ ] 컬렉션 생성 + 항목 추가/정렬.
 - [ ] 관리자/파트너용 공식화 상태 변경 (`community → verified → official`, `merged`).

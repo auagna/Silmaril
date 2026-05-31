@@ -11,8 +11,17 @@
 
 ## 현재 상태 (2026-06-01)
 
-**M0 (Foundation) 완료, M1 (더미 기반 UI) 완료. 교대 프로토콜 수립 완료.**
-**M2 진행 중 — Supabase Auth (클라이언트 측) 구현 완료.**
+**M0/M1 완료, 교대 프로토콜 수립 완료.**
+**M2 진행 중 — Supabase Auth(클라이언트) + Create Thread 완료.**
+
+### 이번에 추가된 것 (Create Thread)
+- `/create/thread` 실마리 생성 폼 (title/type/summary/body/status[local|community]).
+- `src/features/threads/`: `slug.ts`, `threadService.ts`(createThread + getThreadBySlug), `ThreadCreateForm.tsx`, `ThreadLiveView.tsx`.
+- slug 전역 UNIQUE 충돌 시 `-2`,`-3`… 자동 접미사 (생성 안 막음, D-011/D-005).
+- 생성 후 `/threads/[slug]` 이동. 상세는 더미 미스 시 `ThreadLiveView`(브라우저 클라이언트)로 실데이터 조회 → 본인 local 도 보임.
+- `/create` 허브의 '실마리 생성' 카드가 이제 실제로 열림.
+- **검증:** `npm run build` 11 라우트 통과 + dev 라이브 스모크 전 라우트 200.
+- **운영 팁:** dev 에서 `Cannot find module './vendor-chunks/*.js'` 500 → `.next` 지우고 재시작 (이번에 한 번 발생, 해결).
 
 ### 이번에 추가된 것 (Auth)
 - 회원가입 `/signup`, 로그인 `/login`, 로그아웃(Nav 우측), 현재 사용자 조회.
@@ -45,9 +54,11 @@
 
 ## 다음 작업 = `TASKS.md` 의 `## Now` 첫 항목
 
-다음 에이전트는 **N3. Thread 상세(`/threads/[id]`) 를 Supabase 실데이터로 읽기** 부터 시작한다.
-(N2 인증은 완료. N1(@supabase/ssr) 은 서버 세션이 필요해질 때로 이월.)
-(상세·순서는 `TASKS.md ## Now` 가 정본. 여기서는 맥락만.)
+다음 에이전트는 **N6. Perspective 작성** 부터 시작한다 (실마릴 핵심 차별점: 페이지 하나, 관점 여럿).
+구현: Thread 상세에 관점 목록 + `PerspectiveCreateForm`(thread_id·작성자 연결, `visibility='public'`).
+참고 패턴은 `ThreadCreateForm`/`threadService` 와 동일하게 — `getCurrentUser` 가드, `requireSupabaseBrowser`, RLS insert.
+(N2 인증·N5 Create Thread 완료. N1(@supabase/ssr)·N3 통합은 이월.)
+(상세·순서는 `TASKS.md ## Now` 가 정본.)
 
 **전제 (사람이 1회):**
 - Supabase 프로젝트 **`gqvjpfoxktueiclhpjlu`** 가 생성됨 (URL: `https://gqvjpfoxktueiclhpjlu.supabase.co`).

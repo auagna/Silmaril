@@ -50,3 +50,14 @@ export function getSupabaseServer(opts?: { admin?: boolean }): SupabaseClient | 
 export function isSupabaseConfigured(): boolean {
   return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 }
+
+/** 브라우저 클라이언트를 반환하되, 미설정이면 친절한 에러를 던진다. (쓰기 작업용) */
+export function requireSupabaseBrowser(): SupabaseClient {
+  const client = getSupabaseBrowser();
+  if (!client) {
+    throw new Error(
+      "Supabase가 설정되지 않았습니다. .env.local 의 URL / anon key 를 확인하세요.",
+    );
+  }
+  return client;
+}

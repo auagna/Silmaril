@@ -4,6 +4,18 @@
 
 ---
 
+## 2026-06-01 · D-011 · Create Thread — 허브 유지 + slug 충돌 접미사 + 상세 실데이터 폴백
+
+- **맥락:** 외부 Create Thread 스펙이 (a) `/create/page.tsx` 를 폼으로 교체, (b) `description` 컬럼·`@/types/database`·`supabase` 싱글톤·`AppShell` 가정, (c) slug 를 그대로 insert.
+- **결정:**
+  - 폼은 **`/create/thread`** 에 둔다. `/create` 는 M1 의 허브 유지 — 그 '실마리 생성' 카드가 이제 실제로 열린다(그전엔 죽은 링크). 다른 생성 항목(관점/기록/컬렉션/링크)도 보존.
+  - 컬럼 매핑: 스펙의 `description` → 우리 스키마 **`body`**. 타입은 `@/types/domain`. 클라이언트는 `getSupabaseBrowser()`/`requireSupabaseBrowser()` 사용(싱글톤 아님). `AppShell` 미도입(루트 layout 이 셸 제공).
+  - **slug 전역 UNIQUE 충돌 시 `-2`,`-3`… 접미사로 자동 회피** (생성 실패 안 시킴). 같은 대상 중복은 이후 큐레이터가 `merged` 로 정리 — D-005 와 일관.
+  - 생성 후 `/threads/[slug]` 로 이동. 상세는 아직 더미만 읽으므로, **더미에 없으면 브라우저 클라이언트로 조회하는 `ThreadLiveView` 폴백**을 추가(본인 local 도 세션으로 보임). 관점/연결/기록 실데이터 통합은 N3.
+  - 생성 가능한 status 는 **local | community 만**. verified/official 은 검증/관리 흐름 전용.
+- **결과:** `npm run build` 11 라우트 통과, 라이브 스모크 전 라우트 200. 생성→상세 이동이 끊기지 않음.
+- **운영 노트:** dev 에서 의존성/벤더청크 변경 후 `Cannot find module './vendor-chunks/*.js'` 500 이 나면 **`.next` 삭제 후 재시작**. (프로덕션 빌드는 영향 없음.)
+
 ## 2026-06-01 · D-010 · 인증은 클라이언트 측 + 프로필은 DB 트리거가 생성
 
 - **맥락:** 외부에서 받은 Auth 스펙이 (a) `users` 에 `username`/`name`/`role:'user'` 를 클라이언트에서 insert, (b) `@/components/ui/*`·`AppShell` 가정, (c) `supabase` 싱글톤 import 였음. 그러나 우리 스키마는 `handle`/`display_name`, role enum 은 `member|partner|admin`(= 'user' 없음), 프로필은 `handle_new_user` 트리거가 이미 자동 생성.

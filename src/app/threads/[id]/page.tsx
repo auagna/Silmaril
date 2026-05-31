@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { ThreadHeader } from "@/features/threads/ThreadHeader";
+import { ThreadLiveView } from "@/features/threads/ThreadLiveView";
 import { ThreadCard } from "@/components/ThreadCard";
 import { PerspectiveCard } from "@/components/PerspectiveCard";
 import { RecordCard } from "@/components/RecordCard";
@@ -14,7 +15,8 @@ import { RELATION_LABEL } from "@/types/domain";
 export default function ThreadDetailPage({ params }: { params: { id: string } }) {
   const idOrSlug = decodeURIComponent(params.id);
   const thread = findThread(idOrSlug);
-  if (!thread) return notFound();
+  // 더미에 없으면 = 방금 만든 실데이터일 수 있음 → 브라우저 클라이언트로 조회 (N3에서 통합).
+  if (!thread) return <ThreadLiveView slug={idOrSlug} />;
 
   // merged → redirect to canonical
   if (thread.status === "merged" && thread.merged_into) {
