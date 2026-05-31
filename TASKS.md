@@ -17,7 +17,12 @@
       프로필은 `handle_new_user` 트리거가 생성 (D-010).
 - [x] **N5. Create Thread.** `/create/thread` 폼 + `threadService.createThread`(slug 충돌 접미사) + slug 유틸.
       생성 후 `/threads/[slug]` 이동, 상세는 `ThreadLiveView` 실데이터 폴백 (D-011).
-- [ ] **N6. Perspective 작성.**  ← **다음 작업**
+- [ ] **D1. 디자인 시스템 + 전역 셸 (UI/UX 패스).**  ← **다음 작업 (최우선)**
+      디자이너 타겟인데 현재는 기능 위주 기본 폼. **Lazyweb 네이티브 도구**(`mcp__lazyweb__*`, 재시작+서버 승인 후 로드)로
+      레퍼런스(calm/minimal 지식·아카이브 앱, Obsidian/Letterboxd/Wikipedia 톤) 학습 → 토큰화.
+      대상: `tailwind.config.ts`(색/타이포/간격/radius), `app/globals.css`, `components/Nav.tsx`, `components/ui/*`.
+      앱 톤: Apple HIG 여백·정돈 / Obsidian 탐험성 / Letterboxd 기록 / Wikipedia 정보구조. (참고: [[lazyweb-ui-reference]])
+- [ ] **N6. Perspective 작성.**
       Thread 상세에 관점 목록 + 작성 폼(`PerspectiveCreateForm`). `thread_id`/작성자 연결, `visibility='public'` 로 생성.
       *(실마릴 핵심 차별점: 페이지는 하나, 관점은 여러 개.)*
 - [ ] **N3. Thread 상세(`/threads/[id]`)를 Supabase 실데이터로 통합.**

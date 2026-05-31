@@ -54,11 +54,18 @@
 
 ## 다음 작업 = `TASKS.md` 의 `## Now` 첫 항목
 
-다음 에이전트는 **N6. Perspective 작성** 부터 시작한다 (실마릴 핵심 차별점: 페이지 하나, 관점 여럿).
-구현: Thread 상세에 관점 목록 + `PerspectiveCreateForm`(thread_id·작성자 연결, `visibility='public'`).
-참고 패턴은 `ThreadCreateForm`/`threadService` 와 동일하게 — `getCurrentUser` 가드, `requireSupabaseBrowser`, RLS insert.
-(N2 인증·N5 Create Thread 완료. N1(@supabase/ssr)·N3 통합은 이월.)
-(상세·순서는 `TASKS.md ## Now` 가 정본.)
+다음 에이전트는 **D1. 디자인 시스템 + 전역 셸 (UI/UX 패스)** 부터 시작한다. (사용자가 UI/UX 최우선으로 지정.)
+
+**진행 전 (사람):** Claude Code 재시작 → 프로젝트 `.mcp.json` 의 **lazyweb 서버 승인** → `mcp__lazyweb__*` 도구 로드 확인.
+**D1 방법 (네이티브 Lazyweb 도구로):**
+1. `lazyweb_list_categories` / `lazyweb_list_collections` 로 결 파악, `lazyweb_search` 로 'minimal knowledge base', 'calm dashboard', 'note/archive app', 'graph explorer' 등 레퍼런스 수집.
+2. 토큰 정리: 색(현재 ink + accent forest 유지/보정), 타이포(serif 디스플레이 + sans 본문), 간격 스케일, radius, Nav/레이아웃.
+3. 적용: `tailwind.config.ts`, `app/globals.css`, `components/Nav.tsx`, `components/ui/{Button,Input,Card}`. 화면 로직은 건드리지 말고 **토큰/셸만** 먼저.
+- 톤 기준: Apple HIG 여백·정돈 / Obsidian 탐험성 / Letterboxd 기록 / Wikipedia 정보구조.
+- Lazyweb 메모/주의: [[lazyweb-ui-reference]] — 토큰은 `~/.lazyweb/lazyweb_mcp_token` + gitignore된 `.mcp.json`. **공개 레포에 커밋 금지.**
+
+그 다음 N6 Perspective(페이지 하나·관점 여럿) → N3 상세 통합 → N4 Explore 실데이터.
+(N2 인증·N5 Create Thread 완료. N1(@supabase/ssr) 이월. 상세·순서는 `TASKS.md ## Now` 가 정본.)
 
 **전제 (사람이 1회):**
 - Supabase 프로젝트 **`gqvjpfoxktueiclhpjlu`** 가 생성됨 (URL: `https://gqvjpfoxktueiclhpjlu.supabase.co`).
