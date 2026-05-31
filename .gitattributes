@@ -1,0 +1,12 @@
+# Normalize line endings across tools/OSes so Codex ↔ Claude handoffs
+# don't produce noisy whitespace-only diffs.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
