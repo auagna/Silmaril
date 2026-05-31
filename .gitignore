@@ -19,3 +19,7 @@ coverage/
 .turbo/
 
 *.tsbuildinfo
+
+# Local MCP config — contains a bearer token, must NOT be committed (public repo).
+.mcp.json
+.lazyweb/
