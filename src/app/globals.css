@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html, body {
+  background: #fafaf9;
+  color: #1a1a17;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: var(--font-sans, ui-sans-serif, system-ui);
+}
+
+/* Quiet scrollbars — match the "still exploration tool" tone. */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: #e7e6e2; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #cfcec9; }
+
+/* React Flow gets its own styling pulled in by GraphView.tsx. */

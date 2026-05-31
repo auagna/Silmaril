@@ -1,0 +1,103 @@
+# TASKS
+
+> 교대 작업의 단일 진실 공급원. `## Now` 의 **체크 안 된 첫 항목 하나만** 진행한다.
+> 완료된 항목은 `[x]`, 진행 중은 `[~]`, 대기 중은 `[ ]`.
+> 규칙 전문은 [CLAUDE.md](./CLAUDE.md) / [AGENTS.md](./AGENTS.md) 참조.
+
+---
+
+## Now — 다음 작업 (위에서부터 하나씩)
+
+> **전제 (사람이 1회 수행):** Supabase 프로젝트 `gqvjpfoxktueiclhpjlu` 의 SQL Editor 에서
+> `supabase/schema.sql` → `supabase/policies.sql` 를 실행하고,
+> `.env.local` 에 `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` 를 채운다.
+> (이 전제가 안 돼 있어도 N1 은 진행 가능 — env 없으면 더미 폴백 유지.)
+
+- [ ] **N1. `@supabase/ssr` 도입 + 서버/브라우저 클라이언트 분리.**
+      `src/lib/supabase.ts` 는 유지하고, SSR/서버 컴포넌트용 헬퍼를 같은 `src/lib/` 안에 추가.
+      env 가 없으면 지금처럼 `null` 반환 → 더미 폴백 유지 (생성 흐름을 막지 않는다).
+- [ ] **N2. 이메일 매직링크 로그인.** `/auth/sign-in`, `/auth/callback`, 세션 읽기 헬퍼.
+- [ ] **N3. Thread 상세(`/threads/[id]`)를 Supabase 실데이터로 읽기.**
+      해당 행이 없으면 더미로 폴백. 가장 정보가 풍부한 라우트라 파급 효과가 큼.
+- [ ] **N4. Explore 를 Supabase 실데이터로 읽기.**
+      검색은 `title` / `aliases` 에 대한 `ilike`. 타입 탭 유지.
+
+## Next — 그 다음 (Now 가 비면 여기서 하나 올린다)
+
+- [ ] 저장(bookmark) / 좋아요(reaction) 토글 — 서버 액션 + `user_thread_activity` 기록.
+- [ ] 실마리 생성 폼 → `status='local'` 즉시 저장 (D-002: 본인 지도에 바로 반영).
+- [ ] 관점(Perspective) 작성 폼 — 특정 Thread 에 첨부.
+- [ ] 개인 기록(Record) 작성 폼 — Thread 첨부는 선택.
+- [ ] 컬렉션 생성 + 항목 추가/정렬.
+- [ ] 관리자/파트너용 공식화 상태 변경 (`community → verified → official`, `merged`).
+
+## Later
+
+M3/M4/M5 백로그는 아래 "마일스톤 백로그" 참조.
+
+---
+
+## 마일스톤 백로그
+
+### M0 — 기반 (Foundation) ✅
+
+- [x] 프로젝트 루트 파일 구조 결정
+- [x] 도메인 모델 / 정보 구조 문서화
+- [x] Supabase 스키마 / RLS 정책 초안
+- [x] TypeScript 도메인 타입 정의
+- [x] Next.js App Router 스켈레톤
+- [x] Tailwind 설정
+- [x] Supabase 클라이언트 분리 (`src/lib/supabase.ts`)
+- [x] 더미 데이터 시드 (`src/lib/dummy.ts`)
+- [x] 교대 프로토콜 문서 (`CLAUDE.md`, `AGENTS.md`)
+
+### M1 — 더미 기반 UI ✅
+
+- [x] Home — 오늘의 실마리 / 이어서 탐험 / 추천 / 큐레이터 활동
+- [x] Explore — 검색 + 타입 탭 + 결과 그리드
+- [x] Create — 실마리 / 관점 / 기록 / 컬렉션 / 링크
+- [x] Map — 그래프 뷰 + 필터 칩
+- [x] Profile — 사용자 정보 + 카운트 + 파트너 배지
+- [x] Thread 상세 — 관점 탭 / 연결 / 기록 / 컬렉션 / 출처
+- [x] 공용 컴포넌트 — ThreadCard, PerspectiveCard, FilterChip, EmptyState
+
+### M2 — Supabase 실제 연결 (진행 중 — `## Now` 가 이 마일스톤)
+
+- [ ] Supabase 프로젝트 생성 + 스키마 적용  *(프로젝트는 생성됨: gqvjpfoxktueiclhpjlu)*
+- [ ] Auth (이메일 매직링크)
+- [ ] `threads` CRUD 서버 액션
+- [ ] `perspectives` CRUD 서버 액션
+- [ ] `records` CRUD 서버 액션
+- [ ] `connections` 생성 / 그래프 조회
+- [ ] `collections` + `collection_items`
+- [ ] `bookmarks` / `reactions` 토글
+- [ ] `user_thread_activity` 집계
+
+### M3 — 큐레이션 / 검증 흐름
+
+- [ ] Thread 상태 머신: `local` → `community` → `verified` → `official`
+- [ ] 중복 실마리 병합(`merged`) UX
+- [ ] 파트너 큐레이터 배지 노출
+- [ ] 신뢰 점수 / 검토 이력 표시
+
+### M4 — 지도 (Map) 고도화
+
+- [ ] React Flow 기반 실제 그래프 (실데이터 바인딩)
+- [ ] 좋아요 / 저장 / 기록 / 컬렉션 필터
+- [ ] 노드 클러스터링
+- [ ] 노드 더블클릭 → Thread 상세
+- [ ] 지도 공유 링크
+
+### M5 — 탐험 경험
+
+- [ ] "이어서 탐험" 추천 로직
+- [ ] 출처(`sources`) 자동 임베드
+- [ ] 검색 — 풀텍스트 / 별칭 / 임베딩
+- [ ] 알림 — 내가 저장한 실마리에 새 관점이 붙었을 때
+
+### Tech debt / 운영
+
+- [ ] e2e 시드 데이터 스크립트
+- [ ] Vercel 배포 + 환경변수 설정
+- [ ] 에러 / 빈 상태 UI 컴포넌트화
+- [ ] 다크 모드 토큰화
