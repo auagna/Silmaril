@@ -21,16 +21,26 @@
 
 - [x] **UX Research Sprint** (Lazyweb 증거) — 탐험/그래프/컬렉션/큐레이터 4문서 + 결론 + **UX Principles v1**.
       → `docs/ux-research/`. 핵심: 실마릴=디자이너 취향 지도(≈Are.na), 그래프는 로컬·보조, 저장=1급 동사.
-- [x] **W1. Silmaril 모바일 와이어프레임 v1.** (b: 클릭 가능한 lo-fi HTML)
-      `docs/wireframes/silmaril-mobile-v1.html` — 5화면(탐험/상세/컬렉션/로컬그래프/큐레이터) + 원칙 주석.
-      file:// 더블클릭으로 열림(의존성 없음). **다음: 사용자 흐름 검토 → 피드백 반영(v2) → D1.**
-- [ ] **D1. 디자인 시스템 + 전역 셸.** (와이어프레임 확정 후) 색/타이포/간격/radius 토큰 + Nav/`ui/*`.
-      Lazyweb 네이티브 도구(`mcp__lazyweb__*`) 로드 확인됨 → 실앱 토큰 레퍼런스 수집에 사용.
+- [x] **W1. 모바일 와이어프레임 v1.** `docs/wireframes/silmaril-mobile-v1.html` (5화면, 원칙 주석).
+- [ ] **W2. 모바일 와이어프레임 v2 — v2 방향 반영.**  ← **다음 작업**
+      **D-013 / [silmaril-v2-direction.md](docs/silmaril-v2-direction.md) 기준.** 내비 = Home/Search/**Explore=Atlas**/Records/Profile.
+      신규 핵심: **Atlas**(어두운 세계+노드), **Fog**(`???` 미지영역), Exploration Progress, AI-seed 시드 표시.
+      Collections 는 Records 안. v1의 상세(연결우선)·저장 패턴은 유지.
+- [ ] **D1. 디자인 시스템 + 전역 셸.** (W2 확정 후) **shadcn/ui 도입(D-013)** + 색/타이포/간격 토큰 + 5탭 Nav.
+      Lazyweb(`mcp__lazyweb__*`)로 톤 레퍼런스 수집. 톤: Are.na처럼 조용히, Atlas는 어둡고 탐험적.
       Lazyweb 네이티브 도구는 재시작+서버 승인 후 `mcp__lazyweb__*` 로 사용. (참고: [[lazyweb-ui-reference]])
 
-### ⚪ 개발 트랙 (디자인 확정까지 대기)
+### ⚪ 개발 트랙 (디자인 확정까지 대기) — v2 MVP 우선순위 (D-013)
 
-- [ ] **N6. Perspective 작성.** (페이지 하나·관점 여럿 — 바이라인 레이어, Genius 모델)
+> **Must:** Thread Pages · Search · Save · Collections · Connections · **Atlas** · **Basic AI Wiki**
+> **Should:** Notes · **Perspectives** · User Profiles  ·  **Won't(MVP):** Curator Economy · Globe · NOU HAUS · Advanced AI
+> 기존 완료(인증·Create Thread)는 유지. 내비/Explore=Atlas/Records 재배치는 W2 확정 후.
+
+- [ ] **Atlas v0** — Explore 탭에 어두운 캔버스 + 저장 노드 + Fog(`???`) (Graph 모드부터).
+- [ ] **Basic AI Wiki** — 실마리 시드 생성 파이프라인 (origin='ai').
+- [ ] **Search 탭** — 타입별 실마리 검색.
+- [ ] **Records 탭** — Saved / Notes / Collections / Reviews 통합.
+- [ ] **N6. Perspective 작성.** (Should-Have로 강등 — 페이지 하나·관점 레이어, Genius 모델)
       Thread 상세에 관점 목록 + 작성 폼(`PerspectiveCreateForm`). `thread_id`/작성자 연결, `visibility='public'` 로 생성.
       *(실마릴 핵심 차별점: 페이지는 하나, 관점은 여러 개.)*
 - [ ] **N3. Thread 상세(`/threads/[id]`)를 Supabase 실데이터로 통합.**

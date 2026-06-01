@@ -60,7 +60,12 @@
 
 ## 다음 작업 = `TASKS.md` 의 `## Now` 첫 항목
 
-다음은 **W1 와이어프레임 사용자 검토 → 피드백 반영(v2)**, 그 후 **D1 디자인 시스템 + 전역 셸**.
+### ⚠️ v2 방향 전환 (D-013, 2026-06-01)
+- 정본: **[docs/silmaril-v2-direction.md](docs/silmaril-v2-direction.md)**. 충돌 시 이 문서 우선.
+- 핵심: **Atlas 가 제품 중심**(그래프는 한 모드) · **Fog**(`???` 미지영역, 추천 아님) · **AI-seed 우선**(AI Wiki→threads→connections, 빈 그래프 ❌) · **save-first**(노트 선택) · 내비 = **Home/Search/Explore(Atlas)/Records/Profile**(Create 탭 제거, Collections는 Records 안) · **Perspectives→Should** · **shadcn/ui 채택**(D-007 갱신) · NOU HAUS=future.
+- 기존 코드(인증·Create Thread)는 유지. 재배치는 W2 확정 후.
+
+다음은 **W2. 모바일 와이어프레임 v2 (v2 방향 반영)** → 사용자 검토 → **D1 디자인 시스템(shadcn)**.
 
 - W1 산출물: `docs/wireframes/silmaril-mobile-v1.html` (사용자가 브라우저로 클릭 검토 중).
 - 검토 포인트: 5개 UX 문제(정보과부하/길잃음/저장안함/중복피로/그래프안씀)를 이 흐름이 푸는가?

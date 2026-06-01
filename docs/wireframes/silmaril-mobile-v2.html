@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Silmaril — 모바일 와이어프레임 v2 (Atlas 중심)</title>
+<style>
+  :root{
+    --ink:#111; --mut:#666; --faint:#9a9a9a; --line:#cfcfcf; --line2:#e7e7e7;
+    --bg:#f3f3f1; --card:#fff; --chip:#ececec; --note:#3b5bdb; --noteBg:#eef1fe;
+    --ai:#0a7c66; --aiBg:#e6f4f0; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 80px}
+  header.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+  header.top h1{font-size:20px;margin:0;letter-spacing:-.01em}
+  header.top .sub{color:var(--mut);font-size:13px}
+  .legend{font-size:12px;color:var(--mut);background:#fff;border:1px solid var(--line2);border-radius:10px;
+    padding:12px 14px;margin:14px 0 26px;line-height:1.7}
+  .legend b{color:var(--ink)}
+  .legend .pp{display:inline-block;background:var(--noteBg);color:var(--note);border-radius:6px;padding:0 6px;margin-right:4px;font-weight:600;font-size:11px}
+
+  .stage{display:flex;gap:34px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+  .phone{width:390px;flex:0 0 390px;background:#fff;border:1px solid #bcbcbc;border-radius:34px;padding:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);position:sticky;top:20px}
+  .notch{height:26px;display:flex;justify-content:center}
+  .notch::before{content:"";width:120px;height:22px;background:#111;border-radius:0 0 16px 16px}
+  .screenName{font-size:11px;color:var(--faint);text-align:center;letter-spacing:.08em;text-transform:uppercase;margin:2px 0 6px}
+  .viewport{height:720px;overflow-y:auto;background:#fafafa;border:1px solid var(--line2);border-radius:22px;position:relative}
+  .viewport::-webkit-scrollbar{width:6px}.viewport::-webkit-scrollbar-thumb{background:#ddd;border-radius:6px}
+  .screen{display:none;padding:14px 14px 86px}
+  .screen.active{display:block}
+
+  .h{font-weight:700;letter-spacing:-.01em}
+  .muted{color:var(--mut)} .faint{color:var(--faint)}
+  .bar{height:9px;background:#e9e9e9;border-radius:5px;margin:5px 0}.bar.s{width:55%}.bar.m{width:78%}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin:10px 0}
+  .row{display:flex;gap:8px;align-items:center}
+  .between{display:flex;justify-content:space-between;align-items:center}
+  .thumb{width:46px;height:46px;border:1px dashed #bbb;border-radius:10px;flex:0 0 46px;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:10px}
+  .pill{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--mut);background:#fff}
+  .pill.k{background:#f0efea;border-color:#e2e0d8}
+  .pill.ai{background:var(--aiBg);border-color:#bfe3d8;color:var(--ai);font-weight:600}
+  .pill.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn{font-size:12px;border:1px solid var(--ink);border-radius:999px;padding:5px 11px;background:#fff;cursor:pointer}
+  .btn.solid{background:var(--ink);color:#fff}.btn.save{font-weight:700}
+  .meta{font-size:11px;color:var(--faint)}
+  .sectionLbl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin:16px 2px 6px;font-weight:700}
+  a.link,.link{color:var(--note);text-decoration:none;font-size:12px;cursor:pointer}
+  .tap{cursor:pointer}.tap:active{outline:2px solid var(--note)}
+  .note{background:var(--noteBg);border:1px dashed #b9c2f5;color:var(--note);border-radius:8px;font-size:11px;line-height:1.5;padding:6px 8px;margin:8px 0}
+  .note b{font-weight:700}
+  .note.ai{background:var(--aiBg);border-color:#bfe3d8;color:var(--ai)}
+
+  .conn{display:flex;align-items:center;gap:8px;padding:9px 2px;border-bottom:1px solid var(--line2);cursor:pointer}
+  .conn:last-child{border-bottom:0}
+  .rel{font-size:10px;color:#fff;background:#8a8f98;border-radius:5px;padding:1px 6px;flex:0 0 auto}
+  .conn .nm{font-weight:600;font-size:13px}.chev{margin-left:auto;color:#bbb}
+  .actionbar{position:sticky;bottom:48px;background:rgba(255,255,255,.96);backdrop-filter:blur(4px);border-top:1px solid var(--line);display:flex;gap:8px;padding:9px 6px;margin:14px -14px -86px}
+  .actionbar .btn{flex:1;text-align:center}
+
+  .tabbar{position:absolute;left:0;right:0;bottom:0;height:50px;background:#fff;border-top:1px solid var(--line);display:flex}
+  .tabbar button{flex:1;border:0;background:none;font-size:10px;color:var(--faint);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0}
+  .tabbar button .ic{font-size:15px;line-height:1}
+  .tabbar button.on{color:var(--ink);font-weight:700}
+  .tabbar .explore.on{color:#111}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .gcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;height:96px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
+  .gcard .gt{font-size:12px;font-weight:600}
+  .seg{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+
+  /* ===== ATLAS (dark, the heart) ===== */
+  .atlas{background:#0e1116;border-radius:18px;padding:12px;color:#e8eaed;margin-top:8px}
+  .atlas .amodes{display:flex;gap:6px;margin-bottom:8px}
+  .atlas .amode{font-size:11px;border:1px solid #2a2f3a;color:#aab2c0;border-radius:999px;padding:3px 10px;background:#161a22;cursor:pointer}
+  .atlas .amode.on{background:#e8eaed;color:#0e1116;border-color:#e8eaed;font-weight:700}
+  .atlas .amode.lock{opacity:.5}
+  .atlas .prog{font-size:11px;color:#aab2c0;margin:4px 2px}
+  .atlas .progbar{height:6px;background:#1c212b;border-radius:6px;overflow:hidden;margin-bottom:8px}
+  .atlas .progbar i{display:block;height:100%;width:18%;background:linear-gradient(90deg,#3b5bdb,#7aa2ff)}
+  .canvas{position:relative;height:330px;background:radial-gradient(120px 120px at 50% 45%, rgba(122,162,255,.18), transparent 70%), #0e1116;border:1px solid #1c212b;border-radius:12px;overflow:hidden}
+  .edge{position:absolute;height:1px;background:#2b3242;transform-origin:0 0}
+  .lnode{position:absolute;transform:translate(-50%,-50%);background:#e8eaed;color:#0e1116;border-radius:999px;font-size:11px;font-weight:600;padding:4px 9px;cursor:pointer;box-shadow:0 0 14px rgba(122,162,255,.5)}
+  .lnode.dim{background:#aeb6c2;box-shadow:none}
+  .fog{position:absolute;transform:translate(-50%,-50%);border:1px dashed #3a4150;color:#6b7governments;color:#737d8c;background:rgba(255,255,255,.03);border-radius:999px;font-size:11px;padding:4px 10px;cursor:pointer}
+  .fog:hover{color:#aab2c0;border-color:#56607a}
+  .region{position:absolute;font-size:10px;color:#4b5566;letter-spacing:.1em;text-transform:uppercase}
+  .atlas .caption{font-size:11px;color:#8a93a3;margin-top:8px;text-align:center}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;margin:8px 0}
+  .stat .n{font-size:18px;font-weight:700}.stat .l{font-size:10px;color:var(--faint)}
+  .badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;background:#f0efea;border:1px solid #e2ddcf;border-radius:999px;padding:2px 9px;color:#7a6a3a}
+  .idcombo{font-size:13px;font-weight:700;letter-spacing:-.01em}
+
+  .flowmap{font-size:12px;color:var(--mut);max-width:320px}
+  .flowmap h3{font-size:13px;margin:0 0 8px;color:var(--ink)}
+  .flowmap ol{padding-left:18px;margin:0;line-height:1.9}
+  .flowmap code{background:#ececec;border-radius:4px;padding:1px 5px;font-size:11px}
+  .delta{background:#fff;border:1px solid var(--line2);border-radius:10px;padding:10px 12px;margin-top:14px;font-size:12px;line-height:1.7}
+  .delta b{color:#b23b3b}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Silmaril · 모바일 와이어프레임 v2</h1>
+    <span class="sub">v2 방향(Atlas 중심) 반영 · lo-fi · 클릭 가능 · 기준: <code>docs/silmaril-v2-direction.md</code></span>
+  </header>
+  <div class="legend">
+    <b>v2 핵심</b> &nbsp;
+    <span class="pp">Atlas</span>제품의 감정적 중심(어두운 세계를 밝힘) ·
+    <span class="pp">Fog</span><code>???</code> 미지영역(추천 아님, 미스터리) ·
+    <span class="pp">AI-seed</span>AI가 먼저 시드, 유저가 보정 ·
+    <span class="pp">Save-first</span>저장>기록(기록 선택) ·
+    <span class="pp">Nav</span>Home·Search·<b>Explore(Atlas)</b>·Records·Profile
+  </div>
+
+  <div class="stage">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screenName" id="screenName">Home</div>
+      <div class="viewport">
+
+        <!-- ===== HOME (Discovery) ===== -->
+        <section class="screen active" data-screen="home">
+          <div class="between"><div class="h" style="font-size:17px">Discovery</div><div class="faint">◔</div></div>
+          <div class="note"><b>Atlas 진입 유도</b> Home은 발견의 입구. 저장하면 Explore의 Atlas가 밝아진다.</div>
+
+          <div class="sectionLbl">오늘의 발견</div>
+          <div class="card tap" onclick="go('detail')" style="border-width:1.5px">
+            <div class="row"><span class="pill ai">AI-seed</span><span class="meta">오늘의 실마리</span></div>
+            <div class="h" style="font-size:18px;margin:6px 0 2px">안도 타다오</div>
+            <div class="muted" style="font-size:12px">빛과 콘크리트의 건축가 — 루이스 칸, 현상학으로 이어지는 실마리.</div>
+            <div class="row" style="margin-top:8px"><span class="pill k">person</span><span class="meta">연결 12 · 저장 88</span>
+              <button class="btn save" style="margin-left:auto" onclick="openSave(event)">＋저장</button></div>
+          </div>
+
+          <div class="sectionLbl">이어서 탐험</div>
+          <div class="row" style="overflow-x:auto;gap:8px;padding-bottom:4px">
+            <div class="card tap" style="min-width:118px;margin:0" onclick="go('detail')"><div class="thumb" style="width:100%;height:44px">img</div><div style="font-size:12px;font-weight:600;margin-top:6px">루이스 칸</div><div class="meta">person</div></div>
+            <div class="card tap" style="min-width:118px;margin:0" onclick="go('detail')"><div class="thumb" style="width:100%;height:44px">img</div><div style="font-size:12px;font-weight:600;margin-top:6px">카를로 스카르파</div><div class="meta">person</div></div>
+            <div class="card" style="min-width:118px;margin:0"><div class="thumb" style="width:100%;height:44px">img</div><div style="font-size:12px;font-weight:600;margin-top:6px">현상학</div><div class="meta">movement</div></div>
+          </div>
+
+          <div class="sectionLbl">큐레이터 픽</div>
+          <div class="card tap" onclick="go('detail')"><div class="between"><div class="row"><div class="thumb">img</div><div><div style="font-weight:600;font-size:13px">브루탈리즘</div><div class="meta">@editor_yui ✦ · movement</div></div></div><button class="btn save" onclick="openSave(event)">＋저장</button></div></div>
+
+          <div class="sectionLbl">새로 생긴 실마리</div>
+          <div class="card tap" onclick="go('detail')"><div class="between"><div class="row"><div class="thumb">img</div><div><div style="font-weight:600;font-size:13px">데사우</div><div class="meta"><span class="pill ai" style="padding:0 5px">AI-seed</span> place</div></div></div><button class="btn save" onclick="openSave(event)">＋저장</button></div></div>
+
+          <div class="sheet-host"></div>
+        </section>
+
+        <!-- ===== SEARCH ===== -->
+        <section class="screen" data-screen="search">
+          <div class="h" style="font-size:17px">Search</div>
+          <div class="card" style="padding:10px"><div class="muted" style="font-size:13px">⌕ 디터 람스, 바우하우스, 베를린…</div></div>
+          <div class="note"><b>Search 독립 탭</b> 타입별로 실마리를 정확히 찾는다 (Atlas 탐험과 분리).</div>
+          <div class="seg">
+            <span class="pill on">전체</span><span class="pill">Person</span><span class="pill">Work</span><span class="pill">Movement</span>
+            <span class="pill">Place</span><span class="pill">Event</span><span class="pill">Organization</span><span class="pill">Company</span>
+            <span class="pill">Book</span><span class="pill">Film</span><span class="pill">Music</span>
+          </div>
+          <div class="sectionLbl">결과</div>
+          <div class="card tap" onclick="go('detail')"><div class="between"><div class="row"><div class="thumb">img</div><div><div style="font-weight:600;font-size:13px">바우하우스</div><div class="meta">movement · 연결 14</div></div></div><button class="btn save" onclick="openSave(event)">＋저장</button></div></div>
+          <div class="card tap" onclick="go('detail')"><div class="between"><div class="row"><div class="thumb">img</div><div><div style="font-weight:600;font-size:13px">발터 그로피우스</div><div class="meta">person · 연결 9</div></div></div><button class="btn save" onclick="openSave(event)">＋저장</button></div></div>
+        </section>
+
+        <!-- ===== EXPLORE = ATLAS (the heart) ===== -->
+        <section class="screen" data-screen="atlas">
+          <div class="between"><div class="h" style="font-size:17px">Explore — Atlas</div><span class="link" onclick="go('detail')">리스트 ⇄</span></div>
+          <div class="note"><b>★ 제품의 감정적 중심.</b> 어두운 세계를 저장으로 밝힌다. 그래프는 Atlas의 한 모드(보조).</div>
+
+          <div class="atlas">
+            <div class="amodes">
+              <span class="amode on">Graph</span>
+              <span class="amode">Cultural Map</span>
+              <span class="amode lock">Globe 🔒 future</span>
+            </div>
+            <div class="prog">내 세계 — <b style="color:#cdd5e2">18%</b> 밝힘 · 일본 41% · 독일 22% · 이탈리아 9%</div>
+            <div class="progbar"><i></i></div>
+
+            <div class="canvas">
+              <!-- regions emerging -->
+              <div class="region" style="left:14%;top:10%">일본</div>
+              <div class="region" style="left:70%;top:12%">독일</div>
+              <div class="region" style="left:60%;top:84%">이탈리아</div>
+              <!-- edges from center -->
+              <div class="edge" style="left:50%;top:46%;width:96px;transform:rotate(-160deg)"></div>
+              <div class="edge" style="left:50%;top:46%;width:104px;transform:rotate(-35deg)"></div>
+              <div class="edge" style="left:50%;top:46%;width:120px;transform:rotate(70deg)"></div>
+              <!-- lit (saved) nodes -->
+              <div class="lnode" style="left:50%;top:46%" onclick="go('detail')">안도 타다오</div>
+              <div class="lnode dim" style="left:24%;top:34%" onclick="go('detail')">루이스 칸</div>
+              <div class="lnode dim" style="left:78%;top:34%" onclick="go('detail')">카를로 스카르파</div>
+              <!-- fog (mysteries) -->
+              <div class="fog" style="left:72%;top:74%" onclick="unlock(this)">??? <span style="opacity:.6">이탈리아</span></div>
+              <div class="fog" style="left:20%;top:72%" onclick="unlock(this)">???</div>
+              <div class="fog" style="left:50%;top:86%" onclick="unlock(this)">??? <span style="opacity:.6">현상학?</span></div>
+            </div>
+            <div class="caption">밝은 노드 = 저장함 · <b style="color:#9aa3b2">???</b> = Fog(미지). 탭하면 밝혀지고 그 너머가 또 안개로.</div>
+          </div>
+
+          <div class="note" style="margin-top:12px"><b>Fog ≠ 추천.</b> "저기 뭐가 있을까?"의 미스터리. 탐험 > 추천.</div>
+          <div class="sectionLbl">안개 속 실마리 · 3</div>
+          <div class="card tap" onclick="unlockCard(this)"><div class="between"><div class="row"><div class="thumb">?</div><div><div style="font-weight:600;font-size:13px">??? 이탈리아 베네치아 근처</div><div class="meta">밝히려면 탭</div></div></div><span class="faint">↯</span></div></div>
+        </section>
+
+        <!-- ===== DETAIL ===== -->
+        <section class="screen" data-screen="detail">
+          <div class="row"><span class="link" onclick="go('home')">← 뒤로</span></div>
+          <div class="thumb" style="width:100%;height:118px;margin-top:8px">cover</div>
+          <div class="h" style="font-size:22px;margin-top:10px">안도 타다오</div>
+          <div class="row" style="margin-top:4px"><span class="pill k">person</span><span class="pill ai">AI-seed</span><span class="meta">별칭: Tadao Ando</span></div>
+
+          <div class="note"><b>연결 먼저(P2)</b> 본문(AI Wiki)보다 연결을 위에. 상세는 "무엇과 이어지나"로 연다.</div>
+          <div class="sectionLbl">연결 · 12 <span class="faint" style="font-weight:400;text-transform:none">· AI가 시드, 유저가 보정</span></div>
+          <div class="card" style="padding:4px 12px">
+            <div class="conn" onclick="go('detail')"><span class="rel">influenced_by</span><span class="nm">루이스 칸</span><span class="chev">›</span></div>
+            <div class="conn" onclick="go('detail')"><span class="rel">contemporary</span><span class="nm">카를로 스카르파</span><span class="chev">›</span></div>
+            <div class="conn" onclick="go('detail')"><span class="rel">part_of</span><span class="nm">현상학</span><span class="chev">›</span></div>
+          </div>
+          <div class="row" style="justify-content:space-between"><span class="link" onclick="go('atlas')">↳ Atlas에서 보기</span><span class="meta">전체 12 ›</span></div>
+
+          <div class="sectionLbl">AI Wiki <span class="faint" style="font-weight:400;text-transform:none">(접힘)</span></div>
+          <div class="note ai"><b>AI-seed</b> 본문은 AI가 먼저 쓴 초안. 유저가 관점/보정 추가. 읽고 싶을 때만 펼침.</div>
+          <div class="card tap" style="padding:11px"><div class="between"><span style="font-size:13px;font-weight:600">"빛과 노출 콘크리트로 침묵의 공간을 짓는다."</span><span class="faint">⌄</span></div><div class="bar m"></div><div class="bar s"></div></div>
+
+          <div class="sectionLbl">관점 · 2 <span class="faint" style="font-weight:400;text-transform:none">(Should-have)</span></div>
+          <div class="card"><div style="font-size:13px;font-weight:600">"안도는 칸의 침묵을 동양으로 번역했다."</div><div class="meta tap" onclick="go('profile')" style="margin-top:6px">— @minlab · 저장 24</div></div>
+
+          <div class="actionbar">
+            <button class="btn solid save" onclick="openSave(event)">＋ 저장</button>
+            <button class="btn" onclick="go('records')">컬렉션</button>
+            <button class="btn">관점</button><button class="btn">⋯</button>
+          </div>
+          <div class="sheet-host"></div>
+        </section>
+
+        <!-- ===== RECORDS (archive; collections live here) ===== -->
+        <section class="screen" data-screen="records">
+          <div class="h" style="font-size:17px">Records</div>
+          <div class="note"><b>아카이브 = Records</b> Saved / Notes / <b>Collections</b> / Reviews 모두 여기. (Collections 별도 탭 ❌)</div>
+          <div class="seg"><span class="pill on">Saved</span><span class="pill">Notes</span><span class="pill">Collections</span><span class="pill">Reviews</span></div>
+
+          <div class="sectionLbl">Collections</div>
+          <div class="grid2">
+            <div class="gcard tap" onclick="go('detail')"><div class="thumb" style="width:100%;height:38px">img</div><div class="gt">일본 건축 순례</div><div class="meta">실마리 8</div></div>
+            <div class="gcard tap" onclick="go('detail')"><div class="thumb" style="width:100%;height:38px">img</div><div class="gt">빛의 건축</div><div class="meta">실마리 5</div></div>
+          </div>
+          <div class="sectionLbl">Saved (최근)</div>
+          <div class="card tap" onclick="go('detail')"><div class="row"><div class="thumb">img</div><div><div style="font-weight:600;font-size:13px">루이스 칸</div><div class="meta">person · 3일 전</div></div></div></div>
+          <div class="note" style="margin-top:10px"><b>Save-first</b> 기록(Notes/Reviews)은 비어 있어도 괜찮다 — 선택. 저장만으로 지도가 자란다.</div>
+        </section>
+
+        <!-- ===== PROFILE ===== -->
+        <section class="screen" data-screen="profile">
+          <div class="h" style="font-size:17px">Profile</div>
+          <div class="row" style="margin-top:10px;gap:12px"><div class="thumb" style="width:60px;height:60px;border-radius:50%">img</div>
+            <div><div class="h" style="font-size:18px">@yujin</div><div class="idcombo" style="margin-top:3px">Architect × Discoverer</div><div class="meta">탐험 정체성 (future, 행동 기반)</div></div></div>
+
+          <div class="sectionLbl">탐험 통계</div>
+          <div class="card"><div class="stats">
+            <div class="stat"><div class="n">38</div><div class="l">발견</div></div>
+            <div class="stat"><div class="n">92</div><div class="l">연결</div></div>
+            <div class="stat"><div class="n">7</div><div class="l">컬렉션</div></div>
+            <div class="stat"><div class="n">18%</div><div class="l">세계 밝힘</div></div>
+          </div></div>
+
+          <div class="sectionLbl">밝힌 세계 (Cultural Map 미리보기)</div>
+          <div class="card"><div class="row" style="justify-content:space-between"><span style="font-size:12px">일본</span><span class="meta">41%</span></div><div class="bar" style="width:41%"></div>
+            <div class="row" style="justify-content:space-between"><span style="font-size:12px">독일</span><span class="meta">22%</span></div><div class="bar" style="width:22%"></div></div>
+
+          <div class="sectionLbl">배지</div>
+          <div class="row"><span class="badge">✦ 파트너 큐레이터 (future)</span><span class="badge">🗺 첫 지도</span></div>
+        </section>
+
+      </div><!-- /viewport -->
+
+      <div class="tabbar">
+        <button data-tab="home" class="on" onclick="go('home')"><span class="ic">⌂</span>Home</button>
+        <button data-tab="search" onclick="go('search')"><span class="ic">⌕</span>Search</button>
+        <button data-tab="atlas" class="explore" onclick="go('atlas')"><span class="ic">✦</span>Explore</button>
+        <button data-tab="records" onclick="go('records')"><span class="ic">▤</span>Records</button>
+        <button data-tab="profile" onclick="go('profile')"><span class="ic">◔</span>Profile</button>
+      </div>
+    </div>
+
+    <div class="flowmap">
+      <h3>v2 · 5탭 + Atlas 중심</h3>
+      <ol>
+        <li><b>Home</b> — Discovery(오늘의 발견·이어보기·큐레이터픽·신규). AI-seed 칩.</li>
+        <li><b>Search</b> — 타입별 실마리 찾기(독립 탭).</li>
+        <li><b>Explore = Atlas ★</b> — 어두운 세계 + 저장 노드 + <b>Fog(???)</b> + 진행률 + 모드(Graph/Cultural Map/Globe🔒).</li>
+        <li><b>Detail</b> — 연결 먼저 + AI Wiki(접힘) + 관점(Should).</li>
+        <li><b>Records</b> — Saved/Notes/<b>Collections</b>/Reviews (컬렉션 여기).</li>
+        <li><b>Profile</b> — 탐험 정체성 + 통계 + 밝힌 세계.</li>
+      </ol>
+      <p style="margin-top:12px">눌러볼 것: Home 카드→Detail · Detail 연결→다른 실마리 · <b>Atlas의 ???(Fog) 탭→밝히기</b> · Detail "Atlas에서 보기" · ＋저장.</p>
+      <div class="delta">
+        <b>v1 대비 변경</b><br>
+        · Map(그래프) → <b>Explore=Atlas</b> 승격, 그래프는 한 모드<br>
+        · <b>Fog/진행률/문화맵</b> 신규 (어두운 세계를 밝히는 감정)<br>
+        · Create 탭 제거 · <b>Search</b> 독립 · Collections는 Records 안<br>
+        · <b>AI-seed</b> 칩 표시 (AI가 먼저, 유저가 보정)<br>
+        · Perspectives → Should-have(가볍게)
+      </div>
+      <p style="margin-top:12px;color:var(--faint)">v2 의도: "정보 정리"가 아니라 <b>"내 세계를 밝힌다"</b>는 감정. OK면 D1(shadcn 토큰)으로.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function go(name){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.dataset.screen===name));
+    document.querySelectorAll('.tabbar [data-tab]').forEach(b=>b.classList.toggle('on', b.dataset.tab===name));
+    var labels={home:'Home',search:'Search',atlas:'Explore — Atlas',detail:'실마리 상세',records:'Records',profile:'Profile'};
+    document.getElementById('screenName').textContent=labels[name]||name;
+    closeSave(); var vp=document.querySelector('.viewport'); if(vp) vp.scrollTop=0;
+  }
+  function unlock(el){ el.outerHTML='<div class="lnode dim" style="left:'+el.style.left+';top:'+el.style.top+'" onclick="go(\'detail\')">새 실마리</div>'; }
+  function unlockCard(el){ el.querySelector('.thumb').textContent='✦'; el.querySelector('div[style*="font-weight:600"]').textContent='베네치아 (밝혀짐)'; el.querySelector('.meta').textContent='place · Atlas에 추가됨'; }
+  // simple save sheet (created per active screen)
+  function openSave(e){ if(e) e.stopPropagation();
+    var host=document.querySelector('.screen.active .sheet-host'); if(!host) return;
+    host.innerHTML='<div style="position:absolute;left:8px;right:8px;bottom:56px;background:#fff;border:1px solid #cfcfcf;border-radius:16px;padding:12px;box-shadow:0 -6px 24px rgba(0,0,0,.12)">'
+      +'<div class="between"><b style="font-size:13px">저장됨 ✓</b><span class="link" onclick="closeSave()">닫기</span></div>'
+      +'<div class="note" style="margin:8px 0"><b>Save-first</b> 저장 완료. Atlas가 한 칸 더 밝아짐. 컬렉션 정리는 선택.</div>'
+      +'<div class="row" style="gap:6px;flex-wrap:wrap"><span class="pill tap" onclick="go(\'records\')">일본 건축 순례</span><span class="pill">＋ 새 컬렉션</span></div></div>';
+  }
+  function closeSave(){ document.querySelectorAll('.sheet-host').forEach(h=>h.innerHTML=''); }
+</script>
+</body>
+</html>

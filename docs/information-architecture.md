@@ -1,6 +1,28 @@
 # Information Architecture — Silmaril
 
-## 1. 라우팅 트리
+> ⚠️ **v2 방향 전환 적용 중 (D-013).** 최상위 정본은 [silmaril-v2-direction.md](./silmaril-v2-direction.md).
+> 내비게이션은 아래 **§0 (v2)** 를 따른다. 이하 §1~ 의 기존 트리는 점진적으로 v2로 이행한다.
+
+## 0. 내비게이션 (v2 확정) — 모바일 하단 탭
+
+```
+[ Home ]   [ Search ]   [ ✦ Explore = Atlas ]   [ Records ]   [ Profile ]
+```
+
+| 탭 | 라우트(예정) | 역할 / 포함 |
+|----|------|------|
+| **Home** | `/` | Discovery: Daily Discovery · Continue Exploring · Curator Picks · Newly Created |
+| **Search** | `/search` | Find Threads (타입별) |
+| **Explore** | `/explore` | **메인 = Atlas** (Graph / Cultural Map / Globe-future) · **Fog** · Exploration Progress · Unlock Paths |
+| **Records** | `/records` | Saved · Notes · **Collections** · Reviews |
+| **Profile** | `/profile` | Taste Profile · Exploration Stats · Reports · Badges |
+
+- **Create 탭 없음.** 실마리는 주로 AI Wiki 가 시드하고, 유저 생성은 컨텍스트 진입(예: Atlas 의 Fog 채우기, Records 에서)으로.
+- **Collections 는 Records 안.** 별도 탭으로 만들지 않는다.
+
+---
+
+## 1. 라우팅 트리 (레거시 — v2로 이행 중)
 
 ```
 /                              Home

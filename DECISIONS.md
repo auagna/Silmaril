@@ -4,6 +4,22 @@
 
 ---
 
+## 2026-06-01 · D-013 · v2 방향 전환 — Atlas 중심 / Fog / AI-seed / 새 내비
+
+- **맥락:** 제품 방향을 재정의하는 종합 스펙 입력. 기존 일부 결정과 충돌.
+- **결정 (정본: [docs/silmaril-v2-direction.md](docs/silmaril-v2-direction.md)):**
+  1. **Atlas 가 제품의 감정적 중심.** 그래프는 Atlas 의 한 모드(보조). Atlas = Graph / Cultural Map / Globe(future).
+  2. **Fog 시스템 신규** — 발견 주변에 `???` 미지영역(추천 아님, 미스터리). 탐험 > 추천.
+  3. **AI-seed 우선** — AI Wiki 가 먼저 Threads/Connections/Graph 를 생성, 유저는 나중에 보정. (유저 생성 그래프 의존 ❌.) → **D-002 보완:** 유저의 `local` 생성은 여전히 막지 않되, 빈 그래프로 시작하지 않는다.
+  4. **Save-and-explore first** — note-first 아님. 기록은 항상 선택.
+  5. **내비 변경** — Home / Search / Explore(=Atlas) / Records / Profile. `Create` 탭 제거, `Map`→`Explore` 승격, `Search` 독립. **Collections 는 Records 안** (별도 탭 ❌).
+  6. **MVP 재정의** — Must: Thread/Search/Save/Collections/Connections/**Atlas**/**Basic AI Wiki**. **Perspectives → Should-Have** (핵심에서 강등). Curator/Globe/NOU HAUS → future.
+  7. **shadcn/ui 채택** — **D-007("Tailwind-only 시작") 갱신.** 단, 톤(조용한 탐험 도구)을 라이브러리 기본 모양에 끌려가지 않게 유지.
+  8. **NOU HAUS** = 미래 자매 제품(Output형). MVP 미구현, 확장 포인트만.
+  9. Thread 타입에서 `media` 제거 → 10종.
+- **결과:** 기존 코드(인증·Create Thread)는 유지하되, 내비/Explore=Atlas/Records로의 재배치는 디자인(W2 와이어프레임) 확정 후 단계적으로. 이번 턴엔 문서·와이어프레임만.
+- **재고할 시점:** AI Wiki 생성 비용/품질이 MVP에 안 맞으면 시드 범위 축소.
+
 ## 2026-06-01 · D-012 · 개발 일시정지 → UX Research Sprint → 원칙 확정
 
 - **맥락:** 기능(인증·생성)은 붙었지만 UX가 미확정. 더 짜면 "위키+인스타+그래프"가 섞인 애매한 앱 위험. 디자이너 타겟인데 톤도 기본 폼.

@@ -1,5 +1,10 @@
 # Product Spec — Silmaril
 
+> ⚠️ **v2 방향 전환 (D-013) 적용 중.** 최상위 정본 = [silmaril-v2-direction.md](./silmaril-v2-direction.md).
+> 충돌 시 v2 문서 우선. 핵심 변경: **Atlas 가 제품 중심**, **Fog**, **AI-seed 우선**, **save-first**,
+> 내비 = Home/Search/Explore(Atlas)/Records/Profile, Perspectives→Should-Have, shadcn/ui 채택.
+> 아래 본문은 배경/세부로 유지하되, 화면·내비·MVP 우선순위는 v2 문서를 따른다.
+
 ## 1. 한 줄 정의
 
 **연결된 실마리(Thread)를 따라 탐구하며 자신만의 지도(Map)를 만드는 아카이빙 플랫폼.**

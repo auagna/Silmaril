@@ -1,5 +1,7 @@
 # Data Model — Silmaril
 
+> ⚠️ **v2 (D-013) 추가 개념은 §12 참고.** 정본 = [silmaril-v2-direction.md](./silmaril-v2-direction.md).
+
 ## 1. 도메인 다이어그램 (논리)
 
 ```
@@ -181,3 +183,29 @@ score(thread) =
 - `bookmarks (user_id)` / `(thread_id)`
 - GIN on `threads.aliases` — 별칭 검색
 - GIN/trigram on `threads.title` — 부분 매칭 검색
+
+## 12. v2 추가 개념 (D-013) — Atlas / Fog / AI-seed
+
+> 스키마 확정은 W2 와이어프레임 + Atlas 설계 후. 여기서는 데이터 의도만.
+
+### 12.1 AI-seed (threads/connections 출처 구분)
+- `threads.origin`: `ai` | `user` | `curator` (신규 enum 후보). AI Wiki 가 시드한 실마리/연결을 구분.
+- 기존 `created_by` 는 유지하되, AI 시드는 시스템 유저 또는 `origin='ai'` 로 표시.
+- 흐름: **AI Wiki → threads(origin=ai, status≈community) → connections(origin=ai) → 유저가 보정/추가.**
+- 빈 그래프로 시작하지 않는다 (D-013). 유저 `local` 생성은 여전히 허용(D-002).
+
+### 12.2 Atlas / Exploration progress
+- Atlas 는 **뷰**다(별도 거대 테이블 아님). 소스 = `bookmarks` + `connections` + `user_thread_activity`.
+- `user_exploration` (집계, 신규 후보): `user_id`, `region/culture/movement` 차원별 `discovered_count`, `total_estimate`, `progress`(%) — Globe/Cultural Map 용.
+- Atlas 모드: Graph(연결) / Cultural Map(지역·사조 차원) / Globe(future).
+
+### 12.3 Fog (미지 영역)
+- Fog 는 저장된 실마리의 **이웃 중 아직 본/저장 안 한** 노드를 `???`로 노출 (추천 아님, 미스터리).
+- 데이터: `connections` 에서 발견된 이웃 − (`bookmarks` ∪ `user_thread_activity.view`) 차집합.
+- "Unlock path": Fog 노드를 열면 그 이웃이 다시 Fog 로 확장 → 호기심 루프.
+
+### 12.4 Taste Identity (future)
+- `user_taste` (future): Architect/Discoverer/Curator/Critic/Evangelist 점수 — 탐험 *행동* 집계로 산출 (MBTI 아님).
+
+### 12.5 NOU HAUS 확장 포인트 (MVP 미구현)
+- 미래 통합만 고려: thread → "skill/course" 매핑 테이블 자리만 비워둠. MVP 스키마에 넣지 않는다.

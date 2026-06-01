@@ -1,6 +1,8 @@
 # Silmaril
 
-> 연결된 실마리를 따라 탐구하며 자신만의 지도를 만드는 아카이빙 플랫폼.
+> 연결된 실마리를 따라 탐험하며 자신의 취향을 발견하고, **Atlas**(개인 탐험 지도)를 지어 미지의 세계를 밝혀 가는 지식 탐험 플랫폼.
+>
+> 📍 **제품 방향 정본: [docs/silmaril-v2-direction.md](docs/silmaril-v2-direction.md)** (Atlas · Fog · AI-seed · save-first).
 
 Silmaril은 인물 / 작품 / 사조 / 장소 / 사건을 하나의 **실마리(Thread)** 로 다루고,
 그 실마리들 사이의 **연결(Connection)** 을 따라가며 사용자가 자신만의 지식 지도를 만들도록 돕는다.
