@@ -14,10 +14,11 @@
 **M0/M1 완료, 교대 프로토콜 수립 완료. M2 일부(Auth+Create Thread) 완료.**
 **⚠️ 개발 일시정지 (D-012). 현재는 UX 리서치 → 디자인 트랙.**
 
-### 이번에 추가된 것 (UX Research Sprint)
+### 이번에 추가된 것 (UX Research Sprint + 와이어프레임 v1)
 - Lazyweb 증거 기반 4 스프린트 → `docs/ux-research/`: exploration / graph-navigation / collections / curator-system / **silmaril-ux-conclusion**.
-- 결론: 실마릴 = "디자이너 취향 지도"(≈Are.na). **UX Principles v1** + 패턴 10개 확정 (conclusion 문서).
-- Lazyweb 호출은 검증된 HTTP 채널 사용(네이티브 MCP 도구는 재시작 후 로드). 증거 데이터 동일.
+- 결론: 실마릴 = "디자이너 취향 지도"(≈Are.na). **UX Principles v1** + 패턴 10개 확정.
+- **W1 모바일 와이어프레임 v1**: `docs/wireframes/silmaril-mobile-v1.html` (클릭 가능 lo-fi, 5화면, 원칙 주석). file:// 로 열림.
+- Lazyweb 네이티브 도구(`mcp__lazyweb__*`) 재시작 후 **로드·health 확인 완료**. (HTTP 채널도 여전히 사용 가능.)
 
 ### 이번에 추가된 것 (Create Thread)
 - `/create/thread` 실마리 생성 폼 (title/type/summary/body/status[local|community]).
@@ -59,14 +60,15 @@
 
 ## 다음 작업 = `TASKS.md` 의 `## Now` 첫 항목
 
-다음 에이전트는 **W1. Silmaril 모바일 와이어프레임 v1** 부터 시작한다. **개발 아님.**
+다음은 **W1 와이어프레임 사용자 검토 → 피드백 반영(v2)**, 그 후 **D1 디자인 시스템 + 전역 셸**.
 
-- 기준 문서: `docs/ux-research/silmaril-ux-conclusion.md` (UX Principles v1 + 패턴 10). 이게 상위 기준.
-- 화면 우선순위: 탐험 피드 → 실마리 상세(연결 우선) → 저장/컬렉션 → 로컬 그래프(보조) → 큐레이터/관점.
-- 산출물: lo-fi 와이어프레임(문서 또는 단일 HTML 목업). 절대 "예쁜 UI"가 아니라 **구조/흐름**을 잡는다.
-- 핵심 제약(원칙에서): 연결을 정보보다 먼저 / 저장은 한 탭 / 그래프는 보조 / 한 페이지·관점 레이어 / 생성 무브레이크.
-- 그 다음에야 D1(디자인 시스템·셸) → Figma → 코드. 개발 트랙(N6 Perspective 등)은 디자인 확정까지 대기.
-- Lazyweb: 추가 레퍼런스 필요 시 검증된 HTTP 채널 또는 재시작 후 `mcp__lazyweb__*`. 토큰은 [[lazyweb-ui-reference]] — **공개 레포 커밋 금지.**
+- W1 산출물: `docs/wireframes/silmaril-mobile-v1.html` (사용자가 브라우저로 클릭 검토 중).
+- 검토 포인트: 5개 UX 문제(정보과부하/길잃음/저장안함/중복피로/그래프안씀)를 이 흐름이 푸는가?
+- 피드백 들어오면 같은 HTML을 v2로 수정 (구조 먼저, 시각은 D1).
+- **D1 (와이어프레임 확정 후):** `tailwind.config.ts`(색/타이포/간격/radius) + `globals.css` + `Nav` + `components/ui/*`. 화면 로직 말고 토큰/셸만 먼저.
+  - 실앱 토큰 레퍼런스는 `mcp__lazyweb__lazyweb_search`(로드·검증됨)로 수집. 톤: Are.na처럼 조용히 / Apple HIG 여백.
+- 개발 트랙(N6 Perspective 등)은 디자인 확정까지 대기.
+- Lazyweb 토큰 주의: [[lazyweb-ui-reference]] — `.mcp.json`/`.lazyweb/` gitignore됨, **공개 레포 커밋 금지.**
 
 **전제 (사람이 1회):**
 - Supabase 프로젝트 **`gqvjpfoxktueiclhpjlu`** 가 생성됨 (URL: `https://gqvjpfoxktueiclhpjlu.supabase.co`).

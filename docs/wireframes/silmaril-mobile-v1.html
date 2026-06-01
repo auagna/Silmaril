@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Silmaril — 모바일 와이어프레임 v1 (lo-fi)</title>
+<style>
+  /* ---- lo-fi wireframe: 일부러 무채색/단순. 시각 디자인은 D1에서. ---- */
+  :root{
+    --ink:#111; --mut:#666; --faint:#9a9a9a; --line:#cfcfcf; --line2:#e4e4e4;
+    --bg:#f3f3f1; --card:#fff; --chip:#ececec; --note:#3b5bdb; --noteBg:#eef1fe;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 80px;}
+  header.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+  header.top h1{font-size:20px;margin:0;letter-spacing:-.01em}
+  header.top .sub{color:var(--mut);font-size:13px}
+  .legend{font-size:12px;color:var(--mut);background:#fff;border:1px solid var(--line2);
+    border-radius:10px;padding:12px 14px;margin:14px 0 26px;line-height:1.7}
+  .legend b{color:var(--ink)}
+  .legend .pp{display:inline-block;background:var(--noteBg);color:var(--note);border-radius:6px;
+    padding:0 6px;margin-right:4px;font-weight:600;font-size:11px}
+
+  .stage{display:flex;gap:34px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+
+  /* phone */
+  .phone{width:390px;flex:0 0 390px;background:#fff;border:1px solid #bcbcbc;border-radius:34px;
+    padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.08);position:sticky;top:20px}
+  .notch{height:26px;display:flex;justify-content:center}
+  .notch::before{content:"";width:120px;height:22px;background:#111;border-radius:0 0 16px 16px}
+  .screenName{font-size:11px;color:var(--faint);text-align:center;letter-spacing:.08em;text-transform:uppercase;margin:2px 0 6px}
+  .viewport{height:720px;overflow-y:auto;background:#fafafa;border:1px solid var(--line2);border-radius:22px;position:relative}
+  .viewport::-webkit-scrollbar{width:6px}.viewport::-webkit-scrollbar-thumb{background:#ddd;border-radius:6px}
+
+  .screen{display:none;padding:14px 14px 86px}
+  .screen.active{display:block}
+
+  /* generic lo-fi atoms */
+  .h{font-weight:700;letter-spacing:-.01em}
+  .muted{color:var(--mut)} .faint{color:var(--faint)}
+  .bar{height:9px;background:#e9e9e9;border-radius:5px;margin:5px 0}
+  .bar.s{width:55%} .bar.m{width:78%}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin:10px 0}
+  .row{display:flex;gap:8px;align-items:center}
+  .between{display:flex;justify-content:space-between;align-items:center}
+  .thumb{width:46px;height:46px;border:1px dashed #bbb;border-radius:10px;flex:0 0 46px;
+    display:flex;align-items:center;justify-content:center;color:#bbb;font-size:10px}
+  .pill{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--mut);background:#fff}
+  .pill.k{background:#f0efea;border-color:#e2e0d8}
+  .btn{font-size:12px;border:1px solid var(--ink);border-radius:999px;padding:5px 11px;background:#fff;cursor:pointer}
+  .btn.solid{background:var(--ink);color:#fff}
+  .btn.save{font-weight:700}
+  .meta{font-size:11px;color:var(--faint)}
+  .sectionLbl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin:16px 2px 6px;font-weight:700}
+  a.link{color:var(--note);text-decoration:none;font-size:12px;cursor:pointer}
+  .tap{cursor:pointer}
+  .tap:active{outline:2px solid var(--note)}
+
+  /* annotation chips inside screens */
+  .note{background:var(--noteBg);border:1px dashed #b9c2f5;color:var(--note);border-radius:8px;
+    font-size:11px;line-height:1.5;padding:6px 8px;margin:8px 0}
+  .note b{font-weight:700}
+
+  /* connection list */
+  .conn{display:flex;align-items:center;gap:8px;padding:9px 2px;border-bottom:1px solid var(--line2);cursor:pointer}
+  .conn:last-child{border-bottom:0}
+  .rel{font-size:10px;color:#fff;background:#8a8f98;border-radius:5px;padding:1px 6px;flex:0 0 auto}
+  .conn .nm{font-weight:600;font-size:13px}
+  .chev{margin-left:auto;color:#bbb}
+
+  /* sticky action bar inside detail */
+  .actionbar{position:sticky;bottom:48px;background:rgba(255,255,255,.96);backdrop-filter:blur(4px);
+    border-top:1px solid var(--line);display:flex;gap:8px;padding:9px 6px;margin:14px -14px -86px}
+  .actionbar .btn{flex:1;text-align:center}
+
+  /* tab bar */
+  .tabbar{position:absolute;left:0;right:0;bottom:0;height:48px;background:#fff;border-top:1px solid var(--line);
+    display:flex}
+  .tabbar button{flex:1;border:0;background:none;font-size:10px;color:var(--faint);cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0}
+  .tabbar button .ic{font-size:16px;line-height:1}
+  .tabbar button.on{color:var(--ink);font-weight:700}
+  .tabbar .plus{color:#fff}
+  .tabbar .plus .ic{background:var(--ink);color:#fff;width:30px;height:30px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:18px}
+
+  /* grid for collection */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .gcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;height:96px;
+    display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
+  .gcard .gt{font-size:12px;font-weight:600}
+
+  /* save sheet */
+  .sheet{position:absolute;left:8px;right:8px;bottom:56px;background:#fff;border:1px solid var(--line);
+    border-radius:16px;padding:12px;box-shadow:0 -6px 24px rgba(0,0,0,.12);display:none}
+  .sheet.show{display:block}
+
+  /* graph */
+  .graphbox{position:relative;height:300px;background:#fff;border:1px solid var(--line);border-radius:12px;margin:8px 0;overflow:hidden}
+  .node{position:absolute;transform:translate(-50%,-50%);background:#fff;border:1px solid #999;border-radius:999px;
+    font-size:11px;padding:4px 9px;cursor:pointer;white-space:nowrap}
+  .node.center{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:700}
+  .edge{position:absolute;height:1px;background:#cbcbcb;transform-origin:0 0}
+  .edgelbl{position:absolute;font-size:9px;color:#999;background:#fafafa;padding:0 3px;transform:translate(-50%,-50%)}
+
+  /* profile stats */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;margin:8px 0}
+  .stat .n{font-size:18px;font-weight:700}
+  .stat .l{font-size:10px;color:var(--faint)}
+  .badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;background:#f0efea;border:1px solid #e2ddcf;
+    border-radius:999px;padding:2px 9px;color:#7a6a3a}
+
+  .flowmap{font-size:12px;color:var(--mut);max-width:320px}
+  .flowmap h3{font-size:13px;margin:0 0 8px;color:var(--ink)}
+  .flowmap ol{padding-left:18px;margin:0;line-height:1.9}
+  .flowmap code{background:#ececec;border-radius:4px;padding:1px 5px;font-size:11px}
+  .hint{font-size:12px;color:var(--mut);text-align:center;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Silmaril · 모바일 와이어프레임 v1</h1>
+    <span class="sub">lo-fi · 클릭 가능 · 시각 디자인 아님(구조/흐름 검증용) · 기준: <code>docs/ux-research/silmaril-ux-conclusion.md</code></span>
+  </header>
+
+  <div class="legend">
+    <b>UX Principles v1</b> (파란 칩 = 화면에 적용된 위치) &nbsp;
+    <span class="pp">P1</span>실마리 하나·관점 여럿 ·
+    <span class="pp">P2</span>연결을 정보보다 먼저 ·
+    <span class="pp">P3</span>저장은 한 탭(>좋아요) ·
+    <span class="pp">P4</span>그래프는 보조 도구 ·
+    <span class="pp">P5</span>모으기보다 지도 짓기 ·
+    <span class="pp">P6</span>권위=기여 가시성 ·
+    <span class="pp">P7</span>생성 무브레이크 ·
+    <span class="pp">P8</span>Are.na처럼 조용히
+  </div>
+
+  <div class="stage">
+    <!-- ============ PHONE ============ -->
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screenName" id="screenName">탐험</div>
+      <div class="viewport">
+
+        <!-- ===== 1. 탐험 피드 ===== -->
+        <section class="screen active" data-screen="feed">
+          <div class="between">
+            <div class="h" style="font-size:17px">탐험</div>
+            <div class="faint">⌕ &nbsp; ◔</div>
+          </div>
+
+          <div class="note"><b>P4·P8</b> 오늘의 실마리 = 단 하나의 앵커. "오늘 뭐 보지" 비용 0.</div>
+          <div class="card tap" onclick="go('detail')" style="border-width:1.5px">
+            <div class="meta">오늘의 실마리</div>
+            <div class="h" style="font-size:18px;margin:4px 0">바우하우스</div>
+            <div class="muted" style="font-size:12px">교육 혁명이자 산업화의 산물 — 하나의 실마리, 여러 관점.</div>
+            <div class="row" style="margin-top:8px">
+              <span class="pill k">movement</span>
+              <span class="meta">연결 14 · 관점 3 · 저장 92</span>
+            </div>
+          </div>
+
+          <div class="sectionLbl">이어서 탐험</div>
+          <div class="note"><b>(돌아온 사용자)</b> 콜드스타트 제거 — 마지막 지점에서 잇기.</div>
+          <div class="row" style="overflow-x:auto;gap:8px;padding-bottom:4px">
+            <div class="card tap" style="min-width:120px;margin:0" onclick="go('detail')">
+              <div class="thumb" style="width:100%;height:46px">img</div>
+              <div style="font-size:12px;font-weight:600;margin-top:6px">디터 람스</div>
+              <div class="meta">person</div>
+            </div>
+            <div class="card tap" style="min-width:120px;margin:0" onclick="go('detail')">
+              <div class="thumb" style="width:100%;height:46px">img</div>
+              <div style="font-size:12px;font-weight:600;margin-top:6px">브라운</div>
+              <div class="meta">company</div>
+            </div>
+            <div class="card" style="min-width:120px;margin:0">
+              <div class="thumb" style="width:100%;height:46px">img</div>
+              <div style="font-size:12px;font-weight:600;margin-top:6px">빛의 교회</div>
+              <div class="meta">work</div>
+            </div>
+          </div>
+
+          <div class="sectionLbl">추천 — 저장·연결 신호 기준 (좋아요 아님)</div>
+          <div class="note"><b>P3·P8</b> 카드는 "읽을 글"이 아니라 "들어가 볼 입구". 카드마다 저장 한 탭.</div>
+
+          <div class="card">
+            <div class="between">
+              <div class="row"><div class="thumb">img</div>
+                <div class="tap" onclick="go('detail')">
+                  <div style="font-weight:600;font-size:14px">모더니즘</div>
+                  <div class="meta">movement · 연결 21 · 저장 140</div>
+                </div>
+              </div>
+              <button class="btn save" onclick="openSave(event)">＋저장</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="between">
+              <div class="row"><div class="thumb">img</div>
+                <div class="tap" onclick="go('detail')">
+                  <div style="font-weight:600;font-size:14px">데이비드 보위</div>
+                  <div class="meta">person · 연결 33 · 저장 210</div>
+                </div>
+              </div>
+              <button class="btn save" onclick="openSave(event)">＋저장</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="between">
+              <div class="row"><div class="thumb">img</div>
+                <div class="tap" onclick="go('detail')">
+                  <div style="font-weight:600;font-size:14px">베를린</div>
+                  <div class="meta">place · 연결 18 · 저장 76</div>
+                </div>
+              </div>
+              <button class="btn save" onclick="openSave(event)">＋저장</button>
+            </div>
+          </div>
+
+          <!-- save sheet -->
+          <div class="sheet" id="saveSheet">
+            <div class="between"><b style="font-size:13px">저장됨 ✓</b><span class="link" onclick="closeSave()">닫기</span></div>
+            <div class="note" style="margin:8px 0"><b>P7</b> 저장은 끝났다. 컬렉션 정리는 <b>선택</b>(나중에 해도 됨).</div>
+            <div class="muted" style="font-size:12px;margin-bottom:6px">컬렉션에 담기 (선택)</div>
+            <div class="row" style="gap:6px;flex-wrap:wrap">
+              <span class="pill tap" onclick="go('collection')">바우하우스 입문</span>
+              <span class="pill tap" onclick="go('collection')">디터 람스와 애플</span>
+              <span class="pill">＋ 새 컬렉션</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 2. 실마리 상세 (연결 우선) ===== -->
+        <section class="screen" data-screen="detail">
+          <div class="row"><span class="link" onclick="go('feed')">← 탐험</span></div>
+          <div class="thumb" style="width:100%;height:120px;margin-top:8px">cover</div>
+          <div class="h" style="font-size:22px;margin-top:10px">디터 람스</div>
+          <div class="row" style="margin-top:4px">
+            <span class="pill k">person</span><span class="pill">official ✓</span>
+            <span class="meta">별칭: Dieter Rams</span>
+          </div>
+
+          <div class="note"><b>P2 핵심</b> 본문(글벽)보다 <b>연결을 먼저</b>. 상세는 "이게 무엇과 이어지나"로 열린다.</div>
+
+          <div class="sectionLbl">연결 · 14</div>
+          <div class="card" style="padding:4px 12px">
+            <div class="conn" onclick="go('detail')">
+              <span class="rel">created</span><span class="nm">SK4</span><span class="chev">›</span>
+            </div>
+            <div class="conn" onclick="go('detail')">
+              <span class="rel">member_of</span><span class="nm">브라운</span><span class="chev">›</span>
+            </div>
+            <div class="conn" onclick="go('detail')">
+              <span class="rel">influenced</span><span class="nm">조너선 아이브</span><span class="chev">›</span>
+            </div>
+            <div class="conn" onclick="go('detail')">
+              <span class="rel">part_of</span><span class="nm">모더니즘</span><span class="chev">›</span>
+            </div>
+          </div>
+          <div class="row" style="justify-content:space-between">
+            <span class="link" onclick="go('graph')">↳ 지도에서 보기 (로컬 그래프)</span>
+            <span class="meta">전체 연결 14개 ›</span>
+          </div>
+
+          <div class="sectionLbl">요약 / 본문</div>
+          <div class="note"><b>P1·P8</b> 본문은 접힌 채로. 읽고 싶을 때만 펼친다.</div>
+          <div class="card tap" style="padding:11px">
+            <div class="between"><span style="font-size:13px;font-weight:600">"좋은 디자인은 가능한 한 적은 디자인이다."</span><span class="faint">⌄ 펼치기</span></div>
+            <div class="bar m"></div><div class="bar s"></div>
+          </div>
+
+          <div class="sectionLbl">관점 · 3 &nbsp; <span class="faint" style="font-weight:400;text-transform:none">한 페이지, 여러 해석</span></div>
+          <div class="note"><b>P1·P6</b> 중복 페이지 대신 <b>바이라인 관점 레이어</b>(Genius 모델). 관점에 작성자가 붙는다.</div>
+          <div class="card">
+            <div style="font-size:13px;font-weight:600">"10원칙은 모더니즘의 마지막 윤리 강령이다."</div>
+            <div class="row" style="margin-top:6px"><span class="meta tap" onclick="go('curator')">— @editor_yui ✦ · 저장 48</span></div>
+          </div>
+          <div class="card">
+            <div style="font-size:13px;font-weight:600">"람스는 애플 이전에 이미 애플이었다."</div>
+            <div class="row" style="margin-top:6px"><span class="meta tap" onclick="go('curator')">— @minlab · 저장 31</span></div>
+          </div>
+
+          <!-- sticky actions -->
+          <div class="actionbar">
+            <button class="btn solid save" onclick="openSave(event)">＋ 저장</button>
+            <button class="btn" onclick="go('collection')">컬렉션</button>
+            <button class="btn">관점 추가</button>
+            <button class="btn">⋯</button>
+          </div>
+
+          <div class="sheet" id="saveSheet2">
+            <div class="between"><b style="font-size:13px">저장됨 ✓</b><span class="link" onclick="closeSave()">닫기</span></div>
+            <div class="note" style="margin:8px 0"><b>P3·P7</b> 한 탭 저장 완료. 좋아요보다 강한 신호 — 지도에 남는다.</div>
+            <div class="row" style="gap:6px;flex-wrap:wrap">
+              <span class="pill tap" onclick="go('collection')">디터 람스와 애플</span>
+              <span class="pill">＋ 새 컬렉션</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 3. 컬렉션 ===== -->
+        <section class="screen" data-screen="collection">
+          <div class="row"><span class="link" onclick="go('feed')">← 탐험</span></div>
+          <div class="h" style="font-size:20px;margin-top:8px">디터 람스와 애플</div>
+          <div class="row" style="margin-top:4px">
+            <span class="meta tap" onclick="go('curator')">@minlab ✦</span>
+            <span class="meta">· 실마리 12 · 팔로워 240</span>
+          </div>
+          <div class="row" style="margin-top:8px;gap:8px">
+            <button class="btn solid">＋ 팔로우</button>
+            <button class="btn">공유</button>
+          </div>
+
+          <div class="note"><b>P5</b> 컬렉션 = 취향/정체성의 단위. "모으기"가 아니라 "짓기" — 따라갈 가치가 생긴다.</div>
+
+          <div class="grid2" style="margin-top:6px">
+            <div class="gcard tap" onclick="go('detail')"><div class="thumb" style="width:100%;height:40px">img</div><div class="gt">디터 람스</div></div>
+            <div class="gcard tap" onclick="go('detail')"><div class="thumb" style="width:100%;height:40px">img</div><div class="gt">SK4</div></div>
+            <div class="gcard tap" onclick="go('detail')"><div class="thumb" style="width:100%;height:40px">img</div><div class="gt">조너선 아이브</div></div>
+            <div class="gcard tap" onclick="go('detail')"><div class="thumb" style="width:100%;height:40px">img</div><div class="gt">애플</div></div>
+          </div>
+
+          <div class="note" style="margin-top:14px"><b>P5</b> 짓는 감각: "이 컬렉션의 항목들과 <b>연결된</b> 실마리" 추천 → curiosity loop.</div>
+          <div class="card">
+            <div class="between">
+              <div class="row"><div class="thumb">img</div>
+                <div class="tap" onclick="go('detail')"><div style="font-weight:600;font-size:13px">브라운</div><div class="meta">company · 이 컬렉션과 6개 연결</div></div>
+              </div>
+              <button class="btn save" onclick="openSave(event)">＋담기</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 4. 로컬 그래프 (보조) ===== -->
+        <section class="screen" data-screen="graph">
+          <div class="row"><span class="link" onclick="go('detail')">← 디터 람스</span></div>
+          <div class="between" style="margin-top:8px">
+            <div class="h" style="font-size:16px">지도 — 디터 람스 주변</div>
+            <button class="btn" onclick="go('detail')">리스트로 ⇄</button>
+          </div>
+          <div class="note"><b>P4 핵심</b> 그래프는 <b>홈이 아니다</b>. 실마리에서 진입한 <b>1–2홉 로컬 뷰</b>(≤~12노드), 엣지에 관계 라벨. 전역 그래프는 "내 지도 성취" 뷰로만.</div>
+
+          <div class="graphbox" id="gbox">
+            <!-- edges -->
+            <div class="edge" style="left:50%;top:50%;width:120px;transform:rotate(-150deg)"></div>
+            <div class="edge" style="left:50%;top:50%;width:120px;transform:rotate(-30deg)"></div>
+            <div class="edge" style="left:50%;top:50%;width:110px;transform:rotate(60deg)"></div>
+            <div class="edge" style="left:50%;top:50%;width:130px;transform:rotate(150deg)"></div>
+            <div class="edgelbl" style="left:33%;top:34%">member_of</div>
+            <div class="edgelbl" style="left:70%;top:36%">created</div>
+            <div class="edgelbl" style="left:68%;top:70%">influenced</div>
+            <div class="edgelbl" style="left:30%;top:70%">part_of</div>
+            <!-- nodes -->
+            <div class="node center" style="left:50%;top:50%">디터 람스</div>
+            <div class="node tap" style="left:26%;top:24%" onclick="go('detail')">브라운</div>
+            <div class="node tap" style="left:78%;top:26%" onclick="go('detail')">SK4</div>
+            <div class="node tap" style="left:80%;top:78%" onclick="go('detail')">조너선 아이브</div>
+            <div class="node tap" style="left:22%;top:78%" onclick="go('detail')">모더니즘</div>
+          </div>
+          <div class="hint">노드 탭 → 그 실마리로 한 홉 이동. 그래프 없이도(리스트로) 탐험이 끊기지 않음.</div>
+        </section>
+
+        <!-- ===== 5. 큐레이터 / 프로필 ===== -->
+        <section class="screen" data-screen="curator">
+          <div class="row"><span class="link" onclick="go('detail')">← 뒤로</span></div>
+          <div class="row" style="margin-top:10px;gap:12px">
+            <div class="thumb" style="width:62px;height:62px;border-radius:50%">img</div>
+            <div>
+              <div class="h" style="font-size:18px">@editor_yui</div>
+              <div class="badge" style="margin-top:4px">✦ 파트너 큐레이터</div>
+            </div>
+          </div>
+          <div class="note"><b>P6 핵심</b> 배지 = <b>명예이지 권력 아님</b>(GitHub 기여 그래프 / Genius IQ 모델). 게이트키핑 권한 없음.</div>
+
+          <div class="sectionLbl">기여 (저장·연결·인용 기반 — 게시물 수 아님)</div>
+          <div class="card">
+            <div class="stats">
+              <div class="stat"><div class="n">38</div><div class="l">발견한 실마리</div></div>
+              <div class="stat"><div class="n">92</div><div class="l">연결</div></div>
+              <div class="stat"><div class="n">17</div><div class="l">관점</div></div>
+              <div class="stat"><div class="n">1.2k</div><div class="l">받은 저장</div></div>
+            </div>
+          </div>
+
+          <div class="sectionLbl">팔로우 가능한 컬렉션</div>
+          <div class="card tap" onclick="go('collection')">
+            <div class="between"><div style="font-weight:600;font-size:13px">바우하우스 입문</div><button class="btn">＋팔로우</button></div>
+            <div class="meta">실마리 9 · 팔로워 420</div>
+          </div>
+          <div class="card tap" onclick="go('collection')">
+            <div class="between"><div style="font-weight:600;font-size:13px">브루탈리즘 입문</div><button class="btn">＋팔로우</button></div>
+            <div class="meta">실마리 15 · 팔로워 180</div>
+          </div>
+        </section>
+
+      </div><!-- /viewport -->
+
+      <!-- bottom tab bar -->
+      <div class="tabbar">
+        <button data-tab="feed" class="on" onclick="go('feed')"><span class="ic">⌂</span>탐험</button>
+        <button data-tab="collection" onclick="go('collection')"><span class="ic">▥</span>컬렉션</button>
+        <button class="plus"><span class="ic">＋</span></button>
+        <button data-tab="graph" onclick="go('graph')"><span class="ic">⬡</span>지도</button>
+        <button data-tab="curator" onclick="go('curator')"><span class="ic">◔</span>나</button>
+      </div>
+    </div><!-- /phone -->
+
+    <!-- ============ FLOW MAP ============ -->
+    <div class="flowmap">
+      <h3>5개 화면 · 클릭 흐름</h3>
+      <ol>
+        <li><b>탐험 피드</b> — 오늘의 앵커 + 이어보기 + 스캔 카드(저장 한 탭). <span class="muted">P3·P4·P8</span></li>
+        <li><b>실마리 상세</b> — <b>연결 먼저</b>, 본문 접힘, 관점 레이어. <span class="muted">P1·P2·P6</span></li>
+        <li><b>컬렉션</b> — 취향의 단위, 팔로우, "짓는" 추천. <span class="muted">P3·P5</span></li>
+        <li><b>로컬 그래프</b> — 실마리에서 진입, 1–2홉, 보조. <span class="muted">P4</span></li>
+        <li><b>큐레이터</b> — 기여 가시성 배지, 팔로우 컬렉션. <span class="muted">P6</span></li>
+      </ol>
+      <p style="margin-top:14px">눌러볼 것:</p>
+      <ol>
+        <li>피드 카드 → 상세</li>
+        <li>상세의 <b>연결 행</b> → 다른 실마리 (탐험 지속)</li>
+        <li><code>＋저장</code> → 저장 시트(정리는 선택)</li>
+        <li>상세 → <b>지도에서 보기</b> → 로컬 그래프</li>
+        <li>관점의 <b>작성자</b> → 큐레이터</li>
+      </ol>
+      <p style="margin-top:14px;color:var(--faint)">v1 의도: "예쁨"이 아니라 <b>흐름 검증</b>. 이 구조가 5개 UX 문제를 푸는지 본다. OK면 D1(디자인 토큰) → Figma → 코드.</p>
+    </div>
+  </div><!-- /stage -->
+</div>
+
+<script>
+  function go(name){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.dataset.screen===name));
+    document.querySelectorAll('.tabbar [data-tab]').forEach(b=>b.classList.toggle('on', b.dataset.tab===name));
+    var labels={feed:'탐험',detail:'실마리 상세',collection:'컬렉션',graph:'지도(로컬 그래프)',curator:'큐레이터'};
+    document.getElementById('screenName').textContent=labels[name]||name;
+    closeSave();
+    var vp=document.querySelector('.viewport'); if(vp) vp.scrollTop=0;
+  }
+  function openSave(e){ if(e){e.stopPropagation();}
+    var active=document.querySelector('.screen.active');
+    var sheet=active && active.querySelector('.sheet'); if(sheet) sheet.classList.add('show');
+  }
+  function closeSave(){ document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('show')); }
+</script>
+</body>
+</html>

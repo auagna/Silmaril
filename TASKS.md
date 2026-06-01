@@ -21,11 +21,11 @@
 
 - [x] **UX Research Sprint** (Lazyweb 증거) — 탐험/그래프/컬렉션/큐레이터 4문서 + 결론 + **UX Principles v1**.
       → `docs/ux-research/`. 핵심: 실마릴=디자이너 취향 지도(≈Are.na), 그래프는 로컬·보조, 저장=1급 동사.
-- [ ] **W1. Silmaril 모바일 와이어프레임 v1.**  ← **다음 작업 (개발 아님)**
-      `silmaril-ux-conclusion.md` 의 10패턴/8원칙을 화면으로. 우선순위:
-      탐험 피드 → 실마리 상세(연결 우선) → 저장/컬렉션 → 로컬 그래프(보조) → 큐레이터/관점.
-      산출물: lo-fi 와이어프레임(문서 또는 HTML) → 이후 Figma → 코드.
-- [ ] **D1. 디자인 시스템 + 전역 셸.** (와이어프레임 v1 확정 후) 색/타이포/간격/radius 토큰 + Nav/`ui/*`.
+- [x] **W1. Silmaril 모바일 와이어프레임 v1.** (b: 클릭 가능한 lo-fi HTML)
+      `docs/wireframes/silmaril-mobile-v1.html` — 5화면(탐험/상세/컬렉션/로컬그래프/큐레이터) + 원칙 주석.
+      file:// 더블클릭으로 열림(의존성 없음). **다음: 사용자 흐름 검토 → 피드백 반영(v2) → D1.**
+- [ ] **D1. 디자인 시스템 + 전역 셸.** (와이어프레임 확정 후) 색/타이포/간격/radius 토큰 + Nav/`ui/*`.
+      Lazyweb 네이티브 도구(`mcp__lazyweb__*`) 로드 확인됨 → 실앱 토큰 레퍼런스 수집에 사용.
       Lazyweb 네이티브 도구는 재시작+서버 승인 후 `mcp__lazyweb__*` 로 사용. (참고: [[lazyweb-ui-reference]])
 
 ### ⚪ 개발 트랙 (디자인 확정까지 대기)
