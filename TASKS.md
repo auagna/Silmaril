@@ -30,6 +30,8 @@
       검증: `npm install` + `tsc --noEmit` 통과 + `expo config` 정상 + EXPO_PUBLIC env 로드 확인.
 - [ ] **EXP-RUN. (사용자) Expo Go 로 실기기 확인.**  ← **다음 작업 (사용자)**
       `npx expo start` → 아이폰 Expo Go 로 QR 스캔. 5탭/탐험(Atlas)/저장/상세 흐름 점검.
+      Codex 사전 검증(2026-06-02): `npm run typecheck`, `npx expo config --type public` 통과.
+      이 PC에서 Expo API 조회가 `ECONNABORTED` 되면 네트워크 정상화 후 재시도. `--offline`은 localhost 전용이라 실기기 확인에 부적합.
 - [ ] **EXP4. Supabase 실연결** — service 함수(api-spec) 구현 + 마이그레이션(connections→thread_connections, origin 컬럼, perspectives→future, reactions 제외 — erd 노트). 더미 → 실데이터.
 
 > 이전 웹 트랙(W2/D1 등)은 D-014로 보류. UX 원칙/와이어프레임(v1·v2)은 RN 디자인의 참고 자산으로 유지.

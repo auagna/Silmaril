@@ -9,7 +9,7 @@
 - 시작 시 git pull, 종료 시 커밋(+push). 원격: https://github.com/auagna/Silmaril
 - 한 세션 = `## Now` 의 첫 미완료 항목 하나.
 
-## 현재 상태 (2026-06-01)
+## 현재 상태 (2026-06-02)
 
 **M0/M1 완료, 교대 프로토콜 수립 완료. M2 일부(Auth+Create Thread) 완료.**
 **⚠️ 개발 일시정지 (D-012). 현재는 UX 리서치 → 디자인 트랙.**
@@ -70,6 +70,8 @@
 - **루트 = Expo 앱.** 구조: `app/(tabs)/{index,search,explore,records,profile}` + `app/auth/{login,signup}` + `app/thread/[id]` + `src/{components,features,lib,types,constants}`. StyleSheet + `src/constants/theme.ts`. 저장 store = `src/features/saves/store.ts`(더미).
 - **다음 = (사용자) Expo Go 실기기 확인:** `npx expo start` → 아이폰 Expo Go QR. 그 후 **EXP4 Supabase 실연결**(service 구현 + 마이그레이션, erd 노트).
 - **검증 한계:** Windows라 iOS 시뮬레이터 없음 → 실행 확인은 Expo Go(아이폰). 타입체크/config 는 통과.
+- **2026-06-02 Codex 재검증:** `npm run typecheck`, `npx expo config --type public` 통과. LAN Metro 시작은 `https://api.expo.dev/v2/sdks/51.0.0/native-modules` 조회 중 `write ECONNABORTED` 로 중단됨. `--offline` Metro 는 localhost 전용이라 아이폰 확인에 사용할 수 없음. 네트워크 정상화 후 `npx expo start` 재시도.
+- **프로세스 주의:** 이 저장소에서 먼저 떠 있던 Expo CLI PID `15968` 이 `8081` 을 점유 중이며 응답이 지연됨. Codex가 만든 `8082` 오프라인 서버는 종료함. 필요하면 사용자가 기존 Expo 터미널을 종료한 뒤 새로 시작.
 - 미지영역 사용자 용어 = **"미발견 / 새로운 흔적"** (`???`/`Fog`/`Locked` 금지). Atlas=탐험 탭(어두운 화면), 키워드 탭+가로 스와이프.
 - legacy-web/ = 아카이브된 Next.js 웹(보존). 새 개발은 루트 Expo 에서.
 
