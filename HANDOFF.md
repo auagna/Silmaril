@@ -60,6 +60,16 @@
 
 ## 다음 작업 = `TASKS.md` 의 `## Now` 첫 항목
 
+### 🟣 스택 전환 (D-014, 2026-06-01) — 가장 중요
+
+- **웹(Next.js) → iPhone-first Expo React Native.** 모바일이 본진. 백엔드 Supabase 유지.
+- 정본 방향 [silmaril-v2-direction.md](docs/silmaril-v2-direction.md), 로드맵 [roadmap.md](docs/roadmap.md).
+- 새 문서 완료: `docs/{roadmap,thread-taxonomy,feature-matrix,erd,api-spec}.md`. (Thread 타입에 **concept** 포함.)
+- 사용자 용어: 미지영역 = **"미발견"** (`???`/`Fog`/`Locked` 금지, D-015). Atlas = 키워드 탭+스와이프.
+- **다음 작업 = `TASKS ## Now` 의 EXP0~EXP3.** 단, **EXP0(기존 웹 → legacy-web 이동)은 사용자 확인 대기 중** (프로토콜상 재배치는 확인 후).
+- **검증 한계:** Windows라 iOS 시뮬레이터 없음. Expo 앱은 **Expo Go(아이폰)** 로 사용자가 확인. (타입체크/번들은 가능.)
+- 기존 웹 코드(인증/Create Thread)는 보존. UX 원칙·와이어프레임(v1/v2)은 RN 디자인 참고용.
+
 ### ⚠️ v2 방향 전환 (D-013, 2026-06-01)
 - 정본: **[docs/silmaril-v2-direction.md](docs/silmaril-v2-direction.md)**. 충돌 시 이 문서 우선.
 - 핵심: **Atlas 가 제품 중심**(그래프는 한 모드) · **Fog**(`???` 미지영역, 추천 아님) · **AI-seed 우선**(AI Wiki→threads→connections, 빈 그래프 ❌) · **save-first**(노트 선택) · 내비 = **Home/Search/Explore(Atlas)/Records/Profile**(Create 탭 제거, Collections는 Records 안) · **Perspectives→Should** · **shadcn/ui 채택**(D-007 갱신) · NOU HAUS=future.

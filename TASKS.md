@@ -17,17 +17,19 @@
       프로필은 `handle_new_user` 트리거가 생성 (D-010).
 - [x] **N5. Create Thread.** `/create/thread` 폼 + `threadService.createThread`(slug 충돌 접미사) + slug 유틸.
       생성 후 `/threads/[slug]` 이동, 상세는 `ThreadLiveView` 실데이터 폴백 (D-011).
-### 🔵 현재 트랙: UX 리서치 → 디자인 (개발 일시정지 — D-012)
+### 🟣 현재 트랙: Expo RN MVP (D-014) — iPhone-first
 
-- [x] **UX Research Sprint** (Lazyweb 증거) — 탐험/그래프/컬렉션/큐레이터 4문서 + 결론 + **UX Principles v1**.
-      → `docs/ux-research/`. 핵심: 실마릴=디자이너 취향 지도(≈Are.na), 그래프는 로컬·보조, 저장=1급 동사.
-- [x] **W1. 모바일 와이어프레임 v1.** `docs/wireframes/silmaril-mobile-v1.html` (5화면, 원칙 주석).
-- [ ] **W2. 모바일 와이어프레임 v2 — v2 방향 반영.**  ← **다음 작업**
-      **D-013 / [silmaril-v2-direction.md](docs/silmaril-v2-direction.md) 기준.** 내비 = Home/Search/**Explore=Atlas**/Records/Profile.
-      신규 핵심: **Atlas**(어두운 세계+노드), **Fog**(`???` 미지영역), Exploration Progress, AI-seed 시드 표시.
-      Collections 는 Records 안. v1의 상세(연결우선)·저장 패턴은 유지.
-- [ ] **D1. 디자인 시스템 + 전역 셸.** (W2 확정 후) **shadcn/ui 도입(D-013)** + 색/타이포/간격 토큰 + 5탭 Nav.
-      Lazyweb(`mcp__lazyweb__*`)로 톤 레퍼런스 수집. 톤: Are.na처럼 조용히, Atlas는 어둡고 탐험적.
+> 정본: [silmaril-v2-direction.md](docs/silmaril-v2-direction.md) · [roadmap.md](docs/roadmap.md).
+> 미지영역 사용자 용어 = **미발견** (`???`/`Fog`/`Locked` 금지, D-015). Atlas = 키워드 탭+스와이프.
+
+- [x] **P1-4 문서** — roadmap · thread-taxonomy(concept 포함) · feature-matrix · erd · api-spec.
+- [ ] **EXP0. 기존 Next.js 웹 → `legacy-web/` 이동 (사용자 확인 후).** 문서/supabase/루트 MD 는 유지.
+- [ ] **EXP1. Expo 골격.** `app/(tabs)/_layout.tsx` + 5탭(홈/검색/탐험/기록/프로필) + `app/auth/*` + `app/thread/[id].tsx` + `app/_layout.tsx`. package.json(expo, expo-router) + tsconfig + babel/metro.
+- [ ] **EXP2. Supabase client + TS 타입.** `src/lib/supabase.ts`(RN: AsyncStorage 세션) + `src/types/database.ts`.
+- [ ] **EXP3. 더미 데이터 화면.** Home → Search → Thread Detail → Records → Explore → Profile (구현 순서: api-spec/roadmap Phase 5).
+- [ ] **EXP4. Supabase 실연결** (마이그레이션: connections→thread_connections, origin 컬럼 등 — erd 노트).
+
+> 이전 웹 트랙(W2/D1 등)은 D-014로 보류. UX 원칙/와이어프레임(v1·v2)은 RN 디자인의 참고 자산으로 유지.
       Lazyweb 네이티브 도구는 재시작+서버 승인 후 `mcp__lazyweb__*` 로 사용. (참고: [[lazyweb-ui-reference]])
 
 ### ⚪ 개발 트랙 (디자인 확정까지 대기) — v2 MVP 우선순위 (D-013)

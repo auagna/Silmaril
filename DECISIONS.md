@@ -4,6 +4,30 @@
 
 ---
 
+## 2026-06-01 · D-015 · 사용자 용어 — "미발견" (`???`/`Fog`/`Locked` 금지) + Atlas 인터랙션
+
+- **맥락:** v2 와이어프레임에서 `???`로 미지영역 표시 → 사용자가 "오류난 줄" 안다는 피드백.
+- **결정:**
+  - 미지영역의 **사용자 노출 용어 = 미발견 / 미확인 실마리 / 새로운 흔적 / 연결 가능한 실마리.** UI에 `???`·`Fog`·`Locked` 절대 금지.
+  - `Atlas`·`Fog`·`Graph`·`Culture Map` 은 **내부 개념 용어**. 사용자에겐 탭 이름 "탐험"(Explore).
+  - **Atlas 인터랙션 = 키워드 탭 + 스와이프** (노드를 눌러 들어가고, 스와이프로 인접 실마리 탐색). 무거운 그래프 조작 아님.
+- **결과:** RN Explore 화면은 키워드/카드 탭+스와이프, 미발견은 절제된 표현(예: "새로운 흔적 6개").
+
+## 2026-06-01 · D-014 · 스택 전환 — 웹(Next.js) → iPhone-first Expo React Native
+
+- **맥락:** 제품을 **iPhone 앱부터** 만들기로 확정. 기존 Next.js 웹 MVP(인증·Create Thread, 빌드 정상)는 문서/스키마/UX 검증용 디딤돌이었음.
+- **결정:**
+  - **Expo React Native + Expo Router + TypeScript + Supabase** 로 모바일 앱을 본진으로 개발. NativeWind 또는 StyleSheet (구현 시 택1).
+  - 폴더: `app/(tabs)/{index,search,explore,records,profile}.tsx` + `app/auth/*` + `app/thread/[id].tsx` + `src/{components,features,lib,types,utils,constants}`.
+  - 백엔드는 **Supabase만** (Auth/PostgreSQL/Storage). 자체 서버·Neo4j·고급 추천 서버 ❌. AI Wiki 는 v0.2 Edge Function.
+  - 그래프는 MVP에서 **가볍게**(Atlas 한 보기). 3D Globe ❌(future).
+  - **순서: 문서(Phase1-4) → Expo 골격 → 더미 화면 → Supabase 실연결.**
+  - MVP Thread 타입에 **`concept` 포함** (taxonomy 문서). `connections`→`thread_connections`, `perspectives`→future, `reactions` 제외 (erd 문서).
+  - 웹은 나중에 (Expo Web 또는 Next.js).
+- **기존 Next.js 코드 처리:** 임의 삭제·재배치 안 함. **사용자 확인 후** `legacy-web/` 로 이동 예정(보존). 문서/`supabase/`/`docs/`/루트 MD 는 스택 무관 → 유지.
+- **검증 한계:** 이 개발 머신은 Windows — iOS 시뮬레이터 불가. Expo 앱 검증은 **Expo Go(아이폰 실기기)** 로 사용자가. 타입체크/번들은 가능.
+- **재고할 시점:** RN 한계로 그래프/애니메이션이 막히면 일부 화면 웹뷰 또는 Skia 검토.
+
 ## 2026-06-01 · D-013 · v2 방향 전환 — Atlas 중심 / Fog / AI-seed / 새 내비
 
 - **맥락:** 제품 방향을 재정의하는 종합 스펙 입력. 기존 일부 결정과 충돌.

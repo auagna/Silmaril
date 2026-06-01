@@ -26,10 +26,12 @@ Claude Code는 이 파일을 자동으로 읽고, Codex는 [AGENTS.md](./AGENTS.
 2. `DECISIONS.md`
 3. `TASKS.md`
 4. `HANDOFF.md`
-5. `docs/product-spec.md`
-6. `docs/data-model.md`
-7. `docs/information-architecture.md`
-8. `docs/supabase-schema.md`
+5. **`docs/silmaril-v2-direction.md`** ← 제품 방향 정본 (Atlas/Fog/AI-seed)
+6. **`docs/roadmap.md`** ← 스택(Expo RN)·개발 순서 정본 (D-014)
+7. `docs/thread-taxonomy.md` / `docs/feature-matrix.md` / `docs/erd.md` / `docs/api-spec.md`
+8. (배경) `docs/product-spec.md`, `docs/information-architecture.md`, `docs/data-model.md`, `docs/supabase-schema.md`
+
+> 충돌 시 우선순위: silmaril-v2-direction > roadmap/erd/api-spec > 기타 docs. (현 스택은 **Expo RN**, 웹은 legacy.)
 
 그 후 현재 코드 상태를 파악한다. (어떤 라우트/컴포넌트가 있고, 더미인지 실데이터인지.)
 
