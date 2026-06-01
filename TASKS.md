@@ -23,11 +23,14 @@
 > 미지영역 사용자 용어 = **미발견** (`???`/`Fog`/`Locked` 금지, D-015). Atlas = 키워드 탭+스와이프.
 
 - [x] **P1-4 문서** — roadmap · thread-taxonomy(concept 포함) · feature-matrix · erd · api-spec.
-- [ ] **EXP0. 기존 Next.js 웹 → `legacy-web/` 이동 (사용자 확인 후).** 문서/supabase/루트 MD 는 유지.
-- [ ] **EXP1. Expo 골격.** `app/(tabs)/_layout.tsx` + 5탭(홈/검색/탐험/기록/프로필) + `app/auth/*` + `app/thread/[id].tsx` + `app/_layout.tsx`. package.json(expo, expo-router) + tsconfig + babel/metro.
-- [ ] **EXP2. Supabase client + TS 타입.** `src/lib/supabase.ts`(RN: AsyncStorage 세션) + `src/types/database.ts`.
-- [ ] **EXP3. 더미 데이터 화면.** Home → Search → Thread Detail → Records → Explore → Profile (구현 순서: api-spec/roadmap Phase 5).
-- [ ] **EXP4. Supabase 실연결** (마이그레이션: connections→thread_connections, origin 컬럼 등 — erd 노트).
+- [x] **EXP0. 기존 Next.js 웹 → `legacy-web/` 이동.** 루트는 Expo 차지.
+- [x] **EXP1-3. Expo 골격 + Supabase client + 타입 + 더미 화면.**
+      Expo Router 5탭(홈/검색/탐험/기록/프로필) + auth(login/signup) + thread/[id]. StyleSheet + `src/constants/theme.ts`.
+      `src/lib/supabase.ts`(AsyncStorage), `src/types/database.ts`, `src/lib/dummy.ts`, `src/features/saves/store.ts`.
+      검증: `npm install` + `tsc --noEmit` 통과 + `expo config` 정상 + EXPO_PUBLIC env 로드 확인.
+- [ ] **EXP-RUN. (사용자) Expo Go 로 실기기 확인.**  ← **다음 작업 (사용자)**
+      `npx expo start` → 아이폰 Expo Go 로 QR 스캔. 5탭/탐험(Atlas)/저장/상세 흐름 점검.
+- [ ] **EXP4. Supabase 실연결** — service 함수(api-spec) 구현 + 마이그레이션(connections→thread_connections, origin 컬럼, perspectives→future, reactions 제외 — erd 노트). 더미 → 실데이터.
 
 > 이전 웹 트랙(W2/D1 등)은 D-014로 보류. UX 원칙/와이어프레임(v1·v2)은 RN 디자인의 참고 자산으로 유지.
       Lazyweb 네이티브 도구는 재시작+서버 승인 후 `mcp__lazyweb__*` 로 사용. (참고: [[lazyweb-ui-reference]])

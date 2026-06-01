@@ -20,6 +20,13 @@ coverage/
 
 *.tsbuildinfo
 
+# Expo
+.expo/
+expo-env.d.ts
+dist/
+web-build/
+*.orig.*
+
 # Local MCP config — contains a bearer token, must NOT be committed (public repo).
 .mcp.json
 .lazyweb/

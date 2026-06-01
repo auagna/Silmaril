@@ -66,9 +66,12 @@
 - 정본 방향 [silmaril-v2-direction.md](docs/silmaril-v2-direction.md), 로드맵 [roadmap.md](docs/roadmap.md).
 - 새 문서 완료: `docs/{roadmap,thread-taxonomy,feature-matrix,erd,api-spec}.md`. (Thread 타입에 **concept** 포함.)
 - 사용자 용어: 미지영역 = **"미발견"** (`???`/`Fog`/`Locked` 금지, D-015). Atlas = 키워드 탭+스와이프.
-- **다음 작업 = `TASKS ## Now` 의 EXP0~EXP3.** 단, **EXP0(기존 웹 → legacy-web 이동)은 사용자 확인 대기 중** (프로토콜상 재배치는 확인 후).
-- **검증 한계:** Windows라 iOS 시뮬레이터 없음. Expo 앱은 **Expo Go(아이폰)** 로 사용자가 확인. (타입체크/번들은 가능.)
-- 기존 웹 코드(인증/Create Thread)는 보존. UX 원칙·와이어프레임(v1/v2)은 RN 디자인 참고용.
+- **진행 완료:** EXP0(웹→legacy-web/) + EXP1-3(Expo 골격·Supabase client·타입·더미 5탭 화면+상세+auth). `npm install`+`tsc`+`expo config` 검증 통과.
+- **루트 = Expo 앱.** 구조: `app/(tabs)/{index,search,explore,records,profile}` + `app/auth/{login,signup}` + `app/thread/[id]` + `src/{components,features,lib,types,constants}`. StyleSheet + `src/constants/theme.ts`. 저장 store = `src/features/saves/store.ts`(더미).
+- **다음 = (사용자) Expo Go 실기기 확인:** `npx expo start` → 아이폰 Expo Go QR. 그 후 **EXP4 Supabase 실연결**(service 구현 + 마이그레이션, erd 노트).
+- **검증 한계:** Windows라 iOS 시뮬레이터 없음 → 실행 확인은 Expo Go(아이폰). 타입체크/config 는 통과.
+- 미지영역 사용자 용어 = **"미발견 / 새로운 흔적"** (`???`/`Fog`/`Locked` 금지). Atlas=탐험 탭(어두운 화면), 키워드 탭+가로 스와이프.
+- legacy-web/ = 아카이브된 Next.js 웹(보존). 새 개발은 루트 Expo 에서.
 
 ### ⚠️ v2 방향 전환 (D-013, 2026-06-01)
 - 정본: **[docs/silmaril-v2-direction.md](docs/silmaril-v2-direction.md)**. 충돌 시 이 문서 우선.

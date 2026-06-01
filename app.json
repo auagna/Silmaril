@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Silmaril",
+    "slug": "silmaril",
+    "scheme": "silmaril",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": false,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.silmaril.app"
+    },
+    "android": {
+      "package": "com.silmaril.app"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
