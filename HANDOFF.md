@@ -17,6 +17,8 @@
 **✅ EXP-IA2 완료 (2026-06-02):** 앱이 **IA v2 4탭(지도/보관/만들기/나)** 로 재구성됨. Map=Sky/Sea/Land. 옛 5탭 삭제. `tsc`+`expo export`(1033 모듈) 통과.
 **다음:** 사용자 Expo Go 재확인(Reload) → **EXP4(Supabase 실연결)** (스키마 SQL Editor 적용 1회 + service 구현 + 더미 대체).
 
+**설계 문서 추가 (2026-06-02):** `atlas-system`(내부개념↔사용자용어) · `exploration-logic`(저장→미발견→새 흔적→추천 규칙, 안도 워크스루) · `seed-dataset-strategy` 확장(목표 500–1000 threads / 3000–5000 connections / 건축·산업디자인·그래픽·사진·예술 + Official/AI생성/운영진검수 기준). 이 규칙들은 EXP4 의 `getUndiscoveredThreads`/`getUserExploreMap` + 출시 전 시드 파이프라인의 근거.
+
 > **SDK 54 업그레이드 완료 (D-016):** Expo Go(앱스토어=SDK54)와 맞춤. react 19.1 / RN 0.81.5 / expo-router 6 / ts 5.9. `.npmrc`(legacy-peer-deps) 추가. **`babel-preset-expo` 의존성 추가**(Metro resolve 에러 수정). 검증: `expo export --platform ios` 1032 모듈 번들 성공. 첫 실행은 `npx expo start -c`.
 
 > **IA v2 설계 확정 (D-017, 문서만):** Map 중심 **4탭(Map/Archive/Create/My View)** + 3레이어 Map(Sky/Sea/Land), Thread Detail=bottom sheet. 문서: `docs/map-experience.md`·`information-architecture-v2.md`·`navigation-flow.md`. ⚠️ **현 Expo 코드는 아직 5탭** — 다음 구현 태스크 **EXP-IA2** 에서 4탭 재구성.

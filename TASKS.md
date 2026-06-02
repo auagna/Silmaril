@@ -36,6 +36,7 @@
 - [ ] **EXP-DB-APPLY. (사용자) 스키마 적용.** Supabase SQL Editor 에서 `supabase/schema.sql` 실행. ⚠️ 옛 웹 스키마가 있으면 파일 상단 RESET 블록 먼저 (실데이터 없음 → reset 권장).
 - [x] **연결 모델 + 타입 정렬.** `thread_connections.connection_tier`(1 사실/2 해석) 추가 · connection type 10종 · `src/types/database.ts` 를 스키마와 1:1 정렬(+dummy/컴포넌트). `canonical-knowledge-model` 확장. `tsc` 통과.
 - [x] **IA v2 설계 문서** — `map-experience`(Sky/Sea/Land) · `information-architecture-v2`(4탭 Map/Archive/Create/My View) · `navigation-flow` (D-017).
+- [x] **Atlas 설계 문서** — `atlas-system`(내부개념↔사용자용어) · `exploration-logic`(저장→미발견→새로운흔적→추천 규칙) · `seed-dataset-strategy` 확장(500–1000 threads / 3000–5000 connections / 5분야 + Official/AI/검수 기준).
 - [x] **EXP-IA2. 4탭 재구성 (구현 완료).** `app/(tabs)` = 지도(Map)/보관(Archive)/만들기(Create)/나(My View). Map=Sky(나침반)+Sea(별자리 노드·연결·미발견, 경량 RN)+Land(바텀시트 상세, 의존성 0). 옛 5탭 삭제. `tsc` + `expo export`(1033 모듈) 통과. 더미 데이터.
 - [ ] **EXP4. Supabase 실연결** — service 함수(api-spec) 구현 → 더미 store/dummy 대체 + seed 적재. RLS(`policies.sql` 신규)도 이 단계. (타입 정렬은 완료.)
 

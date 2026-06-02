@@ -5,6 +5,7 @@
 ## 2026-06-02
 
 ### Changes
+- docs: Atlas 설계 — `atlas-system`(내부개념↔사용자용어) · `exploration-logic`(탐험 규칙) · `seed-dataset-strategy` 확장(500–1000 threads/3000–5000 connections, 5분야, Official/AI/검수 기준).
 - feat(EXP-IA2): 앱을 IA v2 Map 중심 4탭으로 재구성 — 지도(Sky/Sea/Land)/보관/만들기/나. 옛 5탭 삭제. 경량 별자리 Sea + 의존성 0 Land 바텀시트. tsc + expo export(1033 모듈) 통과. (D-017)
 - chore(EXP-RUN): 아이폰 Expo Go(SDK 54) 실기기 구동 확인 완료 (QR 스캔 정상). 연결 이슈는 동일망 재스캔으로 해결.
 - docs: IA v2 (Map 중심) 설계 — `map-experience`(Sky/Sea/Land) · `information-architecture-v2`(4탭) · `navigation-flow`. (D-017)

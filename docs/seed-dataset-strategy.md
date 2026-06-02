@@ -1,59 +1,76 @@
 # Seed Dataset Strategy
 
 > 앱이 **빈 그래프로 시작하지 않도록** 초기 정본 데이터를 채우는 전략 (D-013: AI-seed 우선).
-> 모델: [canonical-knowledge-model.md](./canonical-knowledge-model.md) · 타입: [thread-taxonomy.md](./thread-taxonomy.md).
+> 모델: [canonical-knowledge-model.md](./canonical-knowledge-model.md) · 타입: [thread-taxonomy.md](./thread-taxonomy.md) · 탐험: [exploration-logic.md](./exploration-logic.md).
 
-## 1. 원칙
+## 1. 목표 (MVP 출시 전 Official Seed)
 
-- **AI가 먼저 정본(threads/connections)을 시드, 사용자가 나중에 보정.** 신규 사용자도 첫날부터 밝힐 세계가 있어야 한다.
-- **넓고 얕게(X) → 좁고 깊게(O).** 한 도메인을 *밀도 높게* 시드해야 연결·미발견·탐험률이 살아난다.
-- **개념을 허브로.** 인물/작품만이 아니라 concept(빛/침묵/구조…)를 충분히 만들어 그래프 중심에 둔다.
+| 항목 | 목표 |
+|------|------|
+| Threads | **500 – 1,000** |
+| Connections | **3,000 – 5,000** (thread당 평균 ~5) |
+| 분야 | **건축 · 산업디자인 · 그래픽 · 사진 · 예술** (5) |
+| 개념(concept) 비중 | 전체의 **12–18%** (허브 역할 — 분야 횡단) |
 
-## 2. MVP 시드 도메인 — 디자인 & 건축
+> 연결이 노드의 ~5배 → 미발견/추천/탐험률이 의미 있게 작동(고립 노드 최소화).
 
-예시들(안도 타다오·디터 람스·바우하우스·빛·침묵)이 한 결로 묶이는 **디자인/건축** 클러스터를 첫 시드로.
-이유: 타깃 사용자(디자이너)와 정렬 + 인물↔작품↔사조↔장소↔개념이 촘촘히 연결되는 도메인.
+## 2. 원칙
 
-## 3. 시드 모양 (목표치, MVP)
+- **AI가 먼저 정본 시드 → 운영진 검수 → 발행.** 사용자는 이후 보정/기여.
+- **개념을 허브로.** 빛/침묵/구조/물성/여백/그리드/타이포그래피/추상 등 분야를 가로지르는 개념으로 그래프를 묶는다.
+- **분야 내 깊게 + 분야 간 개념으로 연결.** (한 분야만 깊은 게 아니라, 5분야를 *개념*이 가로질러 잇는다.)
 
-| 타입 | 목표 수(초안) | 비고 |
-|------|----------------|------|
-| person | 15–25 | 디터 람스, 안도 타다오, 루이스 칸, 그로피우스… |
-| work | 15–25 | SK4, 빛의 교회, 롱샹… (이미지 중심) |
-| movement | 6–10 | 바우하우스, 모더니즘, 브루탈리즘… |
-| place | 6–10 | 데사우, 베를린, 나오시마… |
-| **concept** | **10–15** | **빛/침묵/구조/물성/여백/현상학/기능주의…** (허브) |
-| organization | 4–8 | 바우하우스(학교), CIAM… |
+## 3. 분야별 배분 (초안)
 
-- **연결 밀도:** thread 당 평균 ≥ 3 connections. 개념 노드는 더 많이(허브).
-- **품질 바:** 각 thread = `summary` 1줄 필수 + 연결 ≥ 2 + (가능하면) `cover_image_url`.
+| 분야 | Threads(초안) | 핵심 타입 | 예시 |
+|------|----------------|-----------|------|
+| 건축 | 120–220 | person/work/movement/place | 안도 타다오, 빛의 교회, 브루탈리즘, 나오시마 |
+| 산업디자인 | 100–180 | person/work/company/movement | 디터 람스, Braun SK4, 기능주의 |
+| 그래픽 | 90–160 | person/work/movement/concept | 헬베티카, 스위스 스타일, 그리드 |
+| 사진 | 80–150 | person/work/movement | 앙리 카르티에-브레송, 결정적 순간 |
+| 예술 | 90–160 | person/work/movement/place | 바우하우스, 모더니즘, 미니멀리즘 |
+| (횡단) 개념 | 70–140 | concept | 빛·침묵·구조·물성·여백·추상·리듬 |
 
-## 4. 생성 파이프라인
+## 4. Official Seed Dataset 기준 (발행 자격)
+
+한 Thread가 **Official Seed** 가 되려면:
+1. `summary` 1–2문장 필수 + (가능하면) `description`.
+2. **연결 ≥ 2** (최소 하나는 개념 또는 사조와 연결 — 고립 금지).
+3. 타입 정확 + 정본 1개(중복은 merge).
+4. 사실 검증됨(출처 있거나 운영진 확인) → `status = official` 또는 `verified`.
+5. 민감/저작권 문제 없음(이미지·텍스트).
+
+→ 기준 미달은 `community`/보강 큐로(미발행 또는 후속 보강).
+
+## 5. AI 생성 기준
+
+- **입력:** 분야별 주제 리스트(큐레이션) → AI가 thread(요약/설명/타입) + connection 생성 + **개념 추출**(인물/작품에서 공통 개념을 concept thread로 승격).
+- **Tier 부여:** 사실 관계(영향/창작/소속/위치/동시대)는 **Tier 1**, 해석(관련/주제공유)은 **Tier 2** 로 보수적으로. 불확실하면 Tier 2 + 낮은 trust_score.
+- **품질 게이트(자동):** 중복 slug/alias 제거, 연결 ≥ 2 충족, 빈 요약 제외, 자기연결·역방향중복 제거.
+- **출처/사실성:** AI는 단정 대신 검증 대상 표시(`origin='ai'`, 추후 컬럼). 환각 의심 항목 플래그.
+- **산출:** `origin='ai'`, 초기 `status='community'` 로 적재 → 검수 후 승격.
+
+## 6. 운영진 검수 기준
+
+- **체크리스트:** ① 사실 정확성 ② 연결 *방향/관계* 적절 ③ 중복 → merge ④ 개념 승격 타당 ⑤ Tier 분류 적절 ⑥ 민감/저작권.
+- **샘플링:** AI 배치의 100% 자동 게이트 + **인물/사조 노드는 100% 인간 검수**, 그 외 ≥ 20% 표본 + 이상치.
+- **승격:** 검수 통과 → `verified`, 운영진 공식 인정 → `official`. 반려 → 보강 큐.
+- **사인오프:** 분야별 담당 1인 검수 기록(누가/언제). 추후 `reports`/감사 로그.
+
+## 7. 단계 (Phasing)
 
 ```
-주제 리스트(도메인 큐레이션)
-  → AI Wiki 생성: threads(요약/설명) + 타입 분류
-  → 개념 추출: 인물/작품에서 공통 개념(빛/침묵)을 concept thread 로 승격
-  → 연결 생성: relation_type 부여한 thread_connections
-  → 사람 검수(중복 merge, 오류 수정)
-  → 발행: status = community (official 은 검증 후)
+지금: 더미(src/lib/dummy.ts) 소규모 — UI 검증용
+  ▼
+EXP4: 더미 → Supabase 적재(seed script) + 소규모 실데이터
+  ▼
+출시 전: AI 배치 생성(분야별) → 자동 게이트 → 운영진 검수 → Official Seed 500–1000 / 3000–5000
 ```
 
-- **MVP 현 단계:** AI 파이프라인(Edge Function)은 v0.2. **지금은 손큐레이션 + `src/lib/dummy.ts`** 가 사실상의 시드. 실연결(EXP4) 시 이 시드를 `threads`/`thread_connections` 로 적재.
-- **v0.2:** Supabase Edge Function `seedThreadWiki(topic)` 가 위 단계를 자동화. 생성물은 `origin='ai'`(컬럼 추가 시).
+- 도구: Supabase Edge Function `seedThreadWiki(topic)`(v0.2) + `supabase/seed.sql`/TS 시더.
+- 미발견 체감 보장: 시드는 *허브 개념 + 주변 노드*가 빽빽하도록(고립 노드 최소화) — [exploration-logic.md](./exploration-logic.md) §3.
 
-## 5. 중복/품질 관리
+## 8. 다음 액션
 
-- slug + aliases 로 dedup. 충돌 시 접미사 대신 **동일 대상이면 merge**(`merged_into_thread_id`).
-- 빈/얕은 노드(낮은 `completion_score`)는 미발행 또는 보강 큐로.
-- 사실 오류 방지: AI 생성물은 발행 전 사람 검수(특히 연결의 방향/관계).
-
-## 6. 미발견 체감을 위한 시드 설계
-
-- 사용자가 몇 개만 저장해도 **연결 이웃이 풍부**하게 떠야 "새로운 흔적"이 의미 있다.
-- 따라서 시드는 *허브 개념 + 그 주변 인물/작품/장소*가 빽빽한 형태로. (외딴 노드 최소화.)
-
-## 7. 다음 액션
-
-- EXP4(실연결)에서 `dummy.ts` 시드를 Supabase 에 적재하는 시드 스크립트 작성(`supabase/seed.sql` 또는 TS 시더).
-- v0.2에서 AI Wiki Edge Function + `origin` 컬럼 도입.
+- EXP4에서 시더 스크립트(더미→DB).
+- 출시 전 AI 배치 파이프라인 + 검수 운영 정의(담당/도구).
