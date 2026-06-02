@@ -5,7 +5,8 @@ import { H1, H2, Muted, SectionLabel, Card, Thumb, Chip } from "@/components/ui"
 import { useSaves } from "@/features/saves/store";
 import { colors, space, font } from "@/constants/theme";
 
-export default function ProfileScreen() {
+// My View = 나. 내 지도 / 취향 키워드 / 탐험 통계 / 리포트(자리).
+export default function MyViewScreen() {
   const router = useRouter();
   const { count } = useSaves();
 
@@ -19,7 +20,7 @@ export default function ProfileScreen() {
 
   return (
     <Screen>
-      <H1>프로필</H1>
+      <H1>나</H1>
 
       <View style={styles.head}>
         <Thumb size={60} label="me" />
@@ -30,7 +31,7 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      <SectionLabel>탐험 통계</SectionLabel>
+      <SectionLabel>내 지도</SectionLabel>
       <Card>
         <View style={styles.stats}>
           {stats.map((s) => (
@@ -42,17 +43,23 @@ export default function ProfileScreen() {
         </View>
       </Card>
 
-      <SectionLabel>탐험 키워드</SectionLabel>
+      <SectionLabel>밝힌 세계</SectionLabel>
+      <Card>
+        <View style={styles.progRow}><Text style={styles.pl}>일본 건축</Text><Muted>32%</Muted></View>
+        <View style={styles.track}><View style={[styles.fill, { width: "32%" }]} /></View>
+        <View style={[styles.progRow, { marginTop: space.sm }]}><Text style={styles.pl}>기능주의</Text><Muted>18%</Muted></View>
+        <View style={styles.track}><View style={[styles.fill, { width: "18%" }]} /></View>
+      </Card>
+
+      <SectionLabel>취향 키워드</SectionLabel>
       <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-        {keywords.map((k) => (
-          <Chip key={k} label={k} />
-        ))}
+        {keywords.map((k) => <Chip key={k} label={k} />)}
       </View>
 
-      <SectionLabel>계정</SectionLabel>
+      <SectionLabel>리포트 · 계정</SectionLabel>
       <Card onPress={() => router.push("/auth/login")}>
         <Text style={{ color: colors.ink700, fontSize: font.body }}>로그인 / 회원가입</Text>
-        <Muted style={{ marginTop: 2 }}>실제 인증 연결은 다음 단계(EXP4)</Muted>
+        <Muted style={{ marginTop: 2 }}>취향 리포트와 실제 인증은 다음 단계(EXP4)</Muted>
       </Card>
     </Screen>
   );
@@ -65,4 +72,8 @@ const styles = StyleSheet.create({
   stat: { flex: 1, alignItems: "center" },
   statN: { fontSize: font.h2, fontWeight: "700", color: colors.ink900 },
   statL: { fontSize: font.tiny, color: colors.ink400, marginTop: 2 },
+  progRow: { flexDirection: "row", justifyContent: "space-between" },
+  pl: { fontSize: font.small, color: colors.ink700 },
+  track: { height: 6, backgroundColor: colors.line2, borderRadius: 6, overflow: "hidden", marginTop: 4 },
+  fill: { height: "100%", backgroundColor: colors.accent, borderRadius: 6 },
 });

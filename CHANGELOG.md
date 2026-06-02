@@ -5,6 +5,7 @@
 ## 2026-06-02
 
 ### Changes
+- feat(EXP-IA2): 앱을 IA v2 Map 중심 4탭으로 재구성 — 지도(Sky/Sea/Land)/보관/만들기/나. 옛 5탭 삭제. 경량 별자리 Sea + 의존성 0 Land 바텀시트. tsc + expo export(1033 모듈) 통과. (D-017)
 - chore(EXP-RUN): 아이폰 Expo Go(SDK 54) 실기기 구동 확인 완료 (QR 스캔 정상). 연결 이슈는 동일망 재스캔으로 해결.
 - docs: IA v2 (Map 중심) 설계 — `map-experience`(Sky/Sea/Land) · `information-architecture-v2`(4탭) · `navigation-flow`. (D-017)
 - fix: `babel-preset-expo` 의존성 추가 (SDK 54 Metro resolve 에러). `expo export` 번들 검증.

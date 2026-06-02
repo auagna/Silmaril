@@ -1,84 +1,80 @@
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
-import { Screen } from "@/components/ui/Screen";
-import { H1, H2, Muted, SectionLabel, Card, SaveButton, Thumb } from "@/components/ui";
-import { ThreadCard } from "@/components/cards/ThreadCard";
+import { useState } from "react";
+import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Sea } from "@/features/map/Sea";
+import { LandSheet } from "@/features/map/LandSheet";
 import { useSaves } from "@/features/saves/store";
-import { threads, getThreadById, undiscovered } from "@/lib/dummy";
-import { colors, space, font, radius } from "@/constants/theme";
+import { threads, getThreadById, undiscovered, exploreProgress } from "@/lib/dummy";
+import { colors, space, radius, font } from "@/constants/theme";
 
-export default function HomeScreen() {
-  const router = useRouter();
-  const { isSaved, toggle } = useSaves();
+// Map = 핵심 경험. Sky(나침반) / Sea(Active Map) / Land(상세 시트). (D-017)
+export default function MapScreen() {
+  const insets = useSafeAreaInsets();
+  const { savedSet } = useSaves();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const hero = getThreadById("ando-tadao")!;
-  const cont = ["louis-kahn", "carlo-scarpa", "phenomenology"].map((id) => getThreadById(id)!);
-  const recent = ["dieter-rams", "bauhaus"].map((id) => getThreadById(id)!);
-  const undisc = undiscovered();
+  const litThreads = threads.filter((t) => savedSet.has(t.id));
+  const fogThreads = undiscovered();
+  const heroId = "ando-tadao";
+  const firstFog = fogThreads[0]?.id ?? heroId;
 
   return (
-    <Screen>
-      <Muted>Silmaril</Muted>
-      <H1 style={{ marginTop: 2 }}>발견</H1>
+    <View style={[styles.root, { paddingTop: insets.top + space.md }]}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Sky — 나침반 */}
+        <Text style={styles.wordmark}>Silmaril</Text>
+        <Text style={styles.subtitle}>내 세계를 밝히는 중</Text>
 
-      <SectionLabel>오늘의 발견</SectionLabel>
-      <Card onPress={() => router.push(`/thread/${hero.slug}`)} style={{ borderColor: colors.ink400 }}>
-        <H2>{hero.title}</H2>
-        <Muted style={{ marginTop: 6 }}>{hero.summary}</Muted>
-        <View style={styles.heroFoot}>
-          <View style={styles.typePill}><Text style={styles.typeText}>인물</Text></View>
-          <Muted>연결 6 · 저장 88</Muted>
-          <View style={{ marginLeft: "auto" }}>
-            <SaveButton saved={isSaved(hero.id)} onPress={() => toggle(hero.id)} />
-          </View>
-        </View>
-      </Card>
-
-      <SectionLabel>이어서 탐험</SectionLabel>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
-        {cont.map((th) => (
-          <Pressable key={th.id} onPress={() => router.push(`/thread/${th.slug}`)} style={styles.miniCard}>
-            <Thumb size={40} />
-            <Text style={styles.miniTitle} numberOfLines={1}>{th.title}</Text>
-            <Muted>{th.type === "movement" ? "사조" : "인물"}</Muted>
+        <View style={styles.compass}>
+          <Pressable style={styles.chip} onPress={() => setSelectedId(heroId)}>
+            <Text style={styles.chipText}>오늘의 발견</Text>
           </Pressable>
-        ))}
-      </ScrollView>
+          <Pressable style={styles.chip} onPress={() => setSelectedId("dieter-rams")}>
+            <Text style={styles.chipText}>추천</Text>
+          </Pressable>
+          <Pressable style={styles.chip} onPress={() => setSelectedId(firstFog)}>
+            <Text style={styles.chipText}>새로운 흔적 {fogThreads.length}</Text>
+          </Pressable>
+        </View>
 
-      <SectionLabel>최근 저장 기반</SectionLabel>
-      {recent.map((th) => (
-        <ThreadCard key={th.id} thread={th} saved={isSaved(th.id)} onToggleSave={toggle} />
-      ))}
-
-      <SectionLabel>새로운 흔적</SectionLabel>
-      <Card>
-        <Muted style={{ lineHeight: 20 }}>
-          최근 저장한 실마리들이 <Text style={{ color: colors.ink900, fontWeight: "700" }}>‘빛’</Text>과 연결되고 있어요.
-        </Muted>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: space.sm }}>
-          {undisc.map((th) => (
-            <Pressable key={th.id} onPress={() => router.push(`/thread/${th.slug}`)} style={styles.trace}>
-              <Text style={styles.traceText}>{th.title}</Text>
-            </Pressable>
+        {/* 탐험률 */}
+        <View style={styles.progress}>
+          {exploreProgress.map((p) => (
+            <View key={p.label} style={styles.progRow}>
+              <Text style={styles.progLabel}>{p.label}</Text>
+              <View style={styles.track}><View style={[styles.fill, { width: `${p.pct}%` }]} /></View>
+              <Text style={styles.progPct}>{p.pct}%</Text>
+            </View>
           ))}
         </View>
-      </Card>
-    </Screen>
+
+        {/* Sea — Active Map */}
+        <Sea litThreads={litThreads} fogThreads={fogThreads} selectedId={selectedId} onSelect={setSelectedId} />
+        <Text style={styles.hint}>노드를 눌러 실마리를 펼치고, 연결을 따라가 보세요.</Text>
+      </ScrollView>
+
+      {/* Land — 상세 시트 */}
+      <LandSheet threadId={selectedId} onClose={() => setSelectedId(null)} onSelectThread={(id) => setSelectedId(id)} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  heroFoot: { flexDirection: "row", alignItems: "center", gap: space.sm, marginTop: space.md },
-  typePill: { backgroundColor: colors.line2, borderRadius: radius.pill, paddingHorizontal: 7, paddingVertical: 1 },
-  typeText: { fontSize: font.tiny, color: colors.ink500 },
-  miniCard: {
-    width: 124, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line,
-    borderRadius: radius.md, padding: space.sm, gap: 6,
+  root: { flex: 1, backgroundColor: colors.atlasBg },
+  content: { paddingHorizontal: space.lg, paddingBottom: space.xxl },
+  wordmark: { color: colors.atlasText, fontSize: font.h1, fontWeight: "700", letterSpacing: -0.3 },
+  subtitle: { color: colors.atlasMut, fontSize: font.small, marginTop: 2 },
+  compass: { flexDirection: "row", gap: space.sm, marginTop: space.md },
+  chip: {
+    backgroundColor: colors.atlasSurface, borderWidth: 1, borderColor: colors.atlasLine,
+    borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 7,
   },
-  miniTitle: { fontSize: font.small, fontWeight: "600", color: colors.ink900 },
-  trace: {
-    borderWidth: 1, borderColor: colors.line, borderStyle: "dashed", borderRadius: radius.pill,
-    paddingHorizontal: 11, paddingVertical: 5, backgroundColor: colors.bg,
-  },
-  traceText: { fontSize: font.small, color: colors.ink700 },
+  chipText: { color: colors.atlasText, fontSize: font.small, fontWeight: "600" },
+  progress: { marginTop: space.lg, marginBottom: space.md, gap: space.sm },
+  progRow: { flexDirection: "row", alignItems: "center", gap: space.sm },
+  progLabel: { color: colors.atlasMut, fontSize: font.small, width: 84 },
+  track: { flex: 1, height: 6, backgroundColor: colors.atlasSurface, borderRadius: 6, overflow: "hidden" },
+  fill: { height: "100%", backgroundColor: colors.atlasGlow, borderRadius: 6 },
+  progPct: { color: colors.atlasText, fontSize: font.tiny, width: 34, textAlign: "right" },
+  hint: { color: colors.atlasMut, fontSize: font.small, textAlign: "center", marginTop: space.md },
 });

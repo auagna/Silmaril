@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Screen } from "@/components/ui/Screen";
 import { H1, Chip, SectionLabel, Muted, Thumb } from "@/components/ui";
 import { ThreadCard } from "@/components/cards/ThreadCard";
@@ -15,16 +14,15 @@ const collections = [
   { id: "light-arch", title: "빛의 건축", count: 5 },
 ];
 
-export default function RecordsScreen() {
-  const router = useRouter();
+// Archive = 보관. 저장 / 기록(선택) / 컬렉션. (IA v2 — 컬렉션은 여기, 별도 탭 아님)
+export default function ArchiveScreen() {
   const { savedSet, isSaved, toggle } = useSaves();
   const [tab, setTab] = useState<Tab>("saved");
-
   const savedThreads = threads.filter((t) => savedSet.has(t.id));
 
   return (
     <Screen>
-      <H1>기록</H1>
+      <H1>보관</H1>
       <Muted style={{ marginTop: 4 }}>담아둔 것들. 컬렉션도 여기 있어요.</Muted>
 
       <View style={{ flexDirection: "row", marginTop: space.md }}>
@@ -36,20 +34,16 @@ export default function RecordsScreen() {
       {tab === "saved" && (
         <View style={{ marginTop: space.sm }}>
           {savedThreads.length === 0 ? (
-            <Muted>아직 저장한 실마리가 없어요. 탐험에서 하나 저장해 보세요.</Muted>
+            <Muted>아직 저장한 실마리가 없어요. 지도에서 하나 저장해 보세요.</Muted>
           ) : (
-            savedThreads.map((th) => (
-              <ThreadCard key={th.id} thread={th} saved={isSaved(th.id)} onToggleSave={toggle} />
-            ))
+            savedThreads.map((th) => <ThreadCard key={th.id} thread={th} saved={isSaved(th.id)} onToggleSave={toggle} />)
           )}
         </View>
       )}
 
       {tab === "notes" && (
         <View style={{ marginTop: space.md }}>
-          <Muted style={{ lineHeight: 20 }}>
-            기록은 선택이에요. 저장만으로도 지도는 자랍니다. 남기고 싶을 때, 가볍게.
-          </Muted>
+          <Muted style={{ lineHeight: 20 }}>기록은 선택이에요. 저장만으로도 지도는 자랍니다. 남기고 싶을 때, 가볍게.</Muted>
         </View>
       )}
 
