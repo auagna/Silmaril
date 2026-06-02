@@ -83,6 +83,7 @@ export function Sea({
           <Pressable
             key={n.id}
             onPress={() => onSelect(n.id)}
+            hitSlop={10}
             style={{ position: "absolute", left: p.x - NODE_W / 2, top: p.y - NODE_H / 2, width: NODE_W, alignItems: "center" }}
           >
             <View

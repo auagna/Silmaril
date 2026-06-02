@@ -1,6 +1,8 @@
 import { useMemo } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions } from "react-native";
+
+// 작은 화면(SE급)에서도 시트가 화면을 다 덮지 않도록 높이 상한.
+const SHEET_MAX_H = Dimensions.get("window").height * 0.72;
 import { getThreadById, connectionsOf } from "@/lib/dummy";
 import { THREAD_TYPE_LABEL, RELATION_LABEL } from "@/types/database";
 import { useSaves } from "@/features/saves/store";
@@ -16,7 +18,6 @@ export function LandSheet({
   onClose: () => void;
   onSelectThread: (id: string) => void;
 }) {
-  const insets = useSafeAreaInsets();
   const c = useTheme().colors;
   const styles = useMemo(() => makeStyles(c), [c]);
   const { isSaved, toggle } = useSaves();
@@ -31,7 +32,7 @@ export function LandSheet({
   return (
     <View style={styles.overlay}>
       <Pressable style={styles.backdrop} onPress={onClose} />
-      <View style={[styles.sheet, { paddingBottom: insets.bottom + space.md }]}>
+      <View style={styles.sheet}>
         <View style={styles.handle} />
 
         <View style={styles.row}>
@@ -56,7 +57,7 @@ export function LandSheet({
         </View>
 
         <Text style={styles.sectionLbl}>연결 · {conns.length}</Text>
-        <ScrollView style={{ maxHeight: 180 }} showsVerticalScrollIndicator={false}>
+        <ScrollView style={{ maxHeight: 150 }} showsVerticalScrollIndicator={false}>
           {conns.map((cn) => (
             <Pressable key={cn.thread.id} onPress={() => onSelectThread(cn.thread.id)} style={styles.conn}>
               <View style={[styles.rel, cn.tier === 2 && styles.relTier2]}>
@@ -78,7 +79,7 @@ const makeStyles = (c: Palette) =>
   StyleSheet.create({
     overlay: { ...StyleSheet.absoluteFillObject, justifyContent: "flex-end", zIndex: 10 },
     backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.35)" },
-    sheet: { backgroundColor: c.bgSheet, borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: space.lg, paddingTop: space.sm },
+    sheet: { backgroundColor: c.bgSheet, borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: space.lg, paddingTop: space.sm, paddingBottom: space.lg, maxHeight: SHEET_MAX_H },
     handle: { alignSelf: "center", width: 36, height: 4, borderRadius: 2, backgroundColor: c.lineDefault, marginBottom: space.sm },
     row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
     typePill: { backgroundColor: c.line2, borderRadius: radius.pill, paddingHorizontal: 8, paddingVertical: 2 },
