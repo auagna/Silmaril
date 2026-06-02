@@ -22,7 +22,6 @@ coverage/
 
 # Expo
 .expo/
-expo-env.d.ts
 dist/
 web-build/
 *.orig.*
@@ -30,3 +29,7 @@ web-build/
 # Local MCP config — contains a bearer token, must NOT be committed (public repo).
 .mcp.json
 .lazyweb/
+
+# Agent-local tooling state (not for the repo)
+.codex/
+.claude/

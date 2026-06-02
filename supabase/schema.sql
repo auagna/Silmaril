@@ -1,100 +1,82 @@
 -- ============================================================================
--- Silmaril — Supabase schema
+-- Silmaril MVP — Supabase schema  (Expo iPhone-first)
 -- ----------------------------------------------------------------------------
--- Run order:
---   1. this file (schema.sql)
---   2. policies.sql
+-- 정본 방향: docs/silmaril-v2-direction.md · ERD: docs/erd.md
+-- 범위: MVP. RLS 정책 / AI Wiki / perspectives / taste_profiles / reports /
+--       curator_badges / NOU HAUS 는 제외(추후).
+-- 저장-first UX. 기록은 선택. concept 타입 포함. 미발견 실마리 계산 지원
+--   (user_thread_activity + thread_connections + bookmarks 로 파생).
 --
--- Notes:
---   * uses pgcrypto for gen_random_uuid()
---   * Assumes Supabase auth.users exists (Supabase provides it).
+-- 적용:
+--   Supabase SQL Editor 에서 실행.
+--   ⚠️ 기존(웹 MVP) 스키마가 적용된 DB라면 컬럼이 다르므로, 아래 "RESET(옵션)"
+--      블록을 먼저 실행해 깨끗이 한 뒤 적용하세요. (현재 실데이터 없음 → reset 권장)
 -- ============================================================================
 
 create extension if not exists "pgcrypto";
-create extension if not exists "pg_trgm";
 
--- ----------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- RESET (옵션) — 기존 스키마가 있을 때만 주석 해제 후 1회 실행
+-- ---------------------------------------------------------------------------
+-- drop table if exists collection_items, collections, bookmarks, records,
+--   sources, user_thread_activity, thread_connections, threads, users cascade;
+-- drop type if exists visibility_type, thread_status, thread_type, user_role cascade;
+
+-- ---------------------------------------------------------------------------
 -- 1. Enums
--- ----------------------------------------------------------------------------
-
+-- ---------------------------------------------------------------------------
 do $$ begin
-  create type thread_type as enum (
-    'person','work','movement','place','event',
-    'organization','company','media','book','film','music'
-  );
+  create type user_role as enum ('user', 'partner', 'admin');
 exception when duplicate_object then null; end $$;
 
 do $$ begin
-  create type thread_status as enum (
-    'local','community','verified','official','merged','archived'
-  );
+  create type thread_type as enum ('person', 'work', 'movement', 'place', 'concept', 'organization');
 exception when duplicate_object then null; end $$;
 
 do $$ begin
-  create type visibility as enum ('private','followers','public');
+  create type thread_status as enum ('local', 'community', 'verified', 'official', 'merged', 'archived');
 exception when duplicate_object then null; end $$;
 
 do $$ begin
-  create type user_role as enum ('member','partner','admin');
+  create type visibility_type as enum ('private', 'public', 'followers');
 exception when duplicate_object then null; end $$;
 
-do $$ begin
-  create type relation_kind as enum (
-    'influenced_by','created','member_of','located_in',
-    'contemporary_of','related_to','derived_from','belongs_to'
-  );
-exception when duplicate_object then null; end $$;
+-- ---------------------------------------------------------------------------
+-- utility: updated_at 자동 갱신
+-- ---------------------------------------------------------------------------
+create or replace function public.set_updated_at()
+returns trigger language plpgsql as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
 
-do $$ begin
-  create type perspective_stance as enum (
-    'intro','critique','context','legacy','personal','comparison'
-  );
-exception when duplicate_object then null; end $$;
-
-do $$ begin
-  create type source_kind as enum ('article','book','video','audio','image','other');
-exception when duplicate_object then null; end $$;
-
-do $$ begin
-  create type target_kind as enum ('thread','perspective','record');
-exception when duplicate_object then null; end $$;
-
-do $$ begin
-  create type reaction_kind as enum ('like');
-exception when duplicate_object then null; end $$;
-
-do $$ begin
-  create type activity_kind as enum (
-    'view','like','bookmark','record','connect','collect','perspective'
-  );
-exception when duplicate_object then null; end $$;
-
--- ----------------------------------------------------------------------------
--- 2. users
--- ----------------------------------------------------------------------------
-
+-- ---------------------------------------------------------------------------
+-- 2. users  (auth.users 와 1:1)
+-- ---------------------------------------------------------------------------
 create table if not exists public.users (
-  id           uuid primary key references auth.users(id) on delete cascade,
-  handle       text unique not null,
-  display_name text,
-  avatar_url   text,
-  bio          text,
-  role         user_role not null default 'member',
-  created_at   timestamptz not null default now()
+  id            uuid primary key references auth.users(id) on delete cascade,
+  handle        text unique not null,
+  display_name  text,
+  avatar_url    text,
+  bio           text,
+  role          user_role not null default 'user',
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now()
 );
 
--- Auto-create a public.users row when a new auth user is created.
+drop trigger if exists users_set_updated_at on public.users;
+create trigger users_set_updated_at before update on public.users
+  for each row execute function public.set_updated_at();
+
+-- 가입 시 public.users 자동 생성. username -> handle, name -> display_name.
 create or replace function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer
-set search_path = public
-as $$
+returns trigger language plpgsql security definer set search_path = public as $$
 begin
   insert into public.users (id, handle, display_name)
   values (
     new.id,
-    -- 가입 시 넘긴 username을 handle로. 없으면 자동 생성. (role은 컬럼 기본값 'member')
     coalesce(
       nullif(new.raw_user_meta_data->>'username', ''),
       'u_' || substring(replace(new.id::text, '-', '') from 1 for 8)
@@ -109,289 +91,159 @@ $$;
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
-  for each row execute procedure public.handle_new_user();
+  for each row execute function public.handle_new_user();
 
--- ----------------------------------------------------------------------------
--- 3. utility — touch updated_at
--- ----------------------------------------------------------------------------
-
-create or replace function public.touch_updated_at()
-returns trigger language plpgsql as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$;
-
--- ----------------------------------------------------------------------------
--- 4. threads
--- ----------------------------------------------------------------------------
-
+-- ---------------------------------------------------------------------------
+-- 3. threads
+-- ---------------------------------------------------------------------------
 create table if not exists public.threads (
-  id           uuid primary key default gen_random_uuid(),
-  slug         text not null unique,
-  title        text not null,
-  aliases      text[] not null default '{}',
-  type         thread_type not null,
-  summary      text,
-  body         text,
-  cover_url    text,
-  status       thread_status not null default 'local',
-  merged_into  uuid references public.threads(id) on delete set null,
-  created_by   uuid not null references public.users(id) on delete cascade,
-  created_at   timestamptz not null default now(),
-  updated_at   timestamptz not null default now(),
+  id                      uuid primary key default gen_random_uuid(),
+  title                   text not null,
+  slug                    text not null unique,
+  type                    thread_type not null,
+  summary                 text,
+  description             text,
+  cover_image_url         text,
+  status                  thread_status not null default 'local',
+  created_by              uuid references public.users(id) on delete set null,
+  trust_score             numeric not null default 0,
+  completion_score        numeric not null default 0,
+  merged_into_thread_id   uuid references public.threads(id) on delete set null,
+  created_at              timestamptz not null default now(),
+  updated_at              timestamptz not null default now(),
 
-  constraint threads_merged_target_required
-    check ((status = 'merged') = (merged_into is not null)),
-  constraint threads_no_self_merge
-    check (merged_into is null or merged_into <> id)
+  constraint threads_no_self_merge check (merged_into_thread_id is null or merged_into_thread_id <> id)
 );
 
-create index if not exists threads_status_type_idx
-  on public.threads (status, type);
+drop trigger if exists threads_set_updated_at on public.threads;
+create trigger threads_set_updated_at before update on public.threads
+  for each row execute function public.set_updated_at();
 
-create index if not exists threads_created_at_idx
-  on public.threads (created_at desc);
+-- ---------------------------------------------------------------------------
+-- 4. thread_connections  (thread × thread, 방향)
+-- ---------------------------------------------------------------------------
+-- relation_type 예: influenced_by, created, member_of, located_in,
+--                   contemporary_of, related_to, derived_from, belongs_to
+create table if not exists public.thread_connections (
+  id              uuid primary key default gen_random_uuid(),
+  from_thread_id  uuid not null references public.threads(id) on delete cascade,
+  to_thread_id    uuid not null references public.threads(id) on delete cascade,
+  relation_type   text not null,
+  description     text,
+  created_by      uuid references public.users(id) on delete set null,
+  status          thread_status not null default 'community',
+  trust_score     numeric not null default 0,
+  created_at      timestamptz not null default now(),
 
-create index if not exists threads_aliases_gin
-  on public.threads using gin (aliases);
-
-create index if not exists threads_title_trgm
-  on public.threads using gin (title gin_trgm_ops);
-
-drop trigger if exists threads_touch on public.threads;
-create trigger threads_touch
-  before update on public.threads
-  for each row execute procedure public.touch_updated_at();
-
--- Prevent merge chains: if X is merged into Y and Y is merged into Z, flatten to Z.
-create or replace function public.enforce_merge_chain()
-returns trigger language plpgsql as $$
-declare
-  target_status thread_status;
-  target_redirect uuid;
-begin
-  if new.merged_into is null then
-    return new;
-  end if;
-
-  select status, merged_into into target_status, target_redirect
-  from public.threads where id = new.merged_into;
-
-  -- flatten: if target is itself merged, redirect to its final.
-  while target_status = 'merged' and target_redirect is not null loop
-    new.merged_into := target_redirect;
-    select status, merged_into into target_status, target_redirect
-    from public.threads where id = new.merged_into;
-  end loop;
-
-  return new;
-end;
-$$;
-
-drop trigger if exists threads_enforce_merge on public.threads;
-create trigger threads_enforce_merge
-  before insert or update of merged_into, status on public.threads
-  for each row execute procedure public.enforce_merge_chain();
-
--- Slug uniqueness helper.
-create or replace function public.slug_unique_or_suffix(input text)
-returns text language plpgsql as $$
-declare
-  base text := input;
-  candidate text := input;
-  i int := 2;
-begin
-  while exists (select 1 from public.threads where slug = candidate) loop
-    candidate := base || '-' || i;
-    i := i + 1;
-  end loop;
-  return candidate;
-end;
-$$;
-
--- ----------------------------------------------------------------------------
--- 5. connections (thread × thread)
--- ----------------------------------------------------------------------------
-
-create table if not exists public.connections (
-  id           uuid primary key default gen_random_uuid(),
-  from_thread  uuid not null references public.threads(id) on delete cascade,
-  to_thread    uuid not null references public.threads(id) on delete cascade,
-  relation     relation_kind not null,
-  note         text,
-  created_by   uuid not null references public.users(id) on delete cascade,
-  created_at   timestamptz not null default now(),
-
-  constraint connections_no_self check (from_thread <> to_thread),
-  constraint connections_unique  unique (from_thread, to_thread, relation)
+  constraint thread_connections_no_self check (from_thread_id <> to_thread_id),
+  constraint thread_connections_unique  unique (from_thread_id, to_thread_id, relation_type)
 );
 
-create index if not exists connections_from_idx on public.connections (from_thread);
-create index if not exists connections_to_idx   on public.connections (to_thread);
-create index if not exists connections_rel_idx  on public.connections (relation);
-
--- ----------------------------------------------------------------------------
--- 6. perspectives
--- ----------------------------------------------------------------------------
-
-create table if not exists public.perspectives (
-  id           uuid primary key default gen_random_uuid(),
-  thread_id    uuid not null references public.threads(id) on delete cascade,
-  title        text not null,
-  body         text not null,
-  stance       perspective_stance not null default 'intro',
-  visibility   visibility not null default 'public',
-  created_by   uuid not null references public.users(id) on delete cascade,
-  created_at   timestamptz not null default now(),
-  updated_at   timestamptz not null default now()
+-- ---------------------------------------------------------------------------
+-- 5. bookmarks  (저장 — save-first 핵심)
+-- ---------------------------------------------------------------------------
+create table if not exists public.bookmarks (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references public.users(id)   on delete cascade,
+  thread_id   uuid not null references public.threads(id) on delete cascade,
+  created_at  timestamptz not null default now(),
+  unique (user_id, thread_id)
 );
 
-create index if not exists perspectives_thread_idx
-  on public.perspectives (thread_id, created_at desc);
-
-drop trigger if exists perspectives_touch on public.perspectives;
-create trigger perspectives_touch
-  before update on public.perspectives
-  for each row execute procedure public.touch_updated_at();
-
--- ----------------------------------------------------------------------------
--- 7. records
--- ----------------------------------------------------------------------------
-
+-- ---------------------------------------------------------------------------
+-- 6. records  (기록 — 선택. thread_id nullable = 자유 기록 가능)
+-- ---------------------------------------------------------------------------
 create table if not exists public.records (
-  id           uuid primary key default gen_random_uuid(),
-  thread_id    uuid references public.threads(id) on delete set null, -- nullable
-  body         text not null,
-  media_url    text,
-  visibility   visibility not null default 'private',
-  created_by   uuid not null references public.users(id) on delete cascade,
-  created_at   timestamptz not null default now()
+  id          uuid primary key default gen_random_uuid(),
+  created_by  uuid not null references public.users(id)   on delete cascade,
+  thread_id   uuid references public.threads(id)          on delete set null,
+  content     text not null,
+  media_url   text,
+  visibility  visibility_type not null default 'private',
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
 );
 
-create index if not exists records_author_idx
-  on public.records (created_by, created_at desc);
+drop trigger if exists records_set_updated_at on public.records;
+create trigger records_set_updated_at before update on public.records
+  for each row execute function public.set_updated_at();
 
-create index if not exists records_thread_idx
-  on public.records (thread_id, created_at desc);
-
--- ----------------------------------------------------------------------------
--- 8. collections
--- ----------------------------------------------------------------------------
-
+-- ---------------------------------------------------------------------------
+-- 7. collections + collection_items
+-- ---------------------------------------------------------------------------
 create table if not exists public.collections (
-  id           uuid primary key default gen_random_uuid(),
-  slug         text not null,
-  title        text not null,
-  description  text,
-  cover_url    text,
-  visibility   visibility not null default 'public',
-  created_by   uuid not null references public.users(id) on delete cascade,
-  created_at   timestamptz not null default now(),
-  updated_at   timestamptz not null default now(),
+  id              uuid primary key default gen_random_uuid(),
+  created_by      uuid not null references public.users(id) on delete cascade,
+  title           text not null,
+  slug            text not null,
+  description     text,
+  cover_image_url text,
+  visibility      visibility_type not null default 'public',
+  created_at      timestamptz not null default now(),
+  updated_at      timestamptz not null default now(),
 
-  constraint collections_slug_per_user unique (created_by, slug)
+  unique (created_by, slug)
 );
 
-drop trigger if exists collections_touch on public.collections;
-create trigger collections_touch
-  before update on public.collections
-  for each row execute procedure public.touch_updated_at();
+drop trigger if exists collections_set_updated_at on public.collections;
+create trigger collections_set_updated_at before update on public.collections
+  for each row execute function public.set_updated_at();
 
 create table if not exists public.collection_items (
-  collection_id uuid not null references public.collections(id) on delete cascade,
-  thread_id     uuid not null references public.threads(id)     on delete cascade,
-  position      integer not null default 0,
-  note          text,
-  added_at      timestamptz not null default now(),
-
+  collection_id  uuid not null references public.collections(id) on delete cascade,
+  thread_id      uuid not null references public.threads(id)     on delete cascade,
+  position       integer not null default 0,
+  note           text,
+  added_at       timestamptz not null default now(),
   primary key (collection_id, thread_id)
 );
 
-create index if not exists collection_items_position_idx
-  on public.collection_items (collection_id, position);
-
--- ----------------------------------------------------------------------------
--- 9. bookmarks
--- ----------------------------------------------------------------------------
-
-create table if not exists public.bookmarks (
-  user_id    uuid not null references public.users(id)   on delete cascade,
-  thread_id  uuid not null references public.threads(id) on delete cascade,
-  created_at timestamptz not null default now(),
-  primary key (user_id, thread_id)
-);
-
-create index if not exists bookmarks_user_idx   on public.bookmarks (user_id);
-create index if not exists bookmarks_thread_idx on public.bookmarks (thread_id);
-
--- ----------------------------------------------------------------------------
--- 10. reactions (polymorphic, light)
--- ----------------------------------------------------------------------------
-
-create table if not exists public.reactions (
-  id           uuid primary key default gen_random_uuid(),
-  user_id      uuid not null references public.users(id) on delete cascade,
-  target_kind  target_kind not null,
-  target_id    uuid not null,
-  kind         reaction_kind not null default 'like',
-  created_at   timestamptz not null default now(),
-
-  constraint reactions_unique unique (user_id, target_kind, target_id, kind)
-);
-
-create index if not exists reactions_target_idx
-  on public.reactions (target_kind, target_id);
-
--- ----------------------------------------------------------------------------
--- 11. sources
--- ----------------------------------------------------------------------------
-
-create table if not exists public.sources (
-  id               uuid primary key default gen_random_uuid(),
-  url              text not null,
-  title            text,
-  description      text,
-  kind             source_kind not null default 'article',
-  attached_to_kind target_kind not null,
-  attached_to_id   uuid not null,
-  created_by       uuid not null references public.users(id) on delete cascade,
-  created_at       timestamptz not null default now()
-);
-
-create index if not exists sources_attached_idx
-  on public.sources (attached_to_kind, attached_to_id);
-
--- ----------------------------------------------------------------------------
--- 12. user_thread_activity (denormalized signal log)
--- ----------------------------------------------------------------------------
-
+-- ---------------------------------------------------------------------------
+-- 8. user_thread_activity  (탐험/Atlas/미발견 계산용)
+-- ---------------------------------------------------------------------------
 create table if not exists public.user_thread_activity (
-  user_id   uuid not null references public.users(id)   on delete cascade,
-  thread_id uuid not null references public.threads(id) on delete cascade,
-  kind      activity_kind not null,
-  weight    numeric not null default 1.0,
-  last_at   timestamptz not null default now(),
-
-  primary key (user_id, thread_id, kind)
+  id                   uuid primary key default gen_random_uuid(),
+  user_id              uuid not null references public.users(id)   on delete cascade,
+  thread_id            uuid not null references public.threads(id) on delete cascade,
+  viewed               boolean not null default false,
+  saved                boolean not null default false,
+  recorded             boolean not null default false,
+  added_to_collection  boolean not null default false,
+  last_viewed_at       timestamptz,
+  unique (user_id, thread_id)
 );
 
-create index if not exists user_thread_activity_user_idx
-  on public.user_thread_activity (user_id, kind, last_at desc);
+-- ---------------------------------------------------------------------------
+-- 9. sources  (외부 출처 — MVP는 thread 에 첨부)
+-- ---------------------------------------------------------------------------
+create table if not exists public.sources (
+  id          uuid primary key default gen_random_uuid(),
+  thread_id   uuid references public.threads(id) on delete cascade,
+  url         text not null,
+  title       text,
+  description text,
+  created_by  uuid references public.users(id) on delete set null,
+  created_at  timestamptz not null default now()
+);
 
--- ----------------------------------------------------------------------------
--- 13. convenience views (read-only aggregates for ranking)
--- ----------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- 10. Indexes
+-- ---------------------------------------------------------------------------
+create index if not exists idx_threads_type            on public.threads (type);
+create index if not exists idx_threads_status          on public.threads (status);
+create index if not exists idx_threads_slug            on public.threads (slug);
+create index if not exists idx_connections_from        on public.thread_connections (from_thread_id);
+create index if not exists idx_connections_to          on public.thread_connections (to_thread_id);
+create index if not exists idx_bookmarks_user          on public.bookmarks (user_id);
+create index if not exists idx_activity_user           on public.user_thread_activity (user_id);
 
-create or replace view public.thread_signal as
-select
-  t.id as thread_id,
-  (select count(*) from public.bookmarks b where b.thread_id = t.id)               as bookmarks_count,
-  (select count(*) from public.connections c where c.from_thread = t.id or c.to_thread = t.id) as connections_count,
-  (select count(*) from public.collection_items ci where ci.thread_id = t.id)      as collection_inclusions,
-  (select count(*) from public.records r where r.thread_id = t.id)                 as records_count,
-  (select count(*) from public.perspectives p where p.thread_id = t.id)            as perspectives_count,
-  (select count(*) from public.reactions x
-     where x.target_kind = 'thread' and x.target_id = t.id and x.kind = 'like')    as likes_count
-from public.threads t;
+-- 보조 인덱스 (조회 패턴)
+create index if not exists idx_records_user            on public.records (created_by, created_at desc);
+create index if not exists idx_collection_items_coll   on public.collection_items (collection_id, position);
+
+-- ============================================================================
+-- 미발견(Undiscovered) 계산 메모 — 테이블 아님, 파생
+--   미발견(user) = { 저장 thread 들의 thread_connections 이웃 }
+--                  − { bookmarks ∪ user_thread_activity.viewed }
+--   UI 노출 용어: "미발견 / 미확인 실마리 / 새로운 흔적"  (Fog/Locked/??? 금지)
+-- ============================================================================
