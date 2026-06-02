@@ -18,6 +18,7 @@
 **다음:** 사용자 Expo Go 재확인(Reload) → **EXP4(Supabase 실연결)** (스키마 SQL Editor 적용 1회 + service 구현 + 더미 대체).
 
 **설계 문서 추가 (2026-06-02):** `atlas-system`(내부개념↔사용자용어) · `exploration-logic`(저장→미발견→새 흔적→추천 규칙, 안도 워크스루) · `seed-dataset-strategy` 확장(목표 500–1000 threads / 3000–5000 connections / 건축·산업디자인·그래픽·사진·예술 + Official/AI생성/운영진검수 기준). 이 규칙들은 EXP4 의 `getUndiscoveredThreads`/`getUserExploreMap` + 출시 전 시드 파이프라인의 근거.
+**feature-matrix Map 중심 재정렬 (2026-06-02):** Must를 4탭(Map[Sky/Sea/Land]/Archive/Create/My View)별로 재배치. (canonical-knowledge-model·erd·schema·4탭 스켈레톤은 기존 상태가 이미 충족 → 재작업 안 함.)
 
 > **SDK 54 업그레이드 완료 (D-016):** Expo Go(앱스토어=SDK54)와 맞춤. react 19.1 / RN 0.81.5 / expo-router 6 / ts 5.9. `.npmrc`(legacy-peer-deps) 추가. **`babel-preset-expo` 의존성 추가**(Metro resolve 에러 수정). 검증: `expo export --platform ios` 1032 모듈 번들 성공. 첫 실행은 `npx expo start -c`.
 
