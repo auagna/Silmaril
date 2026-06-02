@@ -37,6 +37,8 @@
 - [x] **연결 모델 + 타입 정렬.** `thread_connections.connection_tier`(1 사실/2 해석) 추가 · connection type 10종 · `src/types/database.ts` 를 스키마와 1:1 정렬(+dummy/컴포넌트). `canonical-knowledge-model` 확장. `tsc` 통과.
 - [x] **IA v2 설계 문서** — `map-experience`(Sky/Sea/Land) · `information-architecture-v2`(4탭 Map/Archive/Create/My View) · `navigation-flow` (D-017).
 - [x] **Atlas 설계 문서** — `atlas-system`(내부개념↔사용자용어) · `exploration-logic`(저장→미발견→새로운흔적→추천 규칙) · `seed-dataset-strategy` 확장(500–1000 threads / 3000–5000 connections / 5분야 + Official/AI/검수 기준).
+- [x] **Step 11. Day/Night 테마 시스템** — `src/theme`(tokens Day/Night + Provider + `useTheme`, system 기본/`setMode`). 4탭+Map(Sky/Sea/Land)+ui+탭바+StatusBar 적용. 금/주황은 추천/선택/저장만. `tsc`+`expo export` 통과. (auth/thread[id]는 추후 — 정적 폴백.) — D-018
+- [ ] **Step 12-23 (UI 빌드 백로그)** — Sky 아이콘 나침반 · Sea 키워드맵 정제 · Land 탭 시트(기본/관점/연결) · Keyword 데이터 모델 · 추천 이동 로직 · Archive/Create/My View 1차 · 전역상태 통합 · Supabase 스키마초안/연결준비. (한 번에 하나씩 진행.)
 - [x] **EXP-IA2. 4탭 재구성 (구현 완료).** `app/(tabs)` = 지도(Map)/보관(Archive)/만들기(Create)/나(My View). Map=Sky(나침반)+Sea(별자리 노드·연결·미발견, 경량 RN)+Land(바텀시트 상세, 의존성 0). 옛 5탭 삭제. `tsc` + `expo export`(1033 모듈) 통과. 더미 데이터.
 - [ ] **EXP4. Supabase 실연결** — service 함수(api-spec) 구현 → 더미 store/dummy 대체 + seed 적재. RLS(`policies.sql` 신규)도 이 단계. (타입 정렬은 완료.)
 

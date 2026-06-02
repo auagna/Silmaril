@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Sea } from "@/features/map/Sea";
 import { LandSheet } from "@/features/map/LandSheet";
 import { useSaves } from "@/features/saves/store";
-import { threads, getThreadById, undiscovered, exploreProgress } from "@/lib/dummy";
-import { colors, space, radius, font } from "@/constants/theme";
+import { threads, undiscovered, exploreProgress } from "@/lib/dummy";
+import { useTheme, space, radius, font, type Palette } from "@/theme";
 
 // Map = 핵심 경험. Sky(나침반) / Sea(Active Map) / Land(상세 시트). (D-017)
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
+  const c = useTheme().colors;
+  const styles = useMemo(() => makeStyles(c), [c]);
   const { savedSet } = useSaves();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -37,7 +39,6 @@ export default function MapScreen() {
           </Pressable>
         </View>
 
-        {/* 탐험률 */}
         <View style={styles.progress}>
           {exploreProgress.map((p) => (
             <View key={p.label} style={styles.progRow}>
@@ -48,33 +49,29 @@ export default function MapScreen() {
           ))}
         </View>
 
-        {/* Sea — Active Map */}
         <Sea litThreads={litThreads} fogThreads={fogThreads} selectedId={selectedId} onSelect={setSelectedId} />
         <Text style={styles.hint}>노드를 눌러 실마리를 펼치고, 연결을 따라가 보세요.</Text>
       </ScrollView>
 
-      {/* Land — 상세 시트 */}
       <LandSheet threadId={selectedId} onClose={() => setSelectedId(null)} onSelectThread={(id) => setSelectedId(id)} />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.atlasBg },
-  content: { paddingHorizontal: space.lg, paddingBottom: space.xxl },
-  wordmark: { color: colors.atlasText, fontSize: font.h1, fontWeight: "700", letterSpacing: -0.3 },
-  subtitle: { color: colors.atlasMut, fontSize: font.small, marginTop: 2 },
-  compass: { flexDirection: "row", gap: space.sm, marginTop: space.md },
-  chip: {
-    backgroundColor: colors.atlasSurface, borderWidth: 1, borderColor: colors.atlasLine,
-    borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 7,
-  },
-  chipText: { color: colors.atlasText, fontSize: font.small, fontWeight: "600" },
-  progress: { marginTop: space.lg, marginBottom: space.md, gap: space.sm },
-  progRow: { flexDirection: "row", alignItems: "center", gap: space.sm },
-  progLabel: { color: colors.atlasMut, fontSize: font.small, width: 84 },
-  track: { flex: 1, height: 6, backgroundColor: colors.atlasSurface, borderRadius: 6, overflow: "hidden" },
-  fill: { height: "100%", backgroundColor: colors.atlasGlow, borderRadius: 6 },
-  progPct: { color: colors.atlasText, fontSize: font.tiny, width: 34, textAlign: "right" },
-  hint: { color: colors.atlasMut, fontSize: font.small, textAlign: "center", marginTop: space.md },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    root: { flex: 1, backgroundColor: c.bgMain },
+    content: { paddingHorizontal: space.lg, paddingBottom: space.xxl },
+    wordmark: { color: c.textMain, fontSize: font.h1, fontWeight: "700", letterSpacing: -0.3 },
+    subtitle: { color: c.textMuted, fontSize: font.small, marginTop: 2 },
+    compass: { flexDirection: "row", gap: space.sm, marginTop: space.md },
+    chip: { backgroundColor: c.surface, borderWidth: 1, borderColor: c.lineDefault, borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 7 },
+    chipText: { color: c.textMain, fontSize: font.small, fontWeight: "600" },
+    progress: { marginTop: space.lg, marginBottom: space.md, gap: space.sm },
+    progRow: { flexDirection: "row", alignItems: "center", gap: space.sm },
+    progLabel: { color: c.textMuted, fontSize: font.small, width: 84 },
+    track: { flex: 1, height: 6, backgroundColor: c.line2, borderRadius: 6, overflow: "hidden" },
+    fill: { height: "100%", backgroundColor: c.nodeDefault, borderRadius: 6 },
+    progPct: { color: c.textMain, fontSize: font.tiny, width: 34, textAlign: "right" },
+    hint: { color: c.textMuted, fontSize: font.small, textAlign: "center", marginTop: space.md },
+  });

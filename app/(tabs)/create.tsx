@@ -1,9 +1,9 @@
+import { useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Screen } from "@/components/ui/Screen";
 import { H1, Muted } from "@/components/ui";
-import { colors, space, radius, font } from "@/constants/theme";
+import { useTheme, space, radius, font, type Palette } from "@/theme";
 
-// Create = 만들기. 실마리 / 기록 / 컬렉션 생성 진입점. (생성은 흐름을 막지 않음 — local 즉시 반영)
 const items = [
   { key: "thread", title: "실마리 생성", body: "인물·작품·사조·장소·개념·조직. 초안은 즉시 내 지도에." },
   { key: "record", title: "기록 생성", body: "짧게 남겨요. 실마리에 묶거나 자유롭게. (선택)" },
@@ -11,6 +11,8 @@ const items = [
 ];
 
 export default function CreateScreen() {
+  const c = useTheme().colors;
+  const styles = useMemo(() => makeStyles(c), [c]);
   return (
     <Screen>
       <H1>만들기</H1>
@@ -33,12 +35,10 @@ export default function CreateScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line,
-    borderRadius: radius.md, padding: space.lg,
-  },
-  title: { fontSize: font.h3, fontWeight: "700", color: colors.ink900 },
-  body: { fontSize: font.small, color: colors.ink500, marginTop: 4, lineHeight: 20 },
-  cta: { fontSize: font.tiny, color: colors.ink400, marginTop: space.md },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    card: { backgroundColor: c.surface, borderWidth: 1, borderColor: c.lineDefault, borderRadius: radius.md, padding: space.lg },
+    title: { fontSize: font.h3, fontWeight: "700", color: c.textMain },
+    body: { fontSize: font.small, color: c.textMuted, marginTop: 4, lineHeight: 20 },
+    cta: { fontSize: font.tiny, color: c.textMuted, marginTop: space.md },
+  });

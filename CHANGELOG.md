@@ -5,6 +5,7 @@
 ## 2026-06-02
 
 ### Changes
+- feat(Step 11): Day/Night 전역 테마 — `src/theme`(tokens + Provider + `useTheme`, system 기본/setMode). 4탭·Map(Sky/Sea/Land)·ui·탭바·StatusBar 적용. 금/주황은 추천·선택·저장만. tsc+expo export(1035) 통과. (D-018)
 - docs: `feature-matrix` 를 Map 중심 4탭(Map/Archive/Create/My View)으로 재정렬. (canonical-knowledge-model·erd·schema·4탭 스켈레톤은 기존 충족 — 재작업 없음.)
 - docs: Atlas 설계 — `atlas-system`(내부개념↔사용자용어) · `exploration-logic`(탐험 규칙) · `seed-dataset-strategy` 확장(500–1000 threads/3000–5000 connections, 5분야, Official/AI/검수 기준).
 - feat(EXP-IA2): 앱을 IA v2 Map 중심 4탭으로 재구성 — 지도(Sky/Sea/Land)/보관/만들기/나. 옛 5탭 삭제. 경량 별자리 Sea + 의존성 0 Land 바텀시트. tsc + expo export(1033 모듈) 통과. (D-017)

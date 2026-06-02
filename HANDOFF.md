@@ -20,6 +20,11 @@
 **설계 문서 추가 (2026-06-02):** `atlas-system`(내부개념↔사용자용어) · `exploration-logic`(저장→미발견→새 흔적→추천 규칙, 안도 워크스루) · `seed-dataset-strategy` 확장(목표 500–1000 threads / 3000–5000 connections / 건축·산업디자인·그래픽·사진·예술 + Official/AI생성/운영진검수 기준). 이 규칙들은 EXP4 의 `getUndiscoveredThreads`/`getUserExploreMap` + 출시 전 시드 파이프라인의 근거.
 **feature-matrix Map 중심 재정렬 (2026-06-02):** Must를 4탭(Map[Sky/Sea/Land]/Archive/Create/My View)별로 재배치. (canonical-knowledge-model·erd·schema·4탭 스켈레톤은 기존 상태가 이미 충족 → 재작업 안 함.)
 
+**✅ Step 11 Day/Night 테마 (D-018):** `src/theme`(tokens Day/Night + Provider + `useTheme`, system 기본). 4탭+Map(Sky/Sea/Land)+ui+탭바+StatusBar 가 테마 적용. 금/주황은 추천·선택·저장만. `tsc`+`expo export`(1035) 통과.
+- **사용법:** 컴포넌트에서 `const c = useTheme().colors; const s = useMemo(()=>makeStyles(c),[c]);`. 설정화면은 `useTheme().setMode('light'|'dark'|'system')` 만 연결하면 됨.
+- **남은 부채:** `app/auth/*`, `app/thread/[id]` 는 아직 정적 `src/constants/theme.ts` 의 `colors` 사용(Day 근사). 추후 테마 전환.
+- **다음 백로그(12~23):** Sky 아이콘 나침반 → Sea 키워드맵 정제 → Land 탭 시트 → Keyword 모델 → 추천 이동 → Archive/Create/My View 1차 → 전역상태 통합 → Supabase 초안/연결. **한 번에 하나씩.**
+
 > **SDK 54 업그레이드 완료 (D-016):** Expo Go(앱스토어=SDK54)와 맞춤. react 19.1 / RN 0.81.5 / expo-router 6 / ts 5.9. `.npmrc`(legacy-peer-deps) 추가. **`babel-preset-expo` 의존성 추가**(Metro resolve 에러 수정). 검증: `expo export --platform ios` 1032 모듈 번들 성공. 첫 실행은 `npx expo start -c`.
 
 > **IA v2 설계 확정 (D-017, 문서만):** Map 중심 **4탭(Map/Archive/Create/My View)** + 3레이어 Map(Sky/Sea/Land), Thread Detail=bottom sheet. 문서: `docs/map-experience.md`·`information-architecture-v2.md`·`navigation-flow.md`. ⚠️ **현 Expo 코드는 아직 5탭** — 다음 구현 태스크 **EXP-IA2** 에서 4탭 재구성.

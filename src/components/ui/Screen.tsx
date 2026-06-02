@@ -1,10 +1,12 @@
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { ScrollView, View, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors, space } from "@/constants/theme";
+import { useTheme, space, type Palette } from "@/theme";
 
 export function Screen({ children, scroll = true }: { children: ReactNode; scroll?: boolean }) {
+  const c = useTheme().colors;
   const insets = useSafeAreaInsets();
+  const styles = useMemo(() => makeStyles(c), [c]);
   const pad = { paddingTop: insets.top + space.md, paddingBottom: space.xxl };
   if (!scroll) {
     return <View style={[styles.base, pad, { flex: 1 }]}>{children}</View>;
@@ -16,7 +18,8 @@ export function Screen({ children, scroll = true }: { children: ReactNode; scrol
   );
 }
 
-const styles = StyleSheet.create({
-  base: { flex: 1, backgroundColor: colors.bg },
-  content: { paddingHorizontal: space.lg },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    base: { flex: 1, backgroundColor: c.bgMain },
+    content: { paddingHorizontal: space.lg },
+  });

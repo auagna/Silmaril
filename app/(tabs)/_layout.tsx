@@ -1,20 +1,21 @@
 import { Tabs } from "expo-router";
 import { Text } from "react-native";
-import { colors } from "@/constants/theme";
+import { useTheme } from "@/theme";
 
-// IA v2 (D-017): Map 중심 4탭. 지도(Map) / 보관(Archive) / 만들기(Create) / 나(My View).
+// IA v2 (D-017): Map 중심 4탭. 지도/보관/만들기/나. 탭바도 Day/Night 테마 적용.
 function Icon({ glyph, color }: { glyph: string; color: string }) {
   return <Text style={{ fontSize: 18, color }}>{glyph}</Text>;
 }
 
 export default function TabsLayout() {
+  const c = useTheme().colors;
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.ink900,
-        tabBarInactiveTintColor: colors.ink400,
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.line },
+        tabBarActiveTintColor: c.textMain,
+        tabBarInactiveTintColor: c.textMuted,
+        tabBarStyle: { backgroundColor: c.surface, borderTopColor: c.lineDefault },
         tabBarLabelStyle: { fontSize: 11 },
       }}
     >

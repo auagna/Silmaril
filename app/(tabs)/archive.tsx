@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Screen } from "@/components/ui/Screen";
-import { H1, Chip, SectionLabel, Muted, Thumb } from "@/components/ui";
+import { H1, Chip, Muted, Thumb } from "@/components/ui";
 import { ThreadCard } from "@/components/cards/ThreadCard";
 import { useSaves } from "@/features/saves/store";
 import { threads } from "@/lib/dummy";
-import { colors, space, radius, font } from "@/constants/theme";
+import { useTheme, space, radius, font, type Palette } from "@/theme";
 
 type Tab = "saved" | "notes" | "collections";
 
@@ -14,8 +14,10 @@ const collections = [
   { id: "light-arch", title: "빛의 건축", count: 5 },
 ];
 
-// Archive = 보관. 저장 / 기록(선택) / 컬렉션. (IA v2 — 컬렉션은 여기, 별도 탭 아님)
+// Archive = 보관. 저장 / 기록(선택) / 컬렉션. (컬렉션은 여기, 별도 탭 아님)
 export default function ArchiveScreen() {
+  const c = useTheme().colors;
+  const styles = useMemo(() => makeStyles(c), [c]);
   const { savedSet, isSaved, toggle } = useSaves();
   const [tab, setTab] = useState<Tab>("saved");
   const savedThreads = threads.filter((t) => savedSet.has(t.id));
@@ -49,11 +51,11 @@ export default function ArchiveScreen() {
 
       {tab === "collections" && (
         <View style={styles.grid}>
-          {collections.map((c) => (
-            <Pressable key={c.id} style={styles.gcard}>
+          {collections.map((cl) => (
+            <Pressable key={cl.id} style={styles.gcard}>
               <Thumb size={36} />
-              <Text style={styles.gtitle}>{c.title}</Text>
-              <Muted>실마리 {c.count}</Muted>
+              <Text style={styles.gtitle}>{cl.title}</Text>
+              <Muted>실마리 {cl.count}</Muted>
             </Pressable>
           ))}
         </View>
@@ -62,11 +64,9 @@ export default function ArchiveScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  grid: { flexDirection: "row", flexWrap: "wrap", gap: space.sm, marginTop: space.sm },
-  gcard: {
-    width: "48%", backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line,
-    borderRadius: radius.md, padding: space.md, gap: 6,
-  },
-  gtitle: { fontSize: font.small, fontWeight: "600", color: colors.ink900 },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    grid: { flexDirection: "row", flexWrap: "wrap", gap: space.sm, marginTop: space.sm },
+    gcard: { width: "48%", backgroundColor: c.surface, borderWidth: 1, borderColor: c.lineDefault, borderRadius: radius.md, padding: space.md, gap: 6 },
+    gtitle: { fontSize: font.small, fontWeight: "600", color: c.textMain },
+  });

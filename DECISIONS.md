@@ -4,6 +4,18 @@
 
 ---
 
+## 2026-06-02 · D-018 · Day/Night 테마 시스템
+
+- **맥락:** 디자이너 타깃 + 어두운 탐험 톤. 전역 테마 필요(라이트=Day Silmaril, 다크=Night Silmaril).
+- **결정:**
+  - 토큰 `src/theme/tokens.ts` (Day/Night 팔레트 — 사용자 지정 색 + 파생 surface/nodeText/line2/onAccent) + `ThemeMode='system'|'light'|'dark'`.
+  - `src/theme/`(Provider/`useTheme`). 기본 = 기기 시스템(`useColorScheme`), `setMode`로 추후 사용자 변경 가능(설정 UI는 추후).
+  - 컴포넌트는 `makeStyles(palette)` + `useTheme()` 로 색을 받음. **금색(accentRecommend)/주황(accentActive)은 추천/선택/저장 상태에만** 제한 사용.
+  - 적용 범위: 4탭(지도/보관/만들기/나) + Map(Sky/Sea/Land) + 공용 ui/카드 + 탭바 + StatusBar. (auth/* · thread/[id] 는 "가능한 범위" 원칙으로 추후 — 정적 `colors` 폴백 유지.)
+  - `src/constants/theme.ts` 는 space/radius/font 를 tokens에서 재export + legacy `colors`(폴백) 보존.
+- **결과:** `tsc` + `expo export`(1035 모듈) 통과. Night/Day 전환이 핵심 화면에 일괄 적용.
+- **다음 훅/이름:** `useTheme()`, `ThemeProvider`, `Palette`, `ThemeMode` — 설정 화면에서 `setMode` 연결만 하면 됨.
+
 ## 2026-06-02 · D-017 · IA v2 — Map 중심 4탭 + 3레이어 Map
 
 - **맥락:** "Atlas = 감정적 중심"(D-013)을 실제 내비게이션 중심으로. 5탭(홈/검색/탐험/기록/프로필)이 탐험을 분산시킴.
