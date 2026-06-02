@@ -5,6 +5,8 @@
 ## 2026-06-02
 
 ### Changes
+- docs: IA v2 (Map 중심) 설계 — `map-experience`(Sky/Sea/Land) · `information-architecture-v2`(4탭) · `navigation-flow`. (D-017)
+- fix: `babel-preset-expo` 의존성 추가 (SDK 54 Metro resolve 에러). `expo export` 번들 검증.
 - chore: Expo SDK 51 → **54** 업그레이드 (react 19.1 / RN 0.81.5 / expo-router 6 / ts 5.9). `.npmrc` legacy-peer-deps. Expo Go(SDK54) 호환. tsc·expo config 통과. (D-016)
 - feat: 연결 모델 강화 — `thread_connections.connection_tier`(1 사실/2 해석) + connection type 10종. `canonical-knowledge-model` 확장(그래프=핵심 자산). `src/types/database.ts` 를 스키마와 1:1 정렬(+dummy/컴포넌트), `tsc` 통과.
 - docs: thread-taxonomy 타입별 5항 보강 + 신규 `docs/canonical-knowledge-model.md`·`docs/seed-dataset-strategy.md` (개념 허브, AI-seed 시드 전략).

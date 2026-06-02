@@ -36,6 +36,8 @@
 - [x] **EXP-DB. MVP Supabase 스키마 작성.** `supabase/schema.sql` — 9테이블(users/threads/thread_connections/bookmarks/records/collections/collection_items/user_thread_activity/sources) + 4 enum(user_role[user/partner/admin]/thread_type[concept 포함]/thread_status/visibility_type) + 인덱스. RLS·AI Wiki·perspectives 제외. `docs/erd.md` 동기화.
 - [ ] **EXP-DB-APPLY. (사용자) 스키마 적용.** Supabase SQL Editor 에서 `supabase/schema.sql` 실행. ⚠️ 옛 웹 스키마가 있으면 파일 상단 RESET 블록 먼저 (실데이터 없음 → reset 권장).
 - [x] **연결 모델 + 타입 정렬.** `thread_connections.connection_tier`(1 사실/2 해석) 추가 · connection type 10종 · `src/types/database.ts` 를 스키마와 1:1 정렬(+dummy/컴포넌트). `canonical-knowledge-model` 확장. `tsc` 통과.
+- [x] **IA v2 설계 문서** — `map-experience`(Sky/Sea/Land) · `information-architecture-v2`(4탭 Map/Archive/Create/My View) · `navigation-flow` (D-017).
+- [ ] **EXP-IA2. 4탭 재구성 (구현).** `app/(tabs)` 를 Map/Archive/Create/My View 로. Map은 Sky/Sea/Land(노드+연결+미발견, Land=bottom sheet). 현 5탭(홈/검색/탐험/기록/프로필) 대체. 더미 우선.
 - [ ] **EXP4. Supabase 실연결** — service 함수(api-spec) 구현 → 더미 store/dummy 대체 + seed 적재. RLS(`policies.sql` 신규)도 이 단계. (타입 정렬은 완료.)
 
 > 이전 웹 트랙(W2/D1 등)은 D-014로 보류. UX 원칙/와이어프레임(v1·v2)은 RN 디자인의 참고 자산으로 유지.

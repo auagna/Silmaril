@@ -15,7 +15,9 @@
 **완료:** 문서 세트(roadmap/taxonomy/feature-matrix/erd/api-spec) · Expo 골격(5탭+auth+thread/[id], 더미) · **MVP Supabase 스키마(`supabase/schema.sql`)**.
 **다음:** (사용자) `npx expo start -c` → Expo Go(SDK 54) 확인 + 스키마 SQL Editor 적용 → 그 후 EXP4(실연결).
 
-> **SDK 54 업그레이드 완료 (D-016):** Expo Go(앱스토어=SDK54)와 맞춤. react 19.1 / RN 0.81.5 / expo-router 6 / ts 5.9. `.npmrc`(legacy-peer-deps) 추가. 코드 변경 없음, `tsc`·`expo config(54.0.0)` 통과. SDK 변경 후 첫 실행은 캐시 클리어(`-c`).
+> **SDK 54 업그레이드 완료 (D-016):** Expo Go(앱스토어=SDK54)와 맞춤. react 19.1 / RN 0.81.5 / expo-router 6 / ts 5.9. `.npmrc`(legacy-peer-deps) 추가. **`babel-preset-expo` 의존성 추가**(Metro resolve 에러 수정). 검증: `expo export --platform ios` 1032 모듈 번들 성공. 첫 실행은 `npx expo start -c`.
+
+> **IA v2 설계 확정 (D-017, 문서만):** Map 중심 **4탭(Map/Archive/Create/My View)** + 3레이어 Map(Sky/Sea/Land), Thread Detail=bottom sheet. 문서: `docs/map-experience.md`·`information-architecture-v2.md`·`navigation-flow.md`. ⚠️ **현 Expo 코드는 아직 5탭** — 다음 구현 태스크 **EXP-IA2** 에서 4탭 재구성.
 
 ### 이번에 추가된 것 (EXP-DB · MVP Supabase 스키마)
 - `supabase/schema.sql` 새로 작성 (옛 웹 스키마 대체): 9테이블 + 4 enum(`user_role` user/partner/admin, `thread_type` person/work/movement/place/**concept**/organization, `thread_status`, `visibility_type`) + 인덱스 + `handle_new_user`/`set_updated_at` 트리거.

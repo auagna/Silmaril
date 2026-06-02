@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-06-02 · D-017 · IA v2 — Map 중심 4탭 + 3레이어 Map
+
+- **맥락:** "Atlas = 감정적 중심"(D-013)을 실제 내비게이션 중심으로. 5탭(홈/검색/탐험/기록/프로필)이 탐험을 분산시킴.
+- **결정:**
+  - **Map을 핵심 경험·시작점**으로. Map = 3레이어: **Sky**(나침반: 추천/Daily Discovery/미발견 점프) · **Sea**(Active Map: 노드/연결/미발견/경로) · **Land**(Bottom Sheet: 요약/저장/컬렉션/연결/관점/출처). → [map-experience.md](docs/map-experience.md).
+  - **하단 4탭: Map · Archive · Create · My View.** Home/Search → Map(Sky)로 흡수, Explore→Map, Records→Archive, Profile→My View, **Create 탭 부활**. 컬렉션은 Archive 안. → [information-architecture-v2.md](docs/information-architecture-v2.md).
+  - **Thread Detail = Land Bottom Sheet**(페이지 push 아님) — 연결 따라가기를 시트 갱신으로 처리해 탐험이 끊기지 않음. → [navigation-flow.md](docs/navigation-flow.md).
+- **결과:** 내비 정본 = IA v2(이전 5탭 IA §0 대체). **문서 우선, 구현은 다음 태스크**(현 Expo 코드는 아직 5탭).
+- **재고할 시점:** Map 그래프 성능이 모바일에서 무거우면 Sea 를 리스트/카드 폴백과 병행.
+
 ## 2026-06-02 · D-016 · Expo SDK 51 → 54 업그레이드
 
 - **맥락:** iOS Expo Go(앱스토어 최신)가 **SDK 54** 인데 프로젝트는 SDK 51 → "Project is incompatible" 로 실기기에서 안 열림. iOS Expo Go 는 구버전 설치 불가(최신만 지원).
