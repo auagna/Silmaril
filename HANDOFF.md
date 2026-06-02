@@ -21,6 +21,7 @@
 - **RLS·AI Wiki·perspectives·taste_profiles·reports·curator_badges·NOU HAUS 제외**(추후). `docs/erd.md` 동기화.
 - `bookmarks`·`user_thread_activity` 는 `id` PK + `unique(user_id, thread_id)`.
 - 운영: `CHANGELOG.md` 신설, CLAUDE/AGENTS 에 보고 형식·브랜치·CHANGELOG 규칙 반영. `.codex/`·`.claude/` gitignore.
+- 문서 보강: `thread-taxonomy.md`(타입별 5항) + 신규 `docs/canonical-knowledge-model.md` · `docs/seed-dataset-strategy.md`. (개념 허브·AI-seed 전략.)
 - ⚠️ **적용 시(사용자):** 옛 웹 스키마가 DB에 있으면 schema.sql 상단 RESET 블록 먼저 실행 후 적용.
 - ⚠️ **정합성 부채(EXP4):** `src/types/database.ts` 가 옛 명칭(body/cover_url/origin/connections, role member)이라 새 스키마와 불일치 → EXP4에서 정렬. `supabase/policies.sql` 도 옛 스키마용 → RLS 단계에서 새로.
 

@@ -23,6 +23,7 @@
 > 미지영역 사용자 용어 = **미발견** (`???`/`Fog`/`Locked` 금지, D-015). Atlas = 키워드 탭+스와이프.
 
 - [x] **P1-4 문서** — roadmap · thread-taxonomy(concept 포함) · feature-matrix · erd · api-spec.
+- [x] **문서 보강** — thread-taxonomy 타입별 5항(정의/예시/필수필드/연결가능타입/MVP이유) + **canonical-knowledge-model** + **seed-dataset-strategy**.
 - [x] **EXP0. 기존 Next.js 웹 → `legacy-web/` 이동.** 루트는 Expo 차지.
 - [x] **EXP1-3. Expo 골격 + Supabase client + 타입 + 더미 화면.**
       Expo Router 5탭(홈/검색/탐험/기록/프로필) + auth(login/signup) + thread/[id]. StyleSheet + `src/constants/theme.ts`.
