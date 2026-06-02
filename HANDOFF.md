@@ -13,7 +13,8 @@
 
 **현 트랙: Expo RN MVP (D-014, iPhone-first).** 웹은 `legacy-web/` 로 보존.
 **완료:** 문서 세트(roadmap/taxonomy/feature-matrix/erd/api-spec) · Expo 골격(5탭+auth+thread/[id], 더미) · **MVP Supabase 스키마(`supabase/schema.sql`)**.
-**다음:** (사용자) `npx expo start -c` → Expo Go(SDK 54) 확인 + 스키마 SQL Editor 적용 → 그 후 EXP4(실연결).
+**✅ 실기기 구동 확인 (2026-06-02):** 아이폰 Expo Go(SDK 54)에서 QR 스캔 → 앱 정상 동작. (연결 이슈=동일망 재스캔으로 해결.)
+**다음:** EXP-IA2(4탭 Map 중심 재구성) 또는 EXP4(Supabase 실연결) — 사용자 선택. (스키마 SQL Editor 적용은 EXP4 전 1회.)
 
 > **SDK 54 업그레이드 완료 (D-016):** Expo Go(앱스토어=SDK54)와 맞춤. react 19.1 / RN 0.81.5 / expo-router 6 / ts 5.9. `.npmrc`(legacy-peer-deps) 추가. **`babel-preset-expo` 의존성 추가**(Metro resolve 에러 수정). 검증: `expo export --platform ios` 1032 모듈 번들 성공. 첫 실행은 `npx expo start -c`.
 

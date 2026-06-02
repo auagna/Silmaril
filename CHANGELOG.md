@@ -5,6 +5,7 @@
 ## 2026-06-02
 
 ### Changes
+- chore(EXP-RUN): 아이폰 Expo Go(SDK 54) 실기기 구동 확인 완료 (QR 스캔 정상). 연결 이슈는 동일망 재스캔으로 해결.
 - docs: IA v2 (Map 중심) 설계 — `map-experience`(Sky/Sea/Land) · `information-architecture-v2`(4탭) · `navigation-flow`. (D-017)
 - fix: `babel-preset-expo` 의존성 추가 (SDK 54 Metro resolve 에러). `expo export` 번들 검증.
 - chore: Expo SDK 51 → **54** 업그레이드 (react 19.1 / RN 0.81.5 / expo-router 6 / ts 5.9). `.npmrc` legacy-peer-deps. Expo Go(SDK54) 호환. tsc·expo config 통과. (D-016)
