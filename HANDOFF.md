@@ -13,7 +13,9 @@
 
 **현 트랙: Expo RN MVP (D-014, iPhone-first).** 웹은 `legacy-web/` 로 보존.
 **완료:** 문서 세트(roadmap/taxonomy/feature-matrix/erd/api-spec) · Expo 골격(5탭+auth+thread/[id], 더미) · **MVP Supabase 스키마(`supabase/schema.sql`)**.
-**다음:** (사용자) `npx expo start` Expo Go 확인 + 스키마 SQL Editor 적용 → 그 후 EXP4(실연결).
+**다음:** (사용자) `npx expo start -c` → Expo Go(SDK 54) 확인 + 스키마 SQL Editor 적용 → 그 후 EXP4(실연결).
+
+> **SDK 54 업그레이드 완료 (D-016):** Expo Go(앱스토어=SDK54)와 맞춤. react 19.1 / RN 0.81.5 / expo-router 6 / ts 5.9. `.npmrc`(legacy-peer-deps) 추가. 코드 변경 없음, `tsc`·`expo config(54.0.0)` 통과. SDK 변경 후 첫 실행은 캐시 클리어(`-c`).
 
 ### 이번에 추가된 것 (EXP-DB · MVP Supabase 스키마)
 - `supabase/schema.sql` 새로 작성 (옛 웹 스키마 대체): 9테이블 + 4 enum(`user_role` user/partner/admin, `thread_type` person/work/movement/place/**concept**/organization, `thread_status`, `visibility_type`) + 인덱스 + `handle_new_user`/`set_updated_at` 트리거.

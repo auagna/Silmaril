@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-06-02 · D-016 · Expo SDK 51 → 54 업그레이드
+
+- **맥락:** iOS Expo Go(앱스토어 최신)가 **SDK 54** 인데 프로젝트는 SDK 51 → "Project is incompatible" 로 실기기에서 안 열림. iOS Expo Go 는 구버전 설치 불가(최신만 지원).
+- **결정:** 프로젝트를 **Expo SDK 54** 로 올림. `expo@^54` 설치 후 `expo install --fix` 로 정렬: react 19.1 · react-native 0.81.5 · expo-router 6.0.24 · safe-area 5.6 · screens 4.16 · async-storage 2.2 · ts 5.9. `@types/react` 19, typescript 5.9 수동 정렬.
+- **npm peer 충돌:** React 19 로 ERESOLVE → **`.npmrc` 에 `legacy-peer-deps=true`** (SDK 53+ / npm 표준 회피책). 커밋됨.
+- **결과:** `tsc --noEmit` 통과, `expo config` sdkVersion 54.0.0. 코드 변경 불필요(expo-router 6 API 동일). 검증은 사용자 Expo Go(SDK 54).
+- **참고:** SDK 변경 후 첫 실행은 `npx expo start -c`(캐시 클리어) 권장.
+
 ## 2026-06-01 · D-015 · 사용자 용어 — "미발견" (`???`/`Fog`/`Locked` 금지) + Atlas 인터랙션
 
 - **맥락:** v2 와이어프레임에서 `???`로 미지영역 표시 → 사용자가 "오류난 줄" 안다는 피드백.

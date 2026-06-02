@@ -29,8 +29,8 @@
       Expo Router 5탭(홈/검색/탐험/기록/프로필) + auth(login/signup) + thread/[id]. StyleSheet + `src/constants/theme.ts`.
       `src/lib/supabase.ts`(AsyncStorage), `src/types/database.ts`, `src/lib/dummy.ts`, `src/features/saves/store.ts`.
       검증: `npm install` + `tsc --noEmit` 통과 + `expo config` 정상 + EXPO_PUBLIC env 로드 확인.
-- [ ] **EXP-RUN. (사용자) Expo Go 로 실기기 확인.**  ← **다음 작업 (사용자)**
-      `npx expo start` → 아이폰 Expo Go 로 QR 스캔. 5탭/탐험(Atlas)/저장/상세 흐름 점검.
+- [ ] **EXP-RUN. (사용자) Expo Go(SDK 54) 로 실기기 확인.**  ← **다음 작업 (사용자)**
+      `npx expo start -c` → 아이폰 Expo Go 로 QR 스캔. (SDK 51→54 업그레이드 완료 — D-016, 이제 호환.) 5탭/탐험(Atlas)/저장/상세 흐름 점검.
       Codex 사전 검증(2026-06-02): `npm run typecheck`, `npx expo config --type public` 통과.
       이 PC에서 Expo API 조회가 `ECONNABORTED` 되면 네트워크 정상화 후 재시도. `--offline`은 localhost 전용이라 실기기 확인에 부적합.
 - [x] **EXP-DB. MVP Supabase 스키마 작성.** `supabase/schema.sql` — 9테이블(users/threads/thread_connections/bookmarks/records/collections/collection_items/user_thread_activity/sources) + 4 enum(user_role[user/partner/admin]/thread_type[concept 포함]/thread_status/visibility_type) + 인덱스. RLS·AI Wiki·perspectives 제외. `docs/erd.md` 동기화.
