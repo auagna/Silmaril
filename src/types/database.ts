@@ -1,19 +1,16 @@
-// Silmaril 도메인 타입 — Supabase 스키마(ERD)와 1:1. 정본: docs/erd.md.
+// Silmaril 도메인 타입 — Supabase 스키마(supabase/schema.sql)와 1:1 정렬.
+// 정본: docs/erd.md · docs/canonical-knowledge-model.md
 
+export type UserRole = "user" | "partner" | "admin";
+
+// MVP enum (확장 추후: event/company/book/film/music/media)
 export type ThreadType =
   | "person"
   | "work"
   | "movement"
   | "place"
   | "concept"
-  | "organization"
-  // 확장(추후): event/company/book/film/music/media
-  | "event"
-  | "company"
-  | "book"
-  | "film"
-  | "music"
-  | "media";
+  | "organization";
 
 export type ThreadStatus =
   | "local"
@@ -23,19 +20,23 @@ export type ThreadStatus =
   | "merged"
   | "archived";
 
-export type Origin = "ai" | "user" | "curator";
+export type Visibility = "private" | "public" | "followers";
 
-export type Visibility = "private" | "followers" | "public";
-
-export type RelationKind =
+// 연결 타입 (relation_type, text). 정본 방향 1개 저장 + 역방향 보강.
+export type RelationType =
   | "influenced_by"
+  | "influenced"
   | "created"
-  | "member_of"
+  | "created_by"
+  | "belongs_to"
+  | "part_of"
   | "located_in"
   | "contemporary_of"
   | "related_to"
-  | "derived_from"
-  | "belongs_to";
+  | "shares_theme";
+
+// 1 = 사실 기반, 2 = 해석 기반
+export type ConnectionTier = 1 | 2;
 
 export interface User {
   id: string;
@@ -43,37 +44,43 @@ export interface User {
   display_name: string | null;
   avatar_url: string | null;
   bio: string | null;
+  role: UserRole;
   created_at: string;
+  updated_at: string;
 }
 
 export interface Thread {
   id: string;
-  slug: string;
   title: string;
-  aliases: string[];
+  slug: string;
   type: ThreadType;
   summary: string | null;
-  body: string | null;
-  cover_url: string | null;
+  description: string | null;
+  cover_image_url: string | null;
   status: ThreadStatus;
-  origin: Origin;
-  created_by: string;
+  created_by: string | null;
+  trust_score: number;
+  completion_score: number;
+  merged_into_thread_id: string | null;
   created_at: string;
   updated_at: string;
 }
 
 export interface ThreadConnection {
   id: string;
-  from_thread: string;
-  to_thread: string;
-  relation: RelationKind;
-  note: string | null;
-  origin: Origin;
-  created_by: string;
+  from_thread_id: string;
+  to_thread_id: string;
+  relation_type: RelationType;
+  connection_tier: ConnectionTier;
+  description: string | null;
+  created_by: string | null;
+  status: ThreadStatus;
+  trust_score: number;
   created_at: string;
 }
 
 export interface Bookmark {
+  id: string;
   user_id: string;
   thread_id: string;
   created_at: string;
@@ -81,27 +88,57 @@ export interface Bookmark {
 
 export interface Record {
   id: string;
+  created_by: string;
   thread_id: string | null;
-  body: string;
+  content: string;
   media_url: string | null;
   visibility: Visibility;
-  created_by: string;
-  created_at: string;
-}
-
-export interface Collection {
-  id: string;
-  slug: string;
-  title: string;
-  description: string | null;
-  cover_url: string | null;
-  visibility: Visibility;
-  created_by: string;
   created_at: string;
   updated_at: string;
 }
 
-// 사용자 노출 라벨 (Search 타입 필터 등). `concept`=개념 포함.
+export interface Collection {
+  id: string;
+  created_by: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  cover_image_url: string | null;
+  visibility: Visibility;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CollectionItem {
+  collection_id: string;
+  thread_id: string;
+  position: number;
+  note: string | null;
+  added_at: string;
+}
+
+export interface UserThreadActivity {
+  id: string;
+  user_id: string;
+  thread_id: string;
+  viewed: boolean;
+  saved: boolean;
+  recorded: boolean;
+  added_to_collection: boolean;
+  last_viewed_at: string | null;
+}
+
+export interface Source {
+  id: string;
+  thread_id: string | null;
+  url: string;
+  title: string | null;
+  description: string | null;
+  created_by: string | null;
+  created_at: string;
+}
+
+// 사용자 노출 라벨 — Search 타입 필터. concept=개념 포함.
 export const THREAD_TYPE_LABEL: { [K in ThreadType]: string } = {
   person: "인물",
   work: "작품",
@@ -109,15 +146,8 @@ export const THREAD_TYPE_LABEL: { [K in ThreadType]: string } = {
   place: "장소",
   concept: "개념",
   organization: "조직",
-  event: "사건",
-  company: "기업",
-  book: "책",
-  film: "영화",
-  music: "음악",
-  media: "매체",
 };
 
-// MVP 검색/필터에 노출할 타입 순서.
 export const MVP_THREAD_TYPES: ThreadType[] = [
   "person",
   "work",
@@ -127,13 +157,15 @@ export const MVP_THREAD_TYPES: ThreadType[] = [
   "organization",
 ];
 
-export const RELATION_LABEL: { [K in RelationKind]: string } = {
+export const RELATION_LABEL: { [K in RelationType]: string } = {
   influenced_by: "영향받음",
+  influenced: "영향줌",
   created: "만듦",
-  member_of: "소속",
+  created_by: "만들어짐",
+  belongs_to: "속함",
+  part_of: "일부",
   located_in: "위치",
   contemporary_of: "동시대",
   related_to: "관련",
-  derived_from: "파생",
-  belongs_to: "속함",
+  shares_theme: "주제 공유",
 };

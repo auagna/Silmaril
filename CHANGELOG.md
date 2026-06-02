@@ -5,6 +5,7 @@
 ## 2026-06-02
 
 ### Changes
+- feat: 연결 모델 강화 — `thread_connections.connection_tier`(1 사실/2 해석) + connection type 10종. `canonical-knowledge-model` 확장(그래프=핵심 자산). `src/types/database.ts` 를 스키마와 1:1 정렬(+dummy/컴포넌트), `tsc` 통과.
 - docs: thread-taxonomy 타입별 5항 보강 + 신규 `docs/canonical-knowledge-model.md`·`docs/seed-dataset-strategy.md` (개념 허브, AI-seed 시드 전략).
 - chore: `bookmarks`·`user_thread_activity` 에 `id` PK 추가(+unique 유지). CHANGELOG 정비, 운영 규칙(브랜치/리포트 형식/CHANGELOG)을 CLAUDE/AGENTS 에 반영.
 - feat(EXP-DB): MVP Supabase 스키마 `supabase/schema.sql` — 9테이블 + 4 enum + 인덱스 + 트리거(handle_new_user/set_updated_at). RLS·AI Wiki·perspectives 제외. `docs/erd.md` 동기화.

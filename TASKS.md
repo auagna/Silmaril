@@ -35,7 +35,8 @@
       이 PC에서 Expo API 조회가 `ECONNABORTED` 되면 네트워크 정상화 후 재시도. `--offline`은 localhost 전용이라 실기기 확인에 부적합.
 - [x] **EXP-DB. MVP Supabase 스키마 작성.** `supabase/schema.sql` — 9테이블(users/threads/thread_connections/bookmarks/records/collections/collection_items/user_thread_activity/sources) + 4 enum(user_role[user/partner/admin]/thread_type[concept 포함]/thread_status/visibility_type) + 인덱스. RLS·AI Wiki·perspectives 제외. `docs/erd.md` 동기화.
 - [ ] **EXP-DB-APPLY. (사용자) 스키마 적용.** Supabase SQL Editor 에서 `supabase/schema.sql` 실행. ⚠️ 옛 웹 스키마가 있으면 파일 상단 RESET 블록 먼저 (실데이터 없음 → reset 권장).
-- [ ] **EXP4. Supabase 실연결** — `src/types/database.ts` 를 새 스키마에 정렬(body→description, cover_url→cover_image_url, from/to_thread_id, relation_type, role 'user', MVP 6타입) → service 함수(api-spec) 구현 → 더미 store 대체. RLS(`policies.sql` 신규)도 이 단계.
+- [x] **연결 모델 + 타입 정렬.** `thread_connections.connection_tier`(1 사실/2 해석) 추가 · connection type 10종 · `src/types/database.ts` 를 스키마와 1:1 정렬(+dummy/컴포넌트). `canonical-knowledge-model` 확장. `tsc` 통과.
+- [ ] **EXP4. Supabase 실연결** — service 함수(api-spec) 구현 → 더미 store/dummy 대체 + seed 적재. RLS(`policies.sql` 신규)도 이 단계. (타입 정렬은 완료.)
 
 > 이전 웹 트랙(W2/D1 등)은 D-014로 보류. UX 원칙/와이어프레임(v1·v2)은 RN 디자인의 참고 자산으로 유지.
       Lazyweb 네이티브 도구는 재시작+서버 승인 후 `mcp__lazyweb__*` 로 사용. (참고: [[lazyweb-ui-reference]])

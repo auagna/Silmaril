@@ -23,7 +23,8 @@
 - 운영: `CHANGELOG.md` 신설, CLAUDE/AGENTS 에 보고 형식·브랜치·CHANGELOG 규칙 반영. `.codex/`·`.claude/` gitignore.
 - 문서 보강: `thread-taxonomy.md`(타입별 5항) + 신규 `docs/canonical-knowledge-model.md` · `docs/seed-dataset-strategy.md`. (개념 허브·AI-seed 전략.)
 - ⚠️ **적용 시(사용자):** 옛 웹 스키마가 DB에 있으면 schema.sql 상단 RESET 블록 먼저 실행 후 적용.
-- ⚠️ **정합성 부채(EXP4):** `src/types/database.ts` 가 옛 명칭(body/cover_url/origin/connections, role member)이라 새 스키마와 불일치 → EXP4에서 정렬. `supabase/policies.sql` 도 옛 스키마용 → RLS 단계에서 새로.
+- ✅ **타입 정합성 해소:** `src/types/database.ts` 를 스키마와 1:1 정렬 완료(+dummy/컴포넌트, `tsc` 통과). `thread_connections.connection_tier`(1 사실/2 해석) 추가, connection type 10종, `canonical-knowledge-model` 확장(그래프=핵심 자산).
+- ⚠️ 남은 부채: `supabase/policies.sql` 은 옛 스키마용 → RLS 단계에서 새로. (AI-seed `origin` 컬럼/`aliases` 는 v0.2.)
 
 ### 이번에 추가된 것 (UX Research Sprint + 와이어프레임 v1)
 - Lazyweb 증거 기반 4 스프린트 → `docs/ux-research/`: exploration / graph-navigation / collections / curator-system / **silmaril-ux-conclusion**.

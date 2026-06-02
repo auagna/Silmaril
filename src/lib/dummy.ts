@@ -1,25 +1,21 @@
-// MVP 더미 데이터. Supabase 실연결 전 UI 구동용. (EXP4에서 service 로 대체)
-import type { Thread, ThreadConnection, RelationKind, ThreadType } from "@/types/database";
+// MVP 더미 데이터. Supabase 실연결 전 UI 구동용. (EXP4에서 service + seed 로 대체)
+// 스키마(supabase/schema.sql)와 동일 필드명.
+import type { Thread, ThreadConnection, RelationType, ThreadType, ConnectionTier } from "@/types/database";
 
-function t(
-  id: string,
-  title: string,
-  type: ThreadType,
-  summary: string,
-  origin: Thread["origin"] = "ai",
-): Thread {
+function t(id: string, title: string, type: ThreadType, summary: string): Thread {
   return {
     id,
-    slug: id,
     title,
-    aliases: [],
+    slug: id,
     type,
     summary,
-    body: null,
-    cover_url: null,
+    description: null,
+    cover_image_url: null,
     status: "community",
-    origin,
-    created_by: "seed",
+    created_by: null,
+    trust_score: 0,
+    completion_score: 0,
+    merged_into_thread_id: null,
     created_at: "2026-06-01T00:00:00Z",
     updated_at: "2026-06-01T00:00:00Z",
   };
@@ -38,32 +34,34 @@ export const threads: Thread[] = [
   t("braun-sk4", "Braun SK4", "work", "백설공주의 관 — 모더니즘 산업디자인의 상징."),
 ];
 
-export const connections: ThreadConnection[] = [
-  conn("ando-tadao", "louis-kahn", "influenced_by"),
-  conn("ando-tadao", "light", "belongs_to"),
-  conn("ando-tadao", "silence", "belongs_to"),
-  conn("louis-kahn", "light", "belongs_to"),
-  conn("carlo-scarpa", "ando-tadao", "contemporary_of"),
-  conn("ando-tadao", "phenomenology", "related_to"),
-  conn("dieter-rams", "braun-sk4", "created"),
-  conn("dieter-rams", "bauhaus", "influenced_by"),
-  conn("bauhaus", "dessau", "located_in"),
-];
-
-function conn(from: string, to: string, relation: RelationKind): ThreadConnection {
+function conn(from: string, to: string, relation_type: RelationType, tier: ConnectionTier): ThreadConnection {
   return {
     id: `${from}__${to}`,
-    from_thread: from,
-    to_thread: to,
-    relation,
-    note: null,
-    origin: "ai",
-    created_by: "seed",
+    from_thread_id: from,
+    to_thread_id: to,
+    relation_type,
+    connection_tier: tier,
+    description: null,
+    created_by: null,
+    status: "community",
+    trust_score: 0,
     created_at: "2026-06-01T00:00:00Z",
   };
 }
 
-// 사용자가 "저장한" 더미 실마리 (Atlas에서 밝혀진 노드).
+export const connections: ThreadConnection[] = [
+  conn("louis-kahn", "ando-tadao", "influenced", 1), // 사실
+  conn("ando-tadao", "light", "related_to", 2), // 해석
+  conn("ando-tadao", "silence", "related_to", 2),
+  conn("louis-kahn", "light", "related_to", 2),
+  conn("carlo-scarpa", "ando-tadao", "contemporary_of", 1),
+  conn("ando-tadao", "phenomenology", "shares_theme", 2),
+  conn("dieter-rams", "braun-sk4", "created", 1),
+  conn("dieter-rams", "bauhaus", "influenced_by", 1),
+  conn("bauhaus", "dessau", "located_in", 1),
+];
+
+// 사용자가 "저장한" 더미 실마리.
 export const savedIds = ["ando-tadao", "louis-kahn", "light"];
 
 export function getThreadById(id: string): Thread | undefined {
@@ -79,21 +77,23 @@ export function searchThreads(q: string, type?: ThreadType): Thread[] {
   );
 }
 
-export function connectionsOf(threadId: string): { thread: Thread; relation: RelationKind }[] {
-  const out: { thread: Thread; relation: RelationKind }[] = [];
+export function connectionsOf(
+  threadId: string,
+): { thread: Thread; relation_type: RelationType; tier: ConnectionTier }[] {
+  const out: { thread: Thread; relation_type: RelationType; tier: ConnectionTier }[] = [];
   for (const c of connections) {
-    if (c.from_thread === threadId) {
-      const th = getThreadById(c.to_thread);
-      if (th) out.push({ thread: th, relation: c.relation });
-    } else if (c.to_thread === threadId) {
-      const th = getThreadById(c.from_thread);
-      if (th) out.push({ thread: th, relation: c.relation });
+    if (c.from_thread_id === threadId) {
+      const th = getThreadById(c.to_thread_id);
+      if (th) out.push({ thread: th, relation_type: c.relation_type, tier: c.connection_tier });
+    } else if (c.to_thread_id === threadId) {
+      const th = getThreadById(c.from_thread_id);
+      if (th) out.push({ thread: th, relation_type: c.relation_type, tier: c.connection_tier });
     }
   }
   return out;
 }
 
-// "미발견" = 저장한 실마리의 이웃 중 아직 저장 안 한 것. (UI 용어: 미발견 / 새로운 흔적)
+// "미발견" = 저장한 실마리의 이웃 중 아직 저장 안 한 것. (UI: 미발견 / 새로운 흔적)
 export function undiscovered(): Thread[] {
   const seen = new Set(savedIds);
   const out = new Map<string, Thread>();

@@ -2,6 +2,9 @@
 
 > Silmaril이 "지식"을 어떻게 표현하는가의 개념 모델. 물리 스키마는 [erd.md](./erd.md), 타입은 [thread-taxonomy.md](./thread-taxonomy.md).
 > 한 줄: **하나의 대상 = 하나의 정본(canonical) 노드. 그 위에 연결·기여·관점이 쌓인다.**
+>
+> ⭐ **핵심 자산은 Thread 가 아니라 Connection Graph 다.** 노드(실마리)는 흔하다 — 가치는 *어떻게 이어졌는가*에 있다.
+> 사용자 용어: 미발견 / 미확인 실마리 / 새로운 흔적 / 연결 가능한 실마리. (`Fog`/`Locked`/`???` 금지 — D-015.)
 
 ## 1. 정본(Canonical) 원칙
 
@@ -20,12 +23,41 @@
 
 > "실마리는 하나, 관점은 여러 개." 관점은 *경쟁 페이지*가 아니라 같은 정본 위의 레이어다(추후).
 
-## 3. 연결(Edge) 모델
+## 3. 연결(Edge) 모델 — 핵심 자산
 
-- `thread_connections` = **방향 있는 타입 엣지**: `from → [relation_type] → to`.
-- relation_type 예: influenced_by / created / member_of / located_in / contemporary_of / related_to / derived_from / belongs_to.
-- 엣지에도 `status`(검증 단계) + `trust_score`(신뢰) — 사실 주장도 검증 대상.
-- **개념 중심성:** 인물·작품을 잇는 진짜 실마리는 종종 `concept`(빛/침묵)다. 개념 노드가 그래프의 허브가 되도록 시드한다.
+- `thread_connections` = **방향 있는 타입 엣지**: `from → [relation_type] → to`. 엣지에 `status`(검증 단계) + `trust_score`(신뢰) + **`connection_tier`**.
+
+### Connection Types (relation_type)
+
+| relation_type | 의미 | 역방향 |
+|---------------|------|--------|
+| `influenced_by` | A가 B에게 영향받음 | `influenced` |
+| `influenced` | A가 B에게 영향줌 | `influenced_by` |
+| `created` | A가 B를 만듦 | `created_by` |
+| `created_by` | A가 B에 의해 만들어짐 | `created` |
+| `belongs_to` | A가 B에 속함 | `part_of`(맥락) |
+| `part_of` | A가 B의 일부 | `belongs_to` |
+| `located_in` | A가 B에 위치 | — |
+| `contemporary_of` | 동시대 (대칭) | 자기 자신 |
+| `related_to` | 관련 (해석) | 대칭 |
+| `shares_theme` | 주제 공유 (해석) | 대칭 |
+
+> 저장은 **정본 방향 1개**만(역방향은 조회/표시에서 보강). MVP `relation_type` 은 text(위 값 권장).
+
+### Connection Tier (사실 vs 해석)
+
+| tier | 이름 | 정의 | 예시 |
+|------|------|------|------|
+| **1** | 사실 기반 | 검증 가능한 사실 관계 | Mies van der Rohe `influenced` Louis Kahn · Louis Kahn `influenced` Tadao Ando · Tadao Ando `created` Church of the Light · Dieter Rams `belongs_to` Braun |
+| **2** | 해석 기반 | 주관적/큐레이션 연결 | Tadao Ando `related_to` 빛 · Peter Zumthor `related_to` 물성 · Bauhaus `shares_theme` 기능주의 |
+
+- Tier 1 = `influenced_by/influenced/created/created_by/belongs_to/part_of/located_in/contemporary_of`.
+- Tier 2 = `related_to/shares_theme`.
+- **왜 분리:** Tier 1은 정본 사실(높은 신뢰), Tier 2는 취향·해석의 영역(다양성 허용). UI/추천에서 다르게 다룬다(예: Tier 2는 "연결 가능한 실마리" 제안에 적극 활용).
+
+### 개념 중심성
+
+인물·작품을 잇는 진짜 실마리는 종종 `concept`(빛/침묵)다 — 대개 **Tier 2(해석)**. 개념 노드가 그래프의 허브가 되도록 시드한다 → [seed-dataset-strategy.md](./seed-dataset-strategy.md).
 
 ## 4. 품질/상태 신호
 

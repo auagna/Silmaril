@@ -122,20 +122,23 @@ create trigger threads_set_updated_at before update on public.threads
 -- ---------------------------------------------------------------------------
 -- 4. thread_connections  (thread × thread, 방향)
 -- ---------------------------------------------------------------------------
--- relation_type 예: influenced_by, created, member_of, located_in,
---                   contemporary_of, related_to, derived_from, belongs_to
+-- relation_type (text): influenced_by, influenced, created, created_by, belongs_to,
+--   part_of, located_in, contemporary_of, related_to, shares_theme
+-- connection_tier: 1 = 사실 기반, 2 = 해석 기반 (docs/canonical-knowledge-model.md)
 create table if not exists public.thread_connections (
-  id              uuid primary key default gen_random_uuid(),
-  from_thread_id  uuid not null references public.threads(id) on delete cascade,
-  to_thread_id    uuid not null references public.threads(id) on delete cascade,
-  relation_type   text not null,
-  description     text,
-  created_by      uuid references public.users(id) on delete set null,
-  status          thread_status not null default 'community',
-  trust_score     numeric not null default 0,
-  created_at      timestamptz not null default now(),
+  id               uuid primary key default gen_random_uuid(),
+  from_thread_id   uuid not null references public.threads(id) on delete cascade,
+  to_thread_id     uuid not null references public.threads(id) on delete cascade,
+  relation_type    text not null,
+  connection_tier  smallint not null default 1,
+  description      text,
+  created_by       uuid references public.users(id) on delete set null,
+  status           thread_status not null default 'community',
+  trust_score      numeric not null default 0,
+  created_at       timestamptz not null default now(),
 
   constraint thread_connections_no_self check (from_thread_id <> to_thread_id),
+  constraint thread_connections_tier    check (connection_tier in (1, 2)),
   constraint thread_connections_unique  unique (from_thread_id, to_thread_id, relation_type)
 );
 

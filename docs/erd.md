@@ -36,9 +36,11 @@ auth.users ──1:1── users ──1:N── threads ──1:N── thread_
 `id` · `title` · `slug`(unique) · `type`(thread_type) · `summary` · `description` · `cover_image_url` · `status`(thread_status, def local) · `created_by`→users · `trust_score`(numeric) · `completion_score`(numeric) · `merged_into_thread_id`→threads · `created_at` · `updated_at`
 - self-merge 방지 check. `updated_at` 자동 갱신.
 
-### thread_connections (방향 있는 연결)
-`id` · `from_thread_id`→threads · `to_thread_id`→threads · `relation_type`(text) · `description` · `created_by`→users · `status`(thread_status, def community) · `trust_score` · `created_at`
-- self 금지 check. unique(from, to, relation_type).
+### thread_connections (방향 있는 연결) — 핵심 자산
+`id` · `from_thread_id`→threads · `to_thread_id`→threads · `relation_type`(text) · **`connection_tier`(smallint 1|2)** · `description` · `created_by`→users · `status`(thread_status, def community) · `trust_score` · `created_at`
+- self 금지 check. tier in (1,2) check. unique(from, to, relation_type).
+- relation_type: influenced_by/influenced/created/created_by/belongs_to/part_of/located_in/contemporary_of/related_to/shares_theme.
+- tier 1=사실, 2=해석 ([canonical-knowledge-model.md](./canonical-knowledge-model.md)).
 
 ### bookmarks (저장 — save-first)
 `id`(PK) · `user_id`→users · `thread_id`→threads · `created_at` · **unique(user_id, thread_id)**.

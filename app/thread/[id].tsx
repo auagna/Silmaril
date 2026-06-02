@@ -36,7 +36,6 @@ export default function ThreadDetailScreen() {
       <H1 style={{ marginTop: space.md }}>{thread.title}</H1>
       <View style={styles.pills}>
         <View style={styles.typePill}><Text style={styles.typeText}>{THREAD_TYPE_LABEL[thread.type]}</Text></View>
-        {thread.origin === "ai" && <View style={styles.aiPill}><Text style={styles.aiText}>AI</Text></View>}
       </View>
 
       {/* 연결 먼저 (P2) */}
@@ -48,7 +47,9 @@ export default function ThreadDetailScreen() {
             onPress={() => router.push(`/thread/${c.thread.slug}`)}
             style={[styles.conn, i < conns.length - 1 && styles.connBorder]}
           >
-            <View style={styles.rel}><Text style={styles.relText}>{RELATION_LABEL[c.relation]}</Text></View>
+            <View style={[styles.rel, c.tier === 2 && styles.relTier2]}>
+              <Text style={styles.relText}>{RELATION_LABEL[c.relation_type]}</Text>
+            </View>
             <Text style={styles.connName}>{c.thread.title}</Text>
             <Text style={styles.chev}>›</Text>
           </Pressable>
@@ -89,6 +90,7 @@ const styles = StyleSheet.create({
   conn: { flexDirection: "row", alignItems: "center", gap: space.sm, paddingVertical: 10, paddingHorizontal: space.sm },
   connBorder: { borderBottomWidth: 1, borderBottomColor: colors.line2 },
   rel: { backgroundColor: "#8a8f98", borderRadius: 5, paddingHorizontal: 6, paddingVertical: 1 },
+  relTier2: { backgroundColor: colors.accent },
   relText: { fontSize: 10, color: "#fff" },
   connName: { fontSize: font.body, fontWeight: "600", color: colors.ink900 },
   chev: { marginLeft: "auto", color: colors.ink400, fontSize: 18 },

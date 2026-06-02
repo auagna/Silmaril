@@ -32,11 +32,6 @@ export function ThreadCard({
             <View style={styles.typePill}>
               <Text style={styles.typeText}>{THREAD_TYPE_LABEL[thread.type]}</Text>
             </View>
-            {thread.origin === "ai" && (
-              <View style={styles.aiPill}>
-                <Text style={styles.aiText}>AI</Text>
-              </View>
-            )}
             <Text style={styles.meta} numberOfLines={1}>
               {meta ?? thread.summary ?? ""}
             </Text>
