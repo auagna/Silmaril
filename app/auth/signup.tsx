@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { useRouter, Link } from "expo-router";
 import { Screen } from "@/components/ui/Screen";
 import { H1, Muted } from "@/components/ui";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { signUp } from "@/features/auth/authService";
-import { colors, space, radius, font } from "@/constants/theme";
+import { useTheme, space, radius, font, type Palette } from "@/theme";
 
 export default function SignupScreen() {
   const router = useRouter();
+  const c = useTheme().colors;
+  const s = useMemo(() => makeStyles(c), [c]);
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -35,15 +37,15 @@ export default function SignupScreen() {
 
   return (
     <Screen>
-      <Pressable onPress={() => router.back()} hitSlop={8}><Muted>← 뒤로</Muted></Pressable>
+      <Pressable onPress={() => router.back()} hitSlop={10}><Muted>← 뒤로</Muted></Pressable>
       <H1 style={{ marginTop: space.md }}>회원가입</H1>
 
-      <TextInput style={s.input} placeholder="이름" placeholderTextColor={colors.ink400} value={name} onChangeText={setName} />
-      <TextInput style={s.input} placeholder="사용자 이름 (handle)" placeholderTextColor={colors.ink400}
+      <TextInput style={s.input} placeholder="이름" placeholderTextColor={c.textMuted} value={name} onChangeText={setName} />
+      <TextInput style={s.input} placeholder="사용자 이름 (handle)" placeholderTextColor={c.textMuted}
         autoCapitalize="none" value={username} onChangeText={setUsername} />
-      <TextInput style={s.input} placeholder="이메일" placeholderTextColor={colors.ink400}
+      <TextInput style={s.input} placeholder="이메일" placeholderTextColor={c.textMuted}
         autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail} />
-      <TextInput style={s.input} placeholder="비밀번호 (6자 이상)" placeholderTextColor={colors.ink400}
+      <TextInput style={s.input} placeholder="비밀번호 (6자 이상)" placeholderTextColor={c.textMuted}
         secureTextEntry value={password} onChangeText={setPassword} />
 
       {err ? <Text style={s.err}>{err}</Text> : null}
@@ -60,13 +62,11 @@ export default function SignupScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  input: {
-    marginTop: space.md, borderWidth: 1, borderColor: colors.line, borderRadius: radius.md,
-    paddingHorizontal: space.md, paddingVertical: 12, fontSize: font.body, color: colors.ink900, backgroundColor: colors.surface,
-  },
-  err: { color: colors.danger, fontSize: font.small, marginTop: space.sm },
-  btn: { marginTop: space.lg, backgroundColor: colors.ink900, borderRadius: radius.pill, paddingVertical: 14, alignItems: "center" },
-  btnText: { color: "#fff", fontWeight: "700", fontSize: font.body },
-  link: { color: colors.accent, fontWeight: "600", fontSize: font.small },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    input: { marginTop: space.md, borderWidth: 1, borderColor: c.lineDefault, borderRadius: radius.md, paddingHorizontal: space.md, paddingVertical: 12, fontSize: font.body, color: c.textMain, backgroundColor: c.surface },
+    err: { color: c.accentActive, fontSize: font.small, marginTop: space.sm },
+    btn: { marginTop: space.lg, backgroundColor: c.nodeDefault, borderRadius: radius.pill, paddingVertical: 14, alignItems: "center" },
+    btnText: { color: c.nodeText, fontWeight: "700", fontSize: font.body },
+    link: { color: c.accentActive, fontWeight: "600", fontSize: font.small },
+  });

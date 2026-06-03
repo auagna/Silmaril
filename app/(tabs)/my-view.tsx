@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { Screen } from "@/components/ui/Screen";
 import { H1, H2, Muted, SectionLabel, Card, Thumb, Chip } from "@/components/ui";
 import { useSaves } from "@/features/saves/store";
+import { useAuth } from "@/features/auth/AuthContext";
 import { useTheme, space, font, type Palette } from "@/theme";
 import { useLocale } from "@/i18n";
 
@@ -14,6 +15,7 @@ export default function MyViewScreen() {
   const { t, locale, setLocale } = useLocale();
   const styles = useMemo(() => makeStyles(c), [c]);
   const { count } = useSaves();
+  const { user, handle, signOut } = useAuth();
 
   const stats = [
     { n: String(count), l: "저장" },
@@ -72,10 +74,17 @@ export default function MyViewScreen() {
       </View>
 
       <SectionLabel>리포트 · 계정</SectionLabel>
-      <Card onPress={() => router.push("/auth/login")}>
-        <Text style={styles.acc}>로그인 / 회원가입</Text>
-        <Muted style={{ marginTop: 2 }}>취향 리포트와 실제 인증은 다음 단계(EXP4)</Muted>
-      </Card>
+      {user ? (
+        <Card onPress={() => signOut()}>
+          <Text style={styles.acc}>{handle}</Text>
+          <Muted style={{ marginTop: 2 }}>{locale === "en" ? "Tap to sign out" : "탭하여 로그아웃"}</Muted>
+        </Card>
+      ) : (
+        <Card onPress={() => router.push("/auth/login")}>
+          <Text style={styles.acc}>{locale === "en" ? "Sign in / Sign up" : "로그인 / 회원가입"}</Text>
+          <Muted style={{ marginTop: 2 }}>{locale === "en" ? "Explore works without an account." : "계정 없이도 탐험은 됩니다."}</Muted>
+        </Card>
+      )}
     </Screen>
   );
 }

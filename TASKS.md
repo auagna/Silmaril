@@ -48,8 +48,10 @@
 - [x] **Track A** — service layer(keyword/archive/viewpoint, supabase-ready·더미 fallback) + `supabase/seed.sql`(20키워드 ko/en, PHASE51).
 - [x] **Track B** — 그래프 레이아웃 모드 Web/Focus/Flow/Branch(PHASE32, `layout.ts`). (pan/zoom[49]은 gesture lib 필요 → 보류.)
 - [x] **Track C(구조)** — Source 어댑터 인터페이스+Mock+NamuWiki(candidate_only)+confidence+ingestion(mock)+reviewStore+aiDraft(mock)+schema(source_documents/source_claims/review_candidates). (PHASE36/39/40/41/42/43/44 골격.)
+- [x] **PHASE 45. Auth** — `AuthContext`/`useAuth`(세션, guest fallback), AuthProvider, login/signup 테마화, My View 로그인/로그아웃. (users 테이블 존재 → 동작.)
+- [ ] **⚠️ 사용자 액션 필요 — 실데이터:** Supabase에 **최신 `schema.sql`(RESET 블록) + `seed.sql` 적용** 필요. (DB 확인 결과 threads=0행, 최신 i18n/소스 테이블 미적용.) 적용 확인되면 PHASE 47(화면 service 교체)로 실데이터 표시.
 - [ ] **남은 단계 = 환경/결정/법무 필요:**
-      · **사용자/환경:** 47 Supabase 실연결(스키마+seed 적용, 화면 service 교체) · 45 Auth · 46 RLS · 48 Create 실제 제출(reviewStore→DB) · 기기 검증.
+      · **사용자/환경:** 47 화면 service 교체(seed 적용 후) · 46 RLS · 48 Create 실제 제출(reviewStore→DB) · 기기 검증.
       · **법무:** 37/38 Wikidata/Wikipedia 실어댑터 · 39 나무위키 활성화 — ToS/저작권 검토 후.
       · **대형 인프라:** 33 Flow 시간축 정밀 · 49 pan/zoom · 50 web/tablet · 52 테스트 · 53 privacy · 54 배포 · 55 feedback.
 - [x] **Step 28. Supabase 다국어 테이블** — schema.sql 에 `thread_translations`(unique thread_id,locale) · `viewpoints`(locale) · `thread_connection_translations`(선택) · `users.preferred_locale` + enum(locale_type/viewpoint_author) + 인덱스. erd 동기화. (RLS 제외.)
