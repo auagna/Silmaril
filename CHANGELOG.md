@@ -5,6 +5,7 @@
 ## 2026-06-02
 
 ### Changes
+- feat(A/B/C): **A** supabase-ready service layer + seed.sql(20키워드 ko/en). **B** 그래프 레이아웃 모드 Web/Focus/Flow/Branch(PHASE32). **C** Source/Review/AI 구조(어댑터 인터페이스+Mock+NamuWiki placeholder+confidence+ingestion+reviewStore+aiDraft, **전부 mock/placeholder — 실수집·크롤링·API·자동활성 없음**)+schema(source_documents/source_claims/review_candidates). 각 tsc+export(1041) 통과.
 - feat(client MVP 일괄): PHASE 16(추천+방문)·35(검색 모달)·34(타입 필터)·30+31(노드 아이콘/관계선 문법)·19(Create 폼 목업). 전역 explore store(selected+visited). 각 tsc+export 통과(1040). **여기까지 = 더미 기반 클라이언트 MVP 기능완성.** 이후(Supabase 실연결·Auth·Source/AI·web·배포)는 환경/법무/결정 필요.
 - docs(PHASE 56): RC 점검 `docs/release-candidate-v0.1.md` — 21항목 정직 점검(✅8/△3/❌10), 리스크, v0.1 노트, v0.2 로드맵. 결론=더미 탐험 프로토타입.
 - feat(PHASE 29): Node Type System v1 — ThreadType 확장(material/emotion/form/era 등) + `subtype` + schema enum/컬럼 + locale 타입라벨. 더미 타입 정교화(Concrete=material, Silence=emotion, +Church of the Light). tsc+export(1036) 통과.

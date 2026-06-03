@@ -45,10 +45,13 @@
 - [ ] **PHASE 30-55 (대형 백로그)** — 노드 아이콘/관계선 문법 · 그래프 레이아웃 모드 · Flow · 타입필터 · 검색 · Source Adapter(Wikidata/Wikipedia/Namu) · ingestion · review queue · confidence · AI draft · Auth/RLS · mock→Supabase · Create 제출 · pan/zoom · web/tablet · seed · QA · privacy · deploy · feedback. **한 번에 하나씩.** (대부분 미구현 — RC 점검 참조.)
 - [x] **PHASE 56. RC 점검** — `docs/release-candidate-v0.1.md`: 21항목 정직 점검(✅8/△3/❌10), 리스크, v0.1 노트, v0.2 로드맵. 결론: **더미 기반 탐험 프로토타입**(공개 플랫폼 아님).
 - [x] **클라이언트 MVP 일괄** — PHASE 16(추천+방문)·35(검색)·34(타입필터)·30+31(아이콘/관계선 문법)·19(Create 폼 목업). 전역 explore store. tsc+export(1040) 통과.
-- [ ] **남은 단계 = 환경/결정/법무 필요 (자율 진행 보류):**
-      · 47 Supabase 실연결 + 45 Auth + 46 RLS + 48 Create 실제 제출 — **스키마 적용·키·기기 검증 필요(사용자)**
-      · 36~44 Source(Wikidata/Wikipedia/**나무위키**)/ingestion/AI — **ToS·저작권 검토 필요(법무)**
-      · 32/33 그래프 레이아웃 모드/Flow · 49 pan/zoom · 50 web/tablet · 51 실 seed · 52 테스트 · 53 privacy · 54 배포 · 55 feedback — **각각 별도 큰 작업**
+- [x] **Track A** — service layer(keyword/archive/viewpoint, supabase-ready·더미 fallback) + `supabase/seed.sql`(20키워드 ko/en, PHASE51).
+- [x] **Track B** — 그래프 레이아웃 모드 Web/Focus/Flow/Branch(PHASE32, `layout.ts`). (pan/zoom[49]은 gesture lib 필요 → 보류.)
+- [x] **Track C(구조)** — Source 어댑터 인터페이스+Mock+NamuWiki(candidate_only)+confidence+ingestion(mock)+reviewStore+aiDraft(mock)+schema(source_documents/source_claims/review_candidates). (PHASE36/39/40/41/42/43/44 골격.)
+- [ ] **남은 단계 = 환경/결정/법무 필요:**
+      · **사용자/환경:** 47 Supabase 실연결(스키마+seed 적용, 화면 service 교체) · 45 Auth · 46 RLS · 48 Create 실제 제출(reviewStore→DB) · 기기 검증.
+      · **법무:** 37/38 Wikidata/Wikipedia 실어댑터 · 39 나무위키 활성화 — ToS/저작권 검토 후.
+      · **대형 인프라:** 33 Flow 시간축 정밀 · 49 pan/zoom · 50 web/tablet · 52 테스트 · 53 privacy · 54 배포 · 55 feedback.
 - [x] **Step 28. Supabase 다국어 테이블** — schema.sql 에 `thread_translations`(unique thread_id,locale) · `viewpoints`(locale) · `thread_connection_translations`(선택) · `users.preferred_locale` + enum(locale_type/viewpoint_author) + 인덱스. erd 동기화. (RLS 제외.)
 - [x] **EXP-IA2. 4탭 재구성 (구현 완료).** `app/(tabs)` = 지도(Map)/보관(Archive)/만들기(Create)/나(My View). Map=Sky(나침반)+Sea(별자리 노드·연결·미발견, 경량 RN)+Land(바텀시트 상세, 의존성 0). 옛 5탭 삭제. `tsc` + `expo export`(1033 모듈) 통과. 더미 데이터.
 - [ ] **EXP4. Supabase 실연결** — service 함수(api-spec) 구현 → 더미 store/dummy 대체 + seed 적재. RLS(`policies.sql` 신규)도 이 단계. (타입 정렬은 완료.)
