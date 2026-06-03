@@ -304,6 +304,45 @@ create table if not exists public.thread_connection_translations (
 );
 
 -- ---------------------------------------------------------------------------
+-- 9c. 출처/검토 (PHASE 40/42) — 구조 초안. (RLS 별도/추후. 원문 저장 지양.)
+-- ---------------------------------------------------------------------------
+create table if not exists public.source_documents (
+  id          uuid primary key default gen_random_uuid(),
+  source_name text not null,
+  source_url  text,
+  title       text not null,
+  locale      locale_type,
+  license     text,
+  fetched_at  timestamptz not null default now(),
+  used_as     text not null default 'reference' check (used_as in ('citation', 'reference', 'candidate_only'))
+);
+
+create table if not exists public.source_claims (
+  id                 uuid primary key default gen_random_uuid(),
+  source_document_id uuid not null references public.source_documents(id) on delete cascade,
+  keyword_id         uuid references public.threads(id) on delete set null,
+  relation_id        uuid references public.thread_connections(id) on delete set null,
+  claim_type         text not null,
+  claim_text         text,   -- 짧은 사실 단위만
+  confidence_score   numeric not null default 0,
+  created_at         timestamptz not null default now()
+);
+
+create table if not exists public.review_candidates (
+  id               uuid primary key default gen_random_uuid(),
+  candidate_type   text not null check (candidate_type in ('keyword', 'relation', 'translation', 'source', 'ai_draft')),
+  title            text not null,
+  summary          text,
+  description      text,
+  source_name      text,
+  source_url       text,
+  confidence_score numeric not null default 0,
+  status           text not null default 'pending' check (status in ('pending', 'approved', 'rejected', 'merged')),
+  created_at       timestamptz not null default now(),
+  reviewed_at      timestamptz
+);
+
+-- ---------------------------------------------------------------------------
 -- 10. Indexes
 -- ---------------------------------------------------------------------------
 create index if not exists idx_threads_type            on public.threads (type);

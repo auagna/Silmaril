@@ -88,6 +88,12 @@ auth.users ──1:1── users ──1:N── threads ──1:N── thread_
 ```
 - Atlas/탐험률은 `user_thread_activity` + `thread_connections` + `bookmarks` 집계로 파생 (별도 거대 테이블 없음).
 
+## 출처/검토 테이블 (PHASE 40/42, 구조 초안)
+- `source_documents`: id · source_name · source_url · title · locale · license · fetched_at · used_as(citation/reference/candidate_only). 원문 저장 지양.
+- `source_claims`: id · source_document_id → · keyword_id(thread) · relation_id · claim_type · claim_text(짧은 사실) · confidence_score · created_at.
+- `review_candidates`: id · candidate_type(keyword/relation/translation/source/ai_draft) · title · summary · source_name · source_url · confidence_score · status(pending/approved/rejected/merged) · created_at · reviewed_at.
+- TS 대응: `src/features/sources/types.ts`(SourceDocument/SourceClaim/ReviewCandidate). RLS 추후.
+
 ## 추후 테이블 (MVP 미구현)
 `perspectives` · `taste_profiles` · `curator_badges` · `reports` · `nouhaus_classes` · (AI Wiki 시드용 `origin` 컬럼 / aliases).
 
