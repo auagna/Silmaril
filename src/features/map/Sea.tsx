@@ -4,11 +4,12 @@ import type { Thread, ThreadType } from "@/types/database";
 import { connections, getThreadTranslation } from "@/lib/dummy";
 import { useTheme, radius, font, type Palette } from "@/theme";
 import { useLocale } from "@/i18n";
+import { TYPE_GLYPH } from "./glyph";
 
 // Sea = Active Map. 경량 별자리(노드+연결). svg 없이 RN View 라인.
 // 노드: 일반=nodeDefault / 선택=accentActive / 추천=accentRecommend. 미발견=점선.
 const NODE_W = 100;
-const NODE_H = 34;
+const NODE_H = 44;
 const CANVAS_H = 380;
 
 export function Sea({
@@ -64,6 +65,9 @@ export function Sea({
         const dy = b.y - a.y;
         const len = Math.hypot(dx, dy);
         const ang = (Math.atan2(dy, dx) * 180) / Math.PI;
+        // PHASE 31: 선택 노드의 관계만 강조, 나머지 흐리게. tier2(해석)=옅은 색.
+        const touches = selectedId != null && (e.from_thread_id === selectedId || e.to_thread_id === selectedId);
+        const base = e.connection_tier === 2 ? c.textMuted : c.lineDefault;
         return (
           <View
             key={e.id}
@@ -72,8 +76,9 @@ export function Sea({
               left: (a.x + b.x) / 2 - len / 2,
               top: (a.y + b.y) / 2,
               width: len,
-              height: 1,
-              backgroundColor: e.connection_tier === 2 ? c.textMuted : c.lineDefault,
+              height: touches ? 2 : 1,
+              backgroundColor: touches ? c.accentActive : base,
+              opacity: selectedId != null && !touches ? 0.25 : 1,
               transform: [{ rotateZ: `${ang}deg` }],
             }}
           />
@@ -98,22 +103,26 @@ export function Sea({
               top: p.y - NODE_H / 2,
               width: NODE_W,
               alignItems: "center",
-              opacity: dimmed ? 0.25 : visited ? 0.55 : 1,
+              opacity: dimmed ? 0.25 : visited ? 0.6 : 1,
             }}
           >
-            <View
+            {/* 아이콘 = 무엇인지(타입), ★ = 추천 */}
+            <Text
               style={[
-                styles.node,
-                lit ? styles.lit : styles.fog,
-                rec && styles.rec,
-                sel && styles.sel,
+                styles.glyph,
+                { color: rec ? c.accentRecommend : sel ? c.accentActive : lit ? c.nodeDefault : c.textMuted },
               ]}
             >
-              <Text style={lit || sel || rec ? styles.litText : styles.fogText} numberOfLines={1}>
+              {rec ? "★" : TYPE_GLYPH[n.type]}
+            </Text>
+            {/* 라벨 = 이름. 선택 시 capsule. */}
+            <View style={[styles.label, sel && styles.labelSel]}>
+              <Text style={[styles.labelText, sel && styles.labelTextSel]} numberOfLines={1}>
+                {lit ? "🔖 " : ""}
                 {getThreadTranslation(n.id, locale).title}
               </Text>
             </View>
-            {!lit && <Text style={styles.fogSub}>미발견</Text>}
+            {!lit && !visited && <Text style={styles.fogSub}>미발견</Text>}
           </Pressable>
         );
       })}
@@ -124,12 +133,10 @@ export function Sea({
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
     canvas: { backgroundColor: c.bgMap, borderRadius: radius.lg, borderWidth: 1, borderColor: c.lineDefault, overflow: "hidden" },
-    node: { height: NODE_H, paddingHorizontal: 12, borderRadius: radius.pill, alignItems: "center", justifyContent: "center", maxWidth: NODE_W },
-    lit: { backgroundColor: c.nodeDefault },
-    fog: { backgroundColor: "transparent", borderWidth: 1, borderColor: c.lineDefault, borderStyle: "dashed" },
-    rec: { backgroundColor: c.accentRecommend, borderWidth: 0 },
-    sel: { backgroundColor: c.accentActive, borderWidth: 0 },
-    litText: { color: c.nodeText, fontSize: font.small, fontWeight: "700" },
-    fogText: { color: c.textMuted, fontSize: font.small },
-    fogSub: { color: c.textMuted, fontSize: 9, marginTop: 2, opacity: 0.7 },
+    glyph: { fontSize: 18, lineHeight: 20, marginBottom: 1 },
+    label: { borderRadius: radius.pill, paddingHorizontal: 7, paddingVertical: 1, maxWidth: NODE_W },
+    labelSel: { backgroundColor: c.accentActive },
+    labelText: { color: c.textMain, fontSize: font.tiny, fontWeight: "600" },
+    labelTextSel: { color: c.onAccent },
+    fogSub: { color: c.textMuted, fontSize: 9, marginTop: 1, opacity: 0.7 },
   });

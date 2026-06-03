@@ -5,6 +5,7 @@ import { threadTypeLabel, RELATION_LABEL } from "@/types/database";
 import { useSaves } from "@/features/saves/store";
 import { useTheme, space, radius, font, type Palette } from "@/theme";
 import { useLocale } from "@/i18n";
+import { TYPE_GLYPH } from "./glyph";
 
 // 작은 화면(SE급)에서도 시트가 화면을 다 덮지 않도록 높이 상한.
 const SHEET_MAX_H = Dimensions.get("window").height * 0.72;
@@ -41,7 +42,7 @@ export function LandSheet({
 
         <View style={styles.row}>
           <View style={styles.typePill}>
-            <Text style={styles.typeText}>{threadTypeLabel(thread.type, locale)}</Text>
+            <Text style={styles.typeText}>{TYPE_GLYPH[thread.type]} {threadTypeLabel(thread.type, locale)}</Text>
           </View>
           <Pressable onPress={onClose} hitSlop={10}>
             <Text style={styles.close}>{t("close")}</Text>
