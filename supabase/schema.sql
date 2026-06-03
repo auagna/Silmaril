@@ -41,6 +41,15 @@ do $$ begin
   create type visibility_type as enum ('private', 'public', 'followers');
 exception when duplicate_object then null; end $$;
 
+-- i18n (Step 28). locale 은 우선 ko/en만. 추후 alter type 로 확장.
+do $$ begin
+  create type locale_type as enum ('ko', 'en');
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create type viewpoint_author as enum ('user', 'curator', 'system');
+exception when duplicate_object then null; end $$;
+
 -- ---------------------------------------------------------------------------
 -- utility: updated_at 자동 갱신
 -- ---------------------------------------------------------------------------
@@ -60,11 +69,15 @@ create table if not exists public.users (
   handle        text unique not null,
   display_name  text,
   avatar_url    text,
-  bio           text,
-  role          user_role not null default 'user',
-  created_at    timestamptz not null default now(),
-  updated_at    timestamptz not null default now()
+  bio              text,
+  role             user_role not null default 'user',
+  preferred_locale locale_type not null default 'ko',
+  created_at       timestamptz not null default now(),
+  updated_at       timestamptz not null default now()
 );
+
+-- 기존 DB 대비 idempotent 추가.
+alter table public.users add column if not exists preferred_locale locale_type not null default 'ko';
 
 drop trigger if exists users_set_updated_at on public.users;
 create trigger users_set_updated_at before update on public.users
@@ -230,6 +243,54 @@ create table if not exists public.sources (
 );
 
 -- ---------------------------------------------------------------------------
+-- 9b. i18n (Step 28) — Thread + i18n 레이어. (RLS 별도/추후)
+-- ---------------------------------------------------------------------------
+-- 표시 텍스트(title/summary/description)는 thread 가 아니라 여기 locale 별로.
+create table if not exists public.thread_translations (
+  id          uuid primary key default gen_random_uuid(),
+  thread_id   uuid not null references public.threads(id) on delete cascade,
+  locale      locale_type not null,
+  title       text not null,
+  summary     text,
+  description text,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now(),
+  unique (thread_id, locale)
+);
+
+drop trigger if exists thread_translations_set_updated_at on public.thread_translations;
+create trigger thread_translations_set_updated_at before update on public.thread_translations
+  for each row execute function public.set_updated_at();
+
+-- 관점 (사용자/큐레이터/시스템). locale 보유.
+create table if not exists public.viewpoints (
+  id          uuid primary key default gen_random_uuid(),
+  thread_id   uuid not null references public.threads(id) on delete cascade,
+  user_id     uuid references public.users(id) on delete set null,
+  locale      locale_type not null,
+  author_type viewpoint_author not null default 'user',
+  title       text not null,
+  body        text not null,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+
+drop trigger if exists viewpoints_set_updated_at on public.viewpoints;
+create trigger viewpoints_set_updated_at before update on public.viewpoints
+  for each row execute function public.set_updated_at();
+
+-- (선택) 연결 설명의 다국어. MVP에선 미사용 가능.
+create table if not exists public.thread_connection_translations (
+  id            uuid primary key default gen_random_uuid(),
+  connection_id uuid not null references public.thread_connections(id) on delete cascade,
+  locale        locale_type not null,
+  description   text,
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now(),
+  unique (connection_id, locale)
+);
+
+-- ---------------------------------------------------------------------------
 -- 10. Indexes
 -- ---------------------------------------------------------------------------
 create index if not exists idx_threads_type            on public.threads (type);
@@ -243,6 +304,8 @@ create index if not exists idx_activity_user           on public.user_thread_act
 -- 보조 인덱스 (조회 패턴)
 create index if not exists idx_records_user            on public.records (created_by, created_at desc);
 create index if not exists idx_collection_items_coll   on public.collection_items (collection_id, position);
+create index if not exists idx_thread_translations_t   on public.thread_translations (thread_id);
+create index if not exists idx_viewpoints_thread       on public.viewpoints (thread_id);
 
 -- ============================================================================
 -- 미발견(Undiscovered) 계산 메모 — 테이블 아님, 파생

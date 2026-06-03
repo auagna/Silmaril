@@ -58,6 +58,23 @@ auth.users ──1:1── users ──1:N── threads ──1:N── thread_
 ### sources
 `id` · `thread_id`→threads · `url` · `title` · `description` · `created_by`→users · `created_at`.
 
+## i18n 테이블 (Step 28 — Thread + i18n 레이어, D-019)
+
+> enum `locale_type`(ko/en, 추후 확장) · `viewpoint_author`(user/curator/system). `users.preferred_locale`(def ko).
+
+### thread_translations
+`id` · `thread_id`→threads · `locale` · `title` · `summary` · `description` · ts. **unique(thread_id, locale).** (표시 텍스트는 여기서.)
+
+### viewpoints
+`id` · `thread_id`→threads · `user_id`→users(nullable) · `locale` · `author_type`(viewpoint_author) · `title` · `body` · ts. (사용자/큐레이터 관점.)
+
+### thread_connection_translations (선택)
+`id` · `connection_id`→thread_connections · `locale` · `description` · ts. **unique(connection_id, locale).** MVP 미사용 가능.
+
+### TS 대응
+`ThreadTranslation`↔thread_translations · `Viewpoint`↔viewpoints · `Locale`↔locale_type · `users.preferred_locale`.
+> 사용자 프롬프트의 keyword_* 명칭 = 본 프로젝트의 thread_* (Keyword=Thread, D-019). profiles=users.
+
 ## Indexes
 `threads.type` · `threads.status` · `threads.slug` · `thread_connections.from_thread_id` · `thread_connections.to_thread_id` · `bookmarks.user_id` · `user_thread_activity.user_id` (+ records(created_by,created_at), collection_items(collection_id,position)).
 
