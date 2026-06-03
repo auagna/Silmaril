@@ -29,9 +29,19 @@ do $$ begin
   create type user_role as enum ('user', 'partner', 'admin');
 exception when duplicate_object then null; end $$;
 
+-- Node Type System v1 (PHASE 29): person/movement/work/material/concept/emotion + form/place/era + organization(호환)
 do $$ begin
-  create type thread_type as enum ('person', 'work', 'movement', 'place', 'concept', 'organization');
+  create type thread_type as enum (
+    'person', 'movement', 'work', 'material', 'concept', 'emotion',
+    'form', 'place', 'era', 'organization'
+  );
 exception when duplicate_object then null; end $$;
+
+-- 기존 DB에 새 값 추가 (idempotent).
+alter type thread_type add value if not exists 'material';
+alter type thread_type add value if not exists 'emotion';
+alter type thread_type add value if not exists 'form';
+alter type thread_type add value if not exists 'era';
 
 do $$ begin
   create type thread_status as enum ('local', 'community', 'verified', 'official', 'merged', 'archived');
@@ -114,6 +124,7 @@ create table if not exists public.threads (
   title                   text not null,
   slug                    text not null unique,
   type                    thread_type not null,
+  subtype                 text,
   summary                 text,
   description             text,
   cover_image_url         text,
@@ -127,6 +138,8 @@ create table if not exists public.threads (
 
   constraint threads_no_self_merge check (merged_into_thread_id is null or merged_into_thread_id <> id)
 );
+
+alter table public.threads add column if not exists subtype text;
 
 drop trigger if exists threads_set_updated_at on public.threads;
 create trigger threads_set_updated_at before update on public.threads

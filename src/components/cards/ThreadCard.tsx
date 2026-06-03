@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import type { Thread } from "@/types/database";
-import { THREAD_TYPE_LABEL } from "@/types/database";
+import { threadTypeLabel } from "@/types/database";
 import { useTheme, space, radius, font, type Palette } from "@/theme";
 import { useLocale } from "@/i18n";
 import { getThreadTranslation } from "@/lib/dummy";
@@ -35,7 +35,7 @@ export function ThreadCard({
           <Text style={styles.title} numberOfLines={1}>{tr.title}</Text>
           <View style={styles.metaRow}>
             <View style={styles.typePill}>
-              <Text style={styles.typeText}>{THREAD_TYPE_LABEL[thread.type]}</Text>
+              <Text style={styles.typeText}>{threadTypeLabel(thread.type, locale)}</Text>
             </View>
             <Text style={styles.meta} numberOfLines={1}>{meta ?? tr.summary}</Text>
           </View>

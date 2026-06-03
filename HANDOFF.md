@@ -29,7 +29,8 @@
 **✅ Step 26-27 다국어(D-019):** 결정 = **Thread 유지 + i18n 레이어**(Keyword=Thread). `src/i18n`(Locale/dict/`useLocale`, 기기언어→ko fallback, setLocale) + `thread_translations`/`viewpoints` 타입 + 더미 ko/en 병렬. 화면 전반 + 노드/카드 locale, My View 언어토글(한국어/English). tsc+export(1036) 통과. 영어 없어도 fallback.
 - 사용법: `const { t, locale, setLocale } = useLocale();` · 콘텐츠는 `getThreadTranslation(id, locale)`.
 - **✅ Step 28:** schema.sql 에 `thread_translations`·`viewpoints`·`thread_connection_translations`(선택)·`users.preferred_locale` + enum(locale_type/viewpoint_author) + 인덱스. erd 동기화. RLS 제외(추후).
-- **다음(미정):** EXP4 Supabase 실연결(스키마 적용→service→더미 대체) 또는 Step 12·14·16(Sky 나침반/Land 탭시트/추천 이동) 정제. 스키마 적용 시 thread_translations/viewpoints 도 함께 적재.
+- **✅ PHASE 29 Node Type System v1:** ThreadType 확장(person/movement/work/material/concept/emotion + form/place/era + organization) + `threads.subtype`. 더미 타입 정교화. `threadTypeLabel(type, locale)` 로 라벨. schema enum/subtype 반영. tsc+export 통과.
+- **다음 = PHASE 30~55 (대형 백로그, 한 번에 하나씩):** 30 노드 아이콘/라벨 문법 → 31 관계선 → 32 레이아웃 모드 → 33 Flow → 34 타입필터 → 35 검색 → 36~40 Source Adapter/출처 → 41~44 ingestion/review/confidence/AI draft → 45~48 Auth/RLS/실데이터/Create제출 → 49 pan/zoom → 50 web/tablet → 51 seed → 52 QA → 53 privacy → 54 deploy → 55 feedback. (26·27·28 완료.)
 
 > **SDK 54 업그레이드 완료 (D-016):** Expo Go(앱스토어=SDK54)와 맞춤. react 19.1 / RN 0.81.5 / expo-router 6 / ts 5.9. `.npmrc`(legacy-peer-deps) 추가. **`babel-preset-expo` 의존성 추가**(Metro resolve 에러 수정). 검증: `expo export --platform ios` 1032 모듈 번들 성공. 첫 실행은 `npx expo start -c`.
 

@@ -3,9 +3,11 @@
 > Thread = 실마리 = 탐험의 단위. **실마리는 하나, 관점은 여러 개.** (같은 대상에 페이지 둘 ❌)
 > 정본 방향: [silmaril-v2-direction.md](./silmaril-v2-direction.md) · 스키마: [erd.md](./erd.md).
 
-## MVP Thread Types (6)
+> **PHASE 29 — Node Type System v1 적용:** 타입 확장 = MVP 우선 `person·movement·work·material·concept·emotion` + 보조 `form·place·era` + 호환 `organization`. `subtype`(보조 분류) 필드 추가. (type=큰 분류=시각/탐구 기준, subtype/태그=세부.) 아래 6종 설명은 기본 골격이며 material/emotion/form/era 는 같은 규칙을 따른다.
 
-`person · work · movement · place · concept · organization`
+## MVP Thread Types (확장: Node Type System v1)
+
+`person · movement · work · material · concept · emotion` (+ 보조 `form · place · era`, 호환 `organization`)
 
 > 공통 필수 필드(모든 타입): `title`, `type`, `slug`(자동), `status`(기본 local), `created_by`.
 > 공통 권장: `summary`(한 줄), `description`, `cover_image_url`.

@@ -20,7 +20,7 @@ auth.users ──1:1── users ──1:N── threads ──1:N── thread_
 | enum | 값 |
 |------|----|
 | `user_role` | user · partner · admin |
-| `thread_type` | person · work · movement · place · **concept** · organization |
+| `thread_type` | person · movement · work · material · concept · emotion · form · place · era · organization (PHASE 29) + `threads.subtype`(text) |
 | `thread_status` | local · community · verified · official · merged · archived |
 | `visibility_type` | private · public · followers |
 

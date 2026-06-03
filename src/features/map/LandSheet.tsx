@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions } from "react-native";
 import { getThreadById, connectionsOf, getThreadTranslation, getViewpoints } from "@/lib/dummy";
-import { THREAD_TYPE_LABEL, RELATION_LABEL } from "@/types/database";
+import { threadTypeLabel, RELATION_LABEL } from "@/types/database";
 import { useSaves } from "@/features/saves/store";
 import { useTheme, space, radius, font, type Palette } from "@/theme";
 import { useLocale } from "@/i18n";
@@ -41,7 +41,7 @@ export function LandSheet({
 
         <View style={styles.row}>
           <View style={styles.typePill}>
-            <Text style={styles.typeText}>{THREAD_TYPE_LABEL[thread.type]}</Text>
+            <Text style={styles.typeText}>{threadTypeLabel(thread.type, locale)}</Text>
           </View>
           <Pressable onPress={onClose} hitSlop={10}>
             <Text style={styles.close}>{t("close")}</Text>

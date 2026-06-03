@@ -17,6 +17,7 @@ function t(id: string, title: string, type: ThreadType): Thread {
     title, // canonical (영문)
     slug: id,
     type,
+    subtype: null,
     summary: null, // 표시 텍스트는 번역에서
     description: null,
     cover_image_url: null,
@@ -35,11 +36,12 @@ export const threads: Thread[] = [
   t("tadao-ando", "Tadao Ando", "person"),
   t("bauhaus", "Bauhaus", "movement"),
   t("less-is-more", "Less is More", "concept"),
-  t("concrete", "Concrete", "concept"),
-  t("silence", "Silence", "concept"),
+  t("concrete", "Concrete", "material"),
+  t("silence", "Silence", "emotion"),
   t("light", "Light", "concept"),
   t("modernism", "Modernism", "movement"),
   t("japanese-minimalism", "Japanese Minimalism", "movement"),
+  t("church-of-the-light", "Church of the Light", "work"),
 ];
 
 function tr(thread_id: string, locale: Locale, title: string, summary: string): ThreadTranslation {
@@ -65,6 +67,8 @@ export const threadTranslations: ThreadTranslation[] = [
   tr("modernism", "en", "Modernism", "A sweeping 20th-century movement pursuing clarity of function and form."),
   tr("japanese-minimalism", "ko", "일본 미니멀리즘", "여백과 절제, 자연과의 관계를 중시하는 일본 특유의 미감."),
   tr("japanese-minimalism", "en", "Japanese Minimalism", "A Japanese sensibility valuing emptiness, restraint, and a relationship with nature."),
+  tr("church-of-the-light", "ko", "빛의 교회", "콘크리트 벽의 십자형 틈으로 빛을 들이는 안도의 대표작."),
+  tr("church-of-the-light", "en", "Church of the Light", "Ando’s signature work, where a cruciform slit lets light pour through a concrete wall."),
 ];
 
 export const viewpoints: Viewpoint[] = [
@@ -102,6 +106,8 @@ export const connections: ThreadConnection[] = [
   conn("tadao-ando", "silence", "related_to", 2),
   conn("tadao-ando", "light", "related_to", 2),
   conn("tadao-ando", "japanese-minimalism", "belongs_to", 1),
+  conn("tadao-ando", "church-of-the-light", "created", 1),
+  conn("church-of-the-light", "light", "related_to", 2),
   conn("modernism", "bauhaus", "related_to", 1),
 ];
 

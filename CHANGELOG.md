@@ -5,6 +5,7 @@
 ## 2026-06-02
 
 ### Changes
+- feat(PHASE 29): Node Type System v1 — ThreadType 확장(material/emotion/form/era 등) + `subtype` + schema enum/컬럼 + locale 타입라벨. 더미 타입 정교화(Concrete=material, Silence=emotion, +Church of the Light). tsc+export(1036) 통과.
 - feat(Step 28): Supabase 다국어 스키마 — `thread_translations`(unique thread_id,locale)·`viewpoints`(locale)·`thread_connection_translations`(선택)·`users.preferred_locale` + enum(locale_type/viewpoint_author). erd 동기화. (RLS 제외.)
 - feat(Step 26-27): 다국어(ko/en) — `src/i18n`(Locale/translations/`useLocale`, 기기언어 기본·ko fallback) + `thread_translations`/`viewpoints` 타입 + 더미 ko/en 병렬. Map/Sea/Land/Archive/Create/My View + 노드/카드 locale 반영, My View 언어 토글. Thread 모델 유지(Keyword=Thread, D-019). tsc+export(1036) 통과.
 - fix(Step 24-25): iPhone-first 반응형/안정화 — LandSheet 높이 상한(0.72H, SE 대응)·탭바 침범 방지(insets 중복 제거)·연결 스크롤, Sea 노드 hitSlop(터치영역). tsc+expo export(1035) 통과(런타임 TS/import 버그 없음).
