@@ -42,6 +42,11 @@ export const translations = {
     searchPlaceholder: "인물·작품·사조·재료·개념 검색",
     noResults: "결과가 없어요.",
     suggestNew: "새 실마리 제안하기",
+    submit: "제출",
+    submitted: "제출됨 — 검토 후 반영됩니다 (목업)",
+    fldTitle: "제목",
+    fldSummary: "요약",
+    fldBody: "내용",
   },
   en: {
     map: "Map",
@@ -79,6 +84,11 @@ export const translations = {
     searchPlaceholder: "Search people, works, movements, materials, concepts",
     noResults: "No results.",
     suggestNew: "Suggest a new thread",
+    submit: "Submit",
+    submitted: "Submitted — will appear after review (mock)",
+    fldTitle: "Title",
+    fldSummary: "Summary",
+    fldBody: "Body",
   },
 } as const;
 
