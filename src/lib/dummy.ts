@@ -114,6 +114,9 @@ export const connections: ThreadConnection[] = [
 // 사용자가 "저장한" 더미 실마리.
 export const savedIds = ["tadao-ando", "light"];
 
+// 추천 실마리(나침반 ★ 후보). 추후 추천 알고리즘/AI 로 대체.
+export const recommendedIds = ["mies-van-der-rohe", "light", "bauhaus"];
+
 export function getThreadById(id: string): Thread | undefined {
   return threads.find((x) => x.id === id || x.slug === id);
 }

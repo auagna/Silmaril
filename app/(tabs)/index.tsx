@@ -4,9 +4,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Sea } from "@/features/map/Sea";
 import { LandSheet } from "@/features/map/LandSheet";
 import { useSaves } from "@/features/saves/store";
-import { threads, undiscovered, exploreProgress } from "@/lib/dummy";
+import { useVisited } from "@/features/explore/store";
+import { recommendNext } from "@/features/explore/recommend";
+import { threads, undiscovered, exploreProgress, recommendedIds } from "@/lib/dummy";
 import { useTheme, space, radius, font, type Palette } from "@/theme";
 import { useLocale } from "@/i18n";
+
+const RECOMMENDED = new Set(recommendedIds);
 
 // Map = 핵심 경험. Sky(나침반) / Sea(Active Map) / Land(상세 시트). (D-017)
 export default function MapScreen() {
@@ -15,12 +19,22 @@ export default function MapScreen() {
   const { t } = useLocale();
   const styles = useMemo(() => makeStyles(c), [c]);
   const { savedSet } = useSaves();
+  const { visitedSet, markVisited } = useVisited();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const litThreads = threads.filter((t) => savedSet.has(t.id));
   const fogThreads = undiscovered();
   const heroId = "tadao-ando";
   const firstFog = fogThreads[0]?.id ?? heroId;
+
+  function select(id: string) {
+    setSelectedId(id);
+    markVisited(id);
+  }
+  function handleRecommend() {
+    const next = recommendNext(selectedId, visitedSet);
+    if (next) select(next);
+  }
 
   return (
     <View style={[styles.root, { paddingTop: insets.top + space.md }]}>
@@ -30,13 +44,13 @@ export default function MapScreen() {
         <Text style={styles.subtitle}>{t("illuminating")}</Text>
 
         <View style={styles.compass}>
-          <Pressable style={styles.chip} onPress={() => setSelectedId(heroId)}>
+          <Pressable style={styles.chip} onPress={() => select(heroId)}>
             <Text style={styles.chipText}>{t("today")}</Text>
           </Pressable>
-          <Pressable style={styles.chip} onPress={() => setSelectedId("mies-van-der-rohe")}>
-            <Text style={styles.chipText}>{t("recommend")}</Text>
+          <Pressable style={[styles.chip, styles.chipStar]} onPress={handleRecommend}>
+            <Text style={styles.chipStarText}>★ {t("recommend")}</Text>
           </Pressable>
-          <Pressable style={styles.chip} onPress={() => setSelectedId(firstFog)}>
+          <Pressable style={styles.chip} onPress={() => select(firstFog)}>
             <Text style={styles.chipText}>{t("newTraces")} {fogThreads.length}</Text>
           </Pressable>
         </View>
@@ -51,11 +65,18 @@ export default function MapScreen() {
           ))}
         </View>
 
-        <Sea litThreads={litThreads} fogThreads={fogThreads} selectedId={selectedId} onSelect={setSelectedId} />
+        <Sea
+          litThreads={litThreads}
+          fogThreads={fogThreads}
+          selectedId={selectedId}
+          recommendedIds={RECOMMENDED}
+          visitedSet={visitedSet}
+          onSelect={select}
+        />
         <Text style={styles.hint}>{t("mapHint")}</Text>
       </ScrollView>
 
-      <LandSheet threadId={selectedId} onClose={() => setSelectedId(null)} onSelectThread={(id) => setSelectedId(id)} />
+      <LandSheet threadId={selectedId} onClose={() => setSelectedId(null)} onSelectThread={(id) => select(id)} />
     </View>
   );
 }
@@ -69,6 +90,8 @@ const makeStyles = (c: Palette) =>
     compass: { flexDirection: "row", gap: space.sm, marginTop: space.md },
     chip: { backgroundColor: c.surface, borderWidth: 1, borderColor: c.lineDefault, borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 7 },
     chipText: { color: c.textMain, fontSize: font.small, fontWeight: "600" },
+    chipStar: { borderColor: c.accentRecommend },
+    chipStarText: { color: c.accentRecommend, fontSize: font.small, fontWeight: "700" },
     progress: { marginTop: space.lg, marginBottom: space.md, gap: space.sm },
     progRow: { flexDirection: "row", alignItems: "center", gap: space.sm },
     progLabel: { color: c.textMuted, fontSize: font.small, width: 84 },

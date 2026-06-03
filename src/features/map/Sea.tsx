@@ -15,13 +15,15 @@ export function Sea({
   litThreads,
   fogThreads,
   selectedId,
-  recommendedId,
+  recommendedIds,
+  visitedSet,
   onSelect,
 }: {
   litThreads: Thread[];
   fogThreads: Thread[];
   selectedId: string | null;
-  recommendedId?: string | null;
+  recommendedIds?: Set<string>;
+  visitedSet?: Set<string>;
   onSelect: (id: string) => void;
 }) {
   const c = useTheme().colors;
@@ -80,13 +82,21 @@ export function Sea({
         const p = pos[n.id];
         const lit = litSet.has(n.id);
         const sel = selectedId === n.id;
-        const rec = recommendedId === n.id;
+        const rec = (recommendedIds?.has(n.id) ?? false) && !sel && !lit;
+        const visited = (visitedSet?.has(n.id) ?? false) && !sel && !lit;
         return (
           <Pressable
             key={n.id}
             onPress={() => onSelect(n.id)}
             hitSlop={10}
-            style={{ position: "absolute", left: p.x - NODE_W / 2, top: p.y - NODE_H / 2, width: NODE_W, alignItems: "center" }}
+            style={{
+              position: "absolute",
+              left: p.x - NODE_W / 2,
+              top: p.y - NODE_H / 2,
+              width: NODE_W,
+              alignItems: "center",
+              opacity: visited ? 0.55 : 1,
+            }}
           >
             <View
               style={[
