@@ -17,6 +17,7 @@ export default function RootLayout() {
           <ThemedStatusBar />
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="search" options={{ presentation: "modal" }} />
             <Stack.Screen name="thread/[id]" />
             <Stack.Screen name="auth/login" />
             <Stack.Screen name="auth/signup" />

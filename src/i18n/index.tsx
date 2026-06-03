@@ -38,6 +38,10 @@ export const translations = {
     notesEmpty: "기록은 선택이에요. 저장만으로도 지도는 자랍니다.",
     savedEmpty: "아직 저장한 실마리가 없어요. 지도에서 하나 저장해 보세요.",
     language: "언어",
+    search: "검색",
+    searchPlaceholder: "인물·작품·사조·재료·개념 검색",
+    noResults: "결과가 없어요.",
+    suggestNew: "새 실마리 제안하기",
   },
   en: {
     map: "Map",
@@ -71,6 +75,10 @@ export const translations = {
     notesEmpty: "Notes are optional. Saving alone grows your map.",
     savedEmpty: "Nothing saved yet. Save a thread from the map.",
     language: "Language",
+    search: "Search",
+    searchPlaceholder: "Search people, works, movements, materials, concepts",
+    noResults: "No results.",
+    suggestNew: "Suggest a new thread",
   },
 } as const;
 
