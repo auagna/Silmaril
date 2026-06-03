@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import { MVP_THREAD_TYPES, threadTypeLabel, type ThreadType } from "@/types/database";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Sea } from "@/features/map/Sea";
 import { LandSheet } from "@/features/map/LandSheet";
@@ -18,10 +19,11 @@ export default function MapScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const c = useTheme().colors;
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const styles = useMemo(() => makeStyles(c), [c]);
   const { savedSet } = useSaves();
   const { selectedId, setSelected, visitedSet } = useExplore();
+  const [typeFilter, setTypeFilter] = useState<ThreadType | null>(null);
 
   const litThreads = threads.filter((th) => savedSet.has(th.id));
   const fogThreads = undiscovered();
@@ -72,12 +74,25 @@ export default function MapScreen() {
           ))}
         </View>
 
+        {/* 타입 필터 (강조/비강조) */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: space.sm }}>
+          <Pressable style={[styles.fchip, !typeFilter && styles.fchipOn]} onPress={() => setTypeFilter(null)}>
+            <Text style={[styles.fchipText, !typeFilter && styles.fchipTextOn]}>{locale === "en" ? "All" : "전체"}</Text>
+          </Pressable>
+          {MVP_THREAD_TYPES.map((tt) => (
+            <Pressable key={tt} style={[styles.fchip, typeFilter === tt && styles.fchipOn]} onPress={() => setTypeFilter(typeFilter === tt ? null : tt)}>
+              <Text style={[styles.fchipText, typeFilter === tt && styles.fchipTextOn]}>{threadTypeLabel(tt, locale)}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+
         <Sea
           litThreads={litThreads}
           fogThreads={fogThreads}
           selectedId={selectedId}
           recommendedIds={RECOMMENDED}
           visitedSet={visitedSet}
+          typeFilter={typeFilter}
           onSelect={select}
         />
         <Text style={styles.hint}>{t("mapHint")}</Text>
@@ -102,6 +117,10 @@ const makeStyles = (c: Palette) =>
     chipText: { color: c.textMain, fontSize: font.small, fontWeight: "600" },
     chipStar: { borderColor: c.accentRecommend },
     chipStarText: { color: c.accentRecommend, fontSize: font.small, fontWeight: "700" },
+    fchip: { borderWidth: 1, borderColor: c.lineDefault, borderRadius: radius.pill, paddingHorizontal: 11, paddingVertical: 5, marginRight: 6, backgroundColor: c.surface },
+    fchipOn: { backgroundColor: c.nodeDefault, borderColor: c.nodeDefault },
+    fchipText: { color: c.textMuted, fontSize: font.small },
+    fchipTextOn: { color: c.nodeText, fontWeight: "700" },
     progress: { marginTop: space.lg, marginBottom: space.md, gap: space.sm },
     progRow: { flexDirection: "row", alignItems: "center", gap: space.sm },
     progLabel: { color: c.textMuted, fontSize: font.small, width: 84 },

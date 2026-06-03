@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
-import type { Thread } from "@/types/database";
+import type { Thread, ThreadType } from "@/types/database";
 import { connections, getThreadTranslation } from "@/lib/dummy";
 import { useTheme, radius, font, type Palette } from "@/theme";
 import { useLocale } from "@/i18n";
@@ -17,6 +17,7 @@ export function Sea({
   selectedId,
   recommendedIds,
   visitedSet,
+  typeFilter,
   onSelect,
 }: {
   litThreads: Thread[];
@@ -24,6 +25,7 @@ export function Sea({
   selectedId: string | null;
   recommendedIds?: Set<string>;
   visitedSet?: Set<string>;
+  typeFilter?: ThreadType | null;
   onSelect: (id: string) => void;
 }) {
   const c = useTheme().colors;
@@ -84,6 +86,7 @@ export function Sea({
         const sel = selectedId === n.id;
         const rec = (recommendedIds?.has(n.id) ?? false) && !sel && !lit;
         const visited = (visitedSet?.has(n.id) ?? false) && !sel && !lit;
+        const dimmed = typeFilter != null && n.type !== typeFilter; // 타입 필터 비강조
         return (
           <Pressable
             key={n.id}
@@ -95,7 +98,7 @@ export function Sea({
               top: p.y - NODE_H / 2,
               width: NODE_W,
               alignItems: "center",
-              opacity: visited ? 0.55 : 1,
+              opacity: dimmed ? 0.25 : visited ? 0.55 : 1,
             }}
           >
             <View
