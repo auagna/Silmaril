@@ -42,7 +42,9 @@
 - [x] **Step 24-25. iPhone-first 반응형 + 안정화** — LandSheet 높이상한/탭바 침범 방지/스크롤, Sea 노드 터치영역. tsc+bundle 통과(TS/import 버그 없음).
 - [x] **Step 26-27. i18n(ko/en) + 번역 레이어** — `src/i18n`(Locale/dict/`useLocale`) + `thread_translations`/`viewpoints` + 더미 ko/en + 화면 적용 + My View 언어토글. **Thread 유지(Keyword=Thread, D-019).** tsc+export 통과.
 - [x] **PHASE 29. Node Type System v1** — ThreadType 확장(material/emotion/form/era + form/place/era) + `subtype` + 더미 타입 정교화(Concrete=material, Silence=emotion, +Church of the Light=work) + locale 타입라벨 + schema enum/subtype. tsc+export 통과.
-- [ ] **PHASE 30-55 (대형 백로그)** — 노드 아이콘/관계선 문법 · 그래프 레이아웃 모드 · Flow · 타입필터 · 검색 · Source Adapter(Wikidata/Wikipedia/Namu) · ingestion · review queue · confidence · AI draft · Auth/RLS · mock→Supabase · Create 제출 · pan/zoom · web/tablet · seed · QA · privacy · deploy · feedback. **한 번에 하나씩.**
+- [ ] **PHASE 30-55 (대형 백로그)** — 노드 아이콘/관계선 문법 · 그래프 레이아웃 모드 · Flow · 타입필터 · 검색 · Source Adapter(Wikidata/Wikipedia/Namu) · ingestion · review queue · confidence · AI draft · Auth/RLS · mock→Supabase · Create 제출 · pan/zoom · web/tablet · seed · QA · privacy · deploy · feedback. **한 번에 하나씩.** (대부분 미구현 — RC 점검 참조.)
+- [x] **PHASE 56. RC 점검** — `docs/release-candidate-v0.1.md`: 21항목 정직 점검(✅8/△3/❌10), 리스크, v0.1 노트, v0.2 로드맵. 결론: **더미 기반 탐험 프로토타입**(공개 플랫폼 아님).
+- [ ] **다음 우선(RC 권고):** ① 검색(35) 최소판 ② 추천 로직(16) ③ Supabase 실연결+seed(47/51). ← 권장 진행 순서
 - [x] **Step 28. Supabase 다국어 테이블** — schema.sql 에 `thread_translations`(unique thread_id,locale) · `viewpoints`(locale) · `thread_connection_translations`(선택) · `users.preferred_locale` + enum(locale_type/viewpoint_author) + 인덱스. erd 동기화. (RLS 제외.)
 - [x] **EXP-IA2. 4탭 재구성 (구현 완료).** `app/(tabs)` = 지도(Map)/보관(Archive)/만들기(Create)/나(My View). Map=Sky(나침반)+Sea(별자리 노드·연결·미발견, 경량 RN)+Land(바텀시트 상세, 의존성 0). 옛 5탭 삭제. `tsc` + `expo export`(1033 모듈) 통과. 더미 데이터.
 - [ ] **EXP4. Supabase 실연결** — service 함수(api-spec) 구현 → 더미 store/dummy 대체 + seed 적재. RLS(`policies.sql` 신규)도 이 단계. (타입 정렬은 완료.)

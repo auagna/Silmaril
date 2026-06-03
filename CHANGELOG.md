@@ -5,6 +5,7 @@
 ## 2026-06-02
 
 ### Changes
+- docs(PHASE 56): RC 점검 `docs/release-candidate-v0.1.md` — 21항목 정직 점검(✅8/△3/❌10), 리스크, v0.1 노트, v0.2 로드맵. 결론=더미 탐험 프로토타입.
 - feat(PHASE 29): Node Type System v1 — ThreadType 확장(material/emotion/form/era 등) + `subtype` + schema enum/컬럼 + locale 타입라벨. 더미 타입 정교화(Concrete=material, Silence=emotion, +Church of the Light). tsc+export(1036) 통과.
 - feat(Step 28): Supabase 다국어 스키마 — `thread_translations`(unique thread_id,locale)·`viewpoints`(locale)·`thread_connection_translations`(선택)·`users.preferred_locale` + enum(locale_type/viewpoint_author). erd 동기화. (RLS 제외.)
 - feat(Step 26-27): 다국어(ko/en) — `src/i18n`(Locale/translations/`useLocale`, 기기언어 기본·ko fallback) + `thread_translations`/`viewpoints` 타입 + 더미 ko/en 병렬. Map/Sea/Land/Archive/Create/My View + 노드/카드 locale 반영, My View 언어 토글. Thread 모델 유지(Keyword=Thread, D-019). tsc+export(1036) 통과.
