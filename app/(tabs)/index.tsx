@@ -8,11 +8,18 @@ import { LandSheet } from "@/features/map/LandSheet";
 import { useSaves } from "@/features/saves/store";
 import { useExplore } from "@/features/explore/store";
 import { recommendNext } from "@/features/explore/recommend";
+import { type GraphLayoutMode } from "@/features/map/layout";
 import { threads, undiscovered, exploreProgress, recommendedIds } from "@/lib/dummy";
 import { useTheme, space, radius, font, type Palette } from "@/theme";
 import { useLocale } from "@/i18n";
 
 const RECOMMENDED = new Set(recommendedIds);
+const MODES: { key: GraphLayoutMode; ko: string; en: string }[] = [
+  { key: "web", ko: "맥락", en: "Web" },
+  { key: "focus", ko: "집중", en: "Focus" },
+  { key: "flow", ko: "시간", en: "Flow" },
+  { key: "branch", ko: "계보", en: "Branch" },
+];
 
 // Map = 핵심 경험. Sky(나침반) / Sea(Active Map) / Land(상세 시트). (D-017)
 export default function MapScreen() {
@@ -24,6 +31,7 @@ export default function MapScreen() {
   const { savedSet } = useSaves();
   const { selectedId, setSelected, visitedSet } = useExplore();
   const [typeFilter, setTypeFilter] = useState<ThreadType | null>(null);
+  const [layoutMode, setLayoutMode] = useState<GraphLayoutMode>("web");
 
   const litThreads = threads.filter((th) => savedSet.has(th.id));
   const fogThreads = undiscovered();
@@ -86,6 +94,15 @@ export default function MapScreen() {
           ))}
         </ScrollView>
 
+        {/* 그래프 레이아웃 모드 */}
+        <View style={styles.modeRow}>
+          {MODES.map((m) => (
+            <Pressable key={m.key} style={[styles.mode, layoutMode === m.key && styles.modeOn]} onPress={() => setLayoutMode(m.key)}>
+              <Text style={[styles.modeText, layoutMode === m.key && styles.modeTextOn]}>{locale === "en" ? m.en : m.ko}</Text>
+            </Pressable>
+          ))}
+        </View>
+
         <Sea
           litThreads={litThreads}
           fogThreads={fogThreads}
@@ -93,6 +110,7 @@ export default function MapScreen() {
           recommendedIds={RECOMMENDED}
           visitedSet={visitedSet}
           typeFilter={typeFilter}
+          layoutMode={layoutMode}
           onSelect={select}
         />
         <Text style={styles.hint}>{t("mapHint")}</Text>
@@ -121,6 +139,11 @@ const makeStyles = (c: Palette) =>
     fchipOn: { backgroundColor: c.nodeDefault, borderColor: c.nodeDefault },
     fchipText: { color: c.textMuted, fontSize: font.small },
     fchipTextOn: { color: c.nodeText, fontWeight: "700" },
+    modeRow: { flexDirection: "row", gap: 6, marginBottom: space.sm, alignSelf: "flex-start" },
+    mode: { borderWidth: 1, borderColor: c.lineDefault, borderRadius: radius.sm, paddingHorizontal: 10, paddingVertical: 4 },
+    modeOn: { backgroundColor: c.accentRecommend, borderColor: c.accentRecommend },
+    modeText: { color: c.textMuted, fontSize: font.tiny, fontWeight: "600" },
+    modeTextOn: { color: c.onAccent, fontWeight: "700" },
     progress: { marginTop: space.lg, marginBottom: space.md, gap: space.sm },
     progRow: { flexDirection: "row", alignItems: "center", gap: space.sm },
     progLabel: { color: c.textMuted, fontSize: font.small, width: 84 },

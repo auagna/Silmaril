@@ -5,6 +5,7 @@ import { connections, getThreadTranslation } from "@/lib/dummy";
 import { useTheme, radius, font, type Palette } from "@/theme";
 import { useLocale } from "@/i18n";
 import { TYPE_GLYPH } from "./glyph";
+import { computeLayout, type GraphLayoutMode } from "./layout";
 
 // Sea = Active Map. 경량 별자리(노드+연결). svg 없이 RN View 라인.
 // 노드: 일반=nodeDefault / 선택=accentActive / 추천=accentRecommend. 미발견=점선.
@@ -19,6 +20,7 @@ export function Sea({
   recommendedIds,
   visitedSet,
   typeFilter,
+  layoutMode,
   onSelect,
 }: {
   litThreads: Thread[];
@@ -27,6 +29,7 @@ export function Sea({
   recommendedIds?: Set<string>;
   visitedSet?: Set<string>;
   typeFilter?: ThreadType | null;
+  layoutMode?: GraphLayoutMode;
   onSelect: (id: string) => void;
 }) {
   const c = useTheme().colors;
@@ -36,20 +39,10 @@ export function Sea({
   const nodes = useMemo(() => [...litThreads, ...fogThreads].slice(0, 8), [litThreads, fogThreads]);
   const litSet = useMemo(() => new Set(litThreads.map((t) => t.id)), [litThreads]);
 
-  const pos = useMemo(() => {
-    const map: Record<string, { x: number; y: number }> = {};
-    const cx = width / 2;
-    const cy = CANVAS_H / 2;
-    const r = Math.min(width, CANVAS_H) / 2 - 64;
-    nodes.forEach((n, i) => {
-      if (i === 0) map[n.id] = { x: cx, y: cy };
-      else {
-        const a = (2 * Math.PI * (i - 1)) / Math.max(1, nodes.length - 1) - Math.PI / 2;
-        map[n.id] = { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
-      }
-    });
-    return map;
-  }, [nodes, width]);
+  const pos = useMemo(
+    () => computeLayout(layoutMode ?? "web", nodes, selectedId, width, CANVAS_H),
+    [layoutMode, nodes, selectedId, width],
+  );
 
   const edges = useMemo(
     () => connections.filter((e) => pos[e.from_thread_id] && pos[e.to_thread_id]),
