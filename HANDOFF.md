@@ -29,6 +29,7 @@
 **✅ Step 26-27 다국어(D-019):** 결정 = **Thread 유지 + i18n 레이어**(Keyword=Thread). `src/i18n`(Locale/dict/`useLocale`, 기기언어→ko fallback, setLocale) + `thread_translations`/`viewpoints` 타입 + 더미 ko/en 병렬. 화면 전반 + 노드/카드 locale, My View 언어토글(한국어/English). tsc+export(1036) 통과. 영어 없어도 fallback.
 - 사용법: `const { t, locale, setLocale } = useLocale();` · 콘텐츠는 `getThreadTranslation(id, locale)`.
 - **✅ Step 28:** schema.sql 에 `thread_translations`·`viewpoints`·`thread_connection_translations`(선택)·`users.preferred_locale` + enum(locale_type/viewpoint_author) + 인덱스. erd 동기화. RLS 제외(추후).
+- **✅ PHASE 52 테스트 (2026-06-02):** jest-expo + 순수 로직 16테스트(`npm test` 통과, legacy-web 제외) + `QA_CHECKLIST.md`. jest 29.7/jest-expo 54.
 - **✅ PHASE 45 Auth (2026-06-02):** `useAuth`/AuthProvider(세션·guest fallback) + login/signup 테마화 + My View 로그인/로그아웃. 비로그인도 탐험 가능.
 - **⚠️ 실데이터 블로커:** DB 확인 결과 **threads=0행(seed 미적용)** + 최신 i18n/소스 테이블 미적용. → 사용자가 **최신 `supabase/schema.sql`(상단 RESET) + `supabase/seed.sql`** 을 SQL Editor 에 적용해야 함. (앱은 그동안 더미 fallback 으로 정상.) 적용 후 PHASE 47(화면 service 교체)로 실데이터 표시.
 - **✅ A/B/C (2026-06-02):** **A** service layer(supabase-ready·더미 fallback)+`seed.sql`(20키워드). **B** 그래프 레이아웃 모드(Web/Focus/Flow/Branch, `layout.ts`). **C** Source/Review/AI **구조(mock/placeholder)** — `src/features/sources/*` + `ingestionService`/`aiDraftService` + schema(source_documents/source_claims/review_candidates). 전부 tsc+export(1041) 통과. ⚠️ C는 실수집·크롤링·API·자동활성 **없음**(법무 게이트). 화면은 아직 더미 직접 사용(service 교체=PHASE47/EXP4).

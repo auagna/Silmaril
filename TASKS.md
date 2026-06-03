@@ -48,6 +48,7 @@
 - [x] **Track A** — service layer(keyword/archive/viewpoint, supabase-ready·더미 fallback) + `supabase/seed.sql`(20키워드 ko/en, PHASE51).
 - [x] **Track B** — 그래프 레이아웃 모드 Web/Focus/Flow/Branch(PHASE32, `layout.ts`). (pan/zoom[49]은 gesture lib 필요 → 보류.)
 - [x] **Track C(구조)** — Source 어댑터 인터페이스+Mock+NamuWiki(candidate_only)+confidence+ingestion(mock)+reviewStore+aiDraft(mock)+schema(source_documents/source_claims/review_candidates). (PHASE36/39/40/41/42/43/44 골격.)
+- [x] **PHASE 52. 테스트/QA** — jest-expo + 순수로직 16테스트(confidence/translation/recommend/connections/undiscovered/layout) + `QA_CHECKLIST.md`. `npm test` 통과.
 - [x] **PHASE 45. Auth** — `AuthContext`/`useAuth`(세션, guest fallback), AuthProvider, login/signup 테마화, My View 로그인/로그아웃. (users 테이블 존재 → 동작.)
 - [ ] **⚠️ 사용자 액션 필요 — 실데이터:** Supabase에 **최신 `schema.sql`(RESET 블록) + `seed.sql` 적용** 필요. (DB 확인 결과 threads=0행, 최신 i18n/소스 테이블 미적용.) 적용 확인되면 PHASE 47(화면 service 교체)로 실데이터 표시.
 - [ ] **남은 단계 = 환경/결정/법무 필요:**

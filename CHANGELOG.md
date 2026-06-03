@@ -5,6 +5,7 @@
 ## 2026-06-02
 
 ### Changes
+- test(PHASE 52): jest-expo 셋업 + 순수 로직 단위 테스트 16개(4 suites: confidence/translation fallback/recommendNext/connectionsOf/undiscovered/computeLayout) + `QA_CHECKLIST.md`. `npm test` 통과, jest는 legacy-web 제외.
 - feat(PHASE 45): Supabase Auth — `AuthContext`/`useAuth`(세션 구독, guest fallback), `_layout` AuthProvider, login/signup 화면 테마화, My View 로그인/로그아웃 상태. tsc+export(1042) 통과. (비로그인도 탐험 가능.)
 - feat(A/B/C): **A** supabase-ready service layer + seed.sql(20키워드 ko/en). **B** 그래프 레이아웃 모드 Web/Focus/Flow/Branch(PHASE32). **C** Source/Review/AI 구조(어댑터 인터페이스+Mock+NamuWiki placeholder+confidence+ingestion+reviewStore+aiDraft, **전부 mock/placeholder — 실수집·크롤링·API·자동활성 없음**)+schema(source_documents/source_claims/review_candidates). 각 tsc+export(1041) 통과.
 - feat(client MVP 일괄): PHASE 16(추천+방문)·35(검색 모달)·34(타입 필터)·30+31(노드 아이콘/관계선 문법)·19(Create 폼 목업). 전역 explore store(selected+visited). 각 tsc+export 통과(1040). **여기까지 = 더미 기반 클라이언트 MVP 기능완성.** 이후(Supabase 실연결·Auth·Source/AI·web·배포)는 환경/법무/결정 필요.
