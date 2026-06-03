@@ -26,7 +26,9 @@
 - **다음 백로그(12~23):** Sky 아이콘 나침반 → Sea 키워드맵 정제 → Land 탭 시트 → Keyword 모델 → 추천 이동 → Archive/Create/My View 1차 → 전역상태 통합 → Supabase 초안/연결. **한 번에 하나씩.**
 
 **✅ Step 24-25 (iPhone 반응형/안정화):** LandSheet 높이상한(SE 대응)·탭바 침범 방지·스크롤, Sea 노드 hitSlop. tsc+bundle 통과.
-**⚠️ Step 26-28 결정 필요 — Keyword vs Thread 통일:** 26~28이 **`Keyword`/`keyword_translations`/`keyword_relations`** 모델을 명시(현재는 `Thread`/`thread_connections`). 같은 개념이므로 **하나로 통일** 해야 함. 기본 방향(미지정 시): **Thread 모델 유지 + i18n 레이어(thread_translations)만 추가** — 기존 스키마/타입/문서 보존. (사용자가 Keyword 전면 전환을 원하면 리네임.) i18n UI(Locale/translations/useLocale)는 모델 무관하게 먼저 도입 가능.
+**✅ Step 26-27 다국어(D-019):** 결정 = **Thread 유지 + i18n 레이어**(Keyword=Thread). `src/i18n`(Locale/dict/`useLocale`, 기기언어→ko fallback, setLocale) + `thread_translations`/`viewpoints` 타입 + 더미 ko/en 병렬. 화면 전반 + 노드/카드 locale, My View 언어토글(한국어/English). tsc+export(1036) 통과. 영어 없어도 fallback.
+- 사용법: `const { t, locale, setLocale } = useLocale();` · 콘텐츠는 `getThreadTranslation(id, locale)`.
+- **다음 = Step 28:** Supabase `thread_translations`/`viewpoints`(locale)/`users.preferred_locale` schema.sql+erd. (RLS 제외.)
 
 > **SDK 54 업그레이드 완료 (D-016):** Expo Go(앱스토어=SDK54)와 맞춤. react 19.1 / RN 0.81.5 / expo-router 6 / ts 5.9. `.npmrc`(legacy-peer-deps) 추가. **`babel-preset-expo` 의존성 추가**(Metro resolve 에러 수정). 검증: `expo export --platform ios` 1032 모듈 번들 성공. 첫 실행은 `npx expo start -c`.
 

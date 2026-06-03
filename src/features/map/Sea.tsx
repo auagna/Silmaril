@@ -1,8 +1,9 @@
 import { useMemo } from "react";
 import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
 import type { Thread } from "@/types/database";
-import { connections } from "@/lib/dummy";
+import { connections, getThreadTranslation } from "@/lib/dummy";
 import { useTheme, radius, font, type Palette } from "@/theme";
+import { useLocale } from "@/i18n";
 
 // Sea = Active Map. 경량 별자리(노드+연결). svg 없이 RN View 라인.
 // 노드: 일반=nodeDefault / 선택=accentActive / 추천=accentRecommend. 미발견=점선.
@@ -24,6 +25,7 @@ export function Sea({
   onSelect: (id: string) => void;
 }) {
   const c = useTheme().colors;
+  const { locale } = useLocale();
   const styles = useMemo(() => makeStyles(c), [c]);
   const width = Dimensions.get("window").width - 32;
   const nodes = useMemo(() => [...litThreads, ...fogThreads].slice(0, 8), [litThreads, fogThreads]);
@@ -95,7 +97,7 @@ export function Sea({
               ]}
             >
               <Text style={lit || sel || rec ? styles.litText : styles.fogText} numberOfLines={1}>
-                {n.title}
+                {getThreadTranslation(n.id, locale).title}
               </Text>
             </View>
             {!lit && <Text style={styles.fogSub}>미발견</Text>}

@@ -1,14 +1,15 @@
 import { useMemo } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions } from "react-native";
-
-// 작은 화면(SE급)에서도 시트가 화면을 다 덮지 않도록 높이 상한.
-const SHEET_MAX_H = Dimensions.get("window").height * 0.72;
-import { getThreadById, connectionsOf } from "@/lib/dummy";
+import { getThreadById, connectionsOf, getThreadTranslation, getViewpoints } from "@/lib/dummy";
 import { THREAD_TYPE_LABEL, RELATION_LABEL } from "@/types/database";
 import { useSaves } from "@/features/saves/store";
 import { useTheme, space, radius, font, type Palette } from "@/theme";
+import { useLocale } from "@/i18n";
 
-// Land = 선택한 실마리 상세(바텀 시트). 배경 = bgSheet 토큰.
+// 작은 화면(SE급)에서도 시트가 화면을 다 덮지 않도록 높이 상한.
+const SHEET_MAX_H = Dimensions.get("window").height * 0.72;
+
+// Land = 선택한 실마리 상세(바텀 시트). 배경 = bgSheet. ko/en 번역 적용.
 export function LandSheet({
   threadId,
   onClose,
@@ -19,6 +20,7 @@ export function LandSheet({
   onSelectThread: (id: string) => void;
 }) {
   const c = useTheme().colors;
+  const { t, locale } = useLocale();
   const styles = useMemo(() => makeStyles(c), [c]);
   const { isSaved, toggle } = useSaves();
 
@@ -26,7 +28,9 @@ export function LandSheet({
   const thread = getThreadById(threadId);
   if (!thread) return null;
 
+  const tr = getThreadTranslation(thread.id, locale);
   const conns = connectionsOf(thread.id);
+  const views = getViewpoints(thread.id, locale);
   const saved = isSaved(thread.id);
 
   return (
@@ -39,37 +43,52 @@ export function LandSheet({
           <View style={styles.typePill}>
             <Text style={styles.typeText}>{THREAD_TYPE_LABEL[thread.type]}</Text>
           </View>
-          <Pressable onPress={onClose} hitSlop={8}>
-            <Text style={styles.close}>닫기</Text>
+          <Pressable onPress={onClose} hitSlop={10}>
+            <Text style={styles.close}>{t("close")}</Text>
           </Pressable>
         </View>
 
-        <Text style={styles.title}>{thread.title}</Text>
-        <Text style={styles.summary}>{thread.summary}</Text>
+        <Text style={styles.title}>{tr.title}</Text>
+        <Text style={styles.summary}>{tr.summary}</Text>
 
-        <Pressable onPress={() => toggle(thread.id)} style={[styles.save, saved && styles.saveOn]}>
-          <Text style={[styles.saveText, saved && styles.saveTextOn]}>{saved ? "✓ 저장됨" : "＋ 저장"}</Text>
+        <Pressable onPress={() => toggle(thread.id)} style={styles.save} hitSlop={6}>
+          <Text style={styles.saveText}>{saved ? `✓ ${t("saved")}` : `＋ ${t("save")}`}</Text>
         </Pressable>
 
         <View style={styles.actionRow}>
-          <View style={styles.miniBtn}><Text style={styles.miniText}>컬렉션 추가</Text></View>
-          <View style={styles.miniBtn}><Text style={styles.miniText}>관점</Text></View>
+          <View style={styles.miniBtn}><Text style={styles.miniText}>{t("addCollection")}</Text></View>
         </View>
 
-        <Text style={styles.sectionLbl}>연결 · {conns.length}</Text>
         <ScrollView style={{ maxHeight: 150 }} showsVerticalScrollIndicator={false}>
+          {/* 연결 */}
+          <Text style={styles.sectionLbl}>{t("connections")} · {conns.length}</Text>
           {conns.map((cn) => (
             <Pressable key={cn.thread.id} onPress={() => onSelectThread(cn.thread.id)} style={styles.conn}>
               <View style={[styles.rel, cn.tier === 2 && styles.relTier2]}>
                 <Text style={styles.relText}>{RELATION_LABEL[cn.relation_type]}</Text>
               </View>
-              <Text style={styles.connName} numberOfLines={1}>{cn.thread.title}</Text>
+              <Text style={styles.connName} numberOfLines={1}>{getThreadTranslation(cn.thread.id, locale).title}</Text>
               <Text style={styles.chev}>›</Text>
             </Pressable>
           ))}
-        </ScrollView>
 
-        <Text style={styles.hint}>출처 · 관점은 다음 단계에서 연결됩니다.</Text>
+          {/* 관점 */}
+          {views.length > 0 && (
+            <>
+              <Text style={styles.sectionLbl}>{t("views")} · {views.length}</Text>
+              {views.map((v) => (
+                <View key={v.id} style={styles.vp}>
+                  <View style={styles.vpHead}>
+                    <Text style={styles.vpTag}>{v.author_type === "curator" ? t("curatorViews") : t("userViews")}</Text>
+                    {v.locale !== locale && <Text style={styles.vpLang}>{v.locale.toUpperCase()}</Text>}
+                  </View>
+                  <Text style={styles.vpTitle}>{v.title}</Text>
+                  <Text style={styles.vpBody}>{v.body}</Text>
+                </View>
+              ))}
+            </>
+          )}
+        </ScrollView>
       </View>
     </View>
   );
@@ -88,18 +107,21 @@ const makeStyles = (c: Palette) =>
     title: { fontSize: font.h2, fontWeight: "700", color: c.textMain, marginTop: space.sm },
     summary: { fontSize: font.small, color: c.textMuted, marginTop: 4, lineHeight: 20 },
     save: { marginTop: space.md, backgroundColor: c.accentActive, borderRadius: radius.pill, paddingVertical: 12, alignItems: "center" },
-    saveOn: { backgroundColor: c.accentActive },
     saveText: { color: c.onAccent, fontWeight: "700", fontSize: font.body },
-    saveTextOn: { color: c.onAccent },
-    actionRow: { flexDirection: "row", gap: space.sm, marginTop: space.sm },
+    actionRow: { flexDirection: "row", gap: space.sm, marginTop: space.sm, marginBottom: space.xs },
     miniBtn: { flex: 1, borderWidth: 1, borderColor: c.lineDefault, borderRadius: radius.pill, paddingVertical: 9, alignItems: "center" },
     miniText: { fontSize: font.small, color: c.textMain },
-    sectionLbl: { fontSize: font.tiny, fontWeight: "700", color: c.textMuted, letterSpacing: 0.6, textTransform: "uppercase", marginTop: space.lg, marginBottom: space.xs },
+    sectionLbl: { fontSize: font.tiny, fontWeight: "700", color: c.textMuted, letterSpacing: 0.6, textTransform: "uppercase", marginTop: space.md, marginBottom: space.xs },
     conn: { flexDirection: "row", alignItems: "center", gap: space.sm, paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: c.line2 },
     rel: { backgroundColor: c.textMuted, borderRadius: 5, paddingHorizontal: 6, paddingVertical: 1 },
     relTier2: { backgroundColor: c.accentRecommend },
     relText: { fontSize: 10, color: c.onAccent },
     connName: { flex: 1, fontSize: font.body, fontWeight: "600", color: c.textMain },
     chev: { color: c.textMuted, fontSize: 18 },
-    hint: { fontSize: font.tiny, color: c.textMuted, marginTop: space.md },
+    vp: { paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: c.line2 },
+    vpHead: { flexDirection: "row", alignItems: "center", gap: 6 },
+    vpTag: { fontSize: 10, color: c.textMuted },
+    vpLang: { fontSize: 9, color: c.onAccent, backgroundColor: c.textMuted, borderRadius: 4, paddingHorizontal: 4 },
+    vpTitle: { fontSize: font.small, fontWeight: "700", color: c.textMain, marginTop: 2 },
+    vpBody: { fontSize: font.small, color: c.textMuted, marginTop: 2, lineHeight: 19 },
   });

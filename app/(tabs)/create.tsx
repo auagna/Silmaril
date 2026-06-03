@@ -3,6 +3,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Screen } from "@/components/ui/Screen";
 import { H1, Muted } from "@/components/ui";
 import { useTheme, space, radius, font, type Palette } from "@/theme";
+import { useLocale } from "@/i18n";
 
 const items = [
   { key: "thread", title: "실마리 생성", body: "인물·작품·사조·장소·개념·조직. 초안은 즉시 내 지도에." },
@@ -12,11 +13,12 @@ const items = [
 
 export default function CreateScreen() {
   const c = useTheme().colors;
+  const { t } = useLocale();
   const styles = useMemo(() => makeStyles(c), [c]);
   return (
     <Screen>
-      <H1>만들기</H1>
-      <Muted style={{ marginTop: 4 }}>완벽하지 않아도 됩니다. 먼저 남기고, 나중에 잇기.</Muted>
+      <H1>{t("create")}</H1>
+      <Muted style={{ marginTop: 4 }}>{t("createSubtitle")}</Muted>
 
       <View style={{ marginTop: space.md, gap: space.sm }}>
         {items.map((it) => (

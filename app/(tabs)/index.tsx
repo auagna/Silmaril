@@ -6,18 +6,20 @@ import { LandSheet } from "@/features/map/LandSheet";
 import { useSaves } from "@/features/saves/store";
 import { threads, undiscovered, exploreProgress } from "@/lib/dummy";
 import { useTheme, space, radius, font, type Palette } from "@/theme";
+import { useLocale } from "@/i18n";
 
 // Map = 핵심 경험. Sky(나침반) / Sea(Active Map) / Land(상세 시트). (D-017)
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
   const c = useTheme().colors;
+  const { t } = useLocale();
   const styles = useMemo(() => makeStyles(c), [c]);
   const { savedSet } = useSaves();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const litThreads = threads.filter((t) => savedSet.has(t.id));
   const fogThreads = undiscovered();
-  const heroId = "ando-tadao";
+  const heroId = "tadao-ando";
   const firstFog = fogThreads[0]?.id ?? heroId;
 
   return (
@@ -25,17 +27,17 @@ export default function MapScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* Sky — 나침반 */}
         <Text style={styles.wordmark}>Silmaril</Text>
-        <Text style={styles.subtitle}>내 세계를 밝히는 중</Text>
+        <Text style={styles.subtitle}>{t("illuminating")}</Text>
 
         <View style={styles.compass}>
           <Pressable style={styles.chip} onPress={() => setSelectedId(heroId)}>
-            <Text style={styles.chipText}>오늘의 발견</Text>
+            <Text style={styles.chipText}>{t("today")}</Text>
           </Pressable>
-          <Pressable style={styles.chip} onPress={() => setSelectedId("dieter-rams")}>
-            <Text style={styles.chipText}>추천</Text>
+          <Pressable style={styles.chip} onPress={() => setSelectedId("mies-van-der-rohe")}>
+            <Text style={styles.chipText}>{t("recommend")}</Text>
           </Pressable>
           <Pressable style={styles.chip} onPress={() => setSelectedId(firstFog)}>
-            <Text style={styles.chipText}>새로운 흔적 {fogThreads.length}</Text>
+            <Text style={styles.chipText}>{t("newTraces")} {fogThreads.length}</Text>
           </Pressable>
         </View>
 
@@ -50,7 +52,7 @@ export default function MapScreen() {
         </View>
 
         <Sea litThreads={litThreads} fogThreads={fogThreads} selectedId={selectedId} onSelect={setSelectedId} />
-        <Text style={styles.hint}>노드를 눌러 실마리를 펼치고, 연결을 따라가 보세요.</Text>
+        <Text style={styles.hint}>{t("mapHint")}</Text>
       </ScrollView>
 
       <LandSheet threadId={selectedId} onClose={() => setSelectedId(null)} onSelectThread={(id) => setSelectedId(id)} />

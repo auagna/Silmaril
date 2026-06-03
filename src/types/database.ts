@@ -1,6 +1,9 @@
 // Silmaril 도메인 타입 — Supabase 스키마(supabase/schema.sql)와 1:1 정렬.
 // 정본: docs/erd.md · docs/canonical-knowledge-model.md
 
+import type { Locale } from "@/i18n";
+export type { Locale };
+
 export type UserRole = "user" | "partner" | "admin";
 
 // MVP enum (확장 추후: event/company/book/film/music/media)
@@ -135,6 +138,30 @@ export interface Source {
   title: string | null;
   description: string | null;
   created_by: string | null;
+  created_at: string;
+}
+
+// ── i18n (Thread + i18n 레이어, D-018/Step 26) ──────────────
+// Thread 는 canonical(title/slug/type 등). 표시 텍스트(title/summary/description)는
+// thread_translations 에서 locale 별로. (Keyword 모델 = Thread 로 매핑.)
+export interface ThreadTranslation {
+  id: string;
+  thread_id: string;
+  locale: Locale;
+  title: string;
+  summary: string;
+  description?: string | null;
+}
+
+export type ViewpointAuthor = "user" | "curator" | "system";
+
+export interface Viewpoint {
+  id: string;
+  thread_id: string;
+  locale: Locale;
+  author_type: ViewpointAuthor;
+  title: string;
+  body: string;
   created_at: string;
 }
 

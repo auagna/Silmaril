@@ -6,6 +6,7 @@ import { ThreadCard } from "@/components/cards/ThreadCard";
 import { useSaves } from "@/features/saves/store";
 import { threads } from "@/lib/dummy";
 import { useTheme, space, radius, font, type Palette } from "@/theme";
+import { useLocale } from "@/i18n";
 
 type Tab = "saved" | "notes" | "collections";
 
@@ -17,26 +18,27 @@ const collections = [
 // Archive = 보관. 저장 / 기록(선택) / 컬렉션. (컬렉션은 여기, 별도 탭 아님)
 export default function ArchiveScreen() {
   const c = useTheme().colors;
+  const { t } = useLocale();
   const styles = useMemo(() => makeStyles(c), [c]);
   const { savedSet, isSaved, toggle } = useSaves();
   const [tab, setTab] = useState<Tab>("saved");
-  const savedThreads = threads.filter((t) => savedSet.has(t.id));
+  const savedThreads = threads.filter((th) => savedSet.has(th.id));
 
   return (
     <Screen>
-      <H1>보관</H1>
-      <Muted style={{ marginTop: 4 }}>담아둔 것들. 컬렉션도 여기 있어요.</Muted>
+      <H1>{t("archive")}</H1>
+      <Muted style={{ marginTop: 4 }}>{t("archiveSubtitle")}</Muted>
 
       <View style={{ flexDirection: "row", marginTop: space.md }}>
-        <Chip label="저장" active={tab === "saved"} onPress={() => setTab("saved")} />
-        <Chip label="기록" active={tab === "notes"} onPress={() => setTab("notes")} />
-        <Chip label="컬렉션" active={tab === "collections"} onPress={() => setTab("collections")} />
+        <Chip label={t("save")} active={tab === "saved"} onPress={() => setTab("saved")} />
+        <Chip label={t("notes")} active={tab === "notes"} onPress={() => setTab("notes")} />
+        <Chip label={t("collections")} active={tab === "collections"} onPress={() => setTab("collections")} />
       </View>
 
       {tab === "saved" && (
         <View style={{ marginTop: space.sm }}>
           {savedThreads.length === 0 ? (
-            <Muted>아직 저장한 실마리가 없어요. 지도에서 하나 저장해 보세요.</Muted>
+            <Muted>{t("savedEmpty")}</Muted>
           ) : (
             savedThreads.map((th) => <ThreadCard key={th.id} thread={th} saved={isSaved(th.id)} onToggleSave={toggle} />)
           )}
@@ -45,7 +47,7 @@ export default function ArchiveScreen() {
 
       {tab === "notes" && (
         <View style={{ marginTop: space.md }}>
-          <Muted style={{ lineHeight: 20 }}>기록은 선택이에요. 저장만으로도 지도는 자랍니다. 남기고 싶을 때, 가볍게.</Muted>
+          <Muted style={{ lineHeight: 20 }}>{t("notesEmpty")}</Muted>
         </View>
       )}
 

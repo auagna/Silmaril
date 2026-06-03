@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { ThemeProvider, useTheme } from "@/theme";
+import { LocaleProvider } from "@/i18n";
 
 function ThemedStatusBar() {
   const { isNight } = useTheme();
@@ -11,15 +12,17 @@ function ThemedStatusBar() {
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <SafeAreaProvider>
-        <ThemedStatusBar />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="thread/[id]" />
-          <Stack.Screen name="auth/login" />
-          <Stack.Screen name="auth/signup" />
-        </Stack>
-      </SafeAreaProvider>
+      <LocaleProvider>
+        <SafeAreaProvider>
+          <ThemedStatusBar />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="thread/[id]" />
+            <Stack.Screen name="auth/login" />
+            <Stack.Screen name="auth/signup" />
+          </Stack>
+        </SafeAreaProvider>
+      </LocaleProvider>
     </ThemeProvider>
   );
 }

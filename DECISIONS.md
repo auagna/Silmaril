@@ -4,6 +4,17 @@
 
 ---
 
+## 2026-06-02 · D-019 · 다국어(ko/en) — Thread + i18n 레이어 (Keyword=Thread)
+
+- **맥락:** Step 26~28이 `Keyword` 모델 + 다국어를 요구. 사용자 결정: **Thread 모델 유지 + i18n 레이어만 추가** (Keyword=Thread 매핑).
+- **결정:**
+  - `src/i18n/` — `Locale='ko'|'en'`, UI 번역 dict, `LocaleProvider`/`useLocale`(기기언어 기본 → 미지원 시 ko, `setLocale` 즉시 전환).
+  - 표시 텍스트 분리: `Thread`(canonical) + **`thread_translations`(locale별 title/summary)** + **`viewpoints`(locale)**. `getThreadTranslation(id, locale)` fallback: locale→ko→en→canonical.
+  - 더미를 ko/en 병렬로(Mies/Ando/Bauhaus/Less is More/Concrete/Silence/Light/Modernism/Japanese Minimalism). 화면(Map/Sea/Land/Archive/Create/My View/탭바)·노드 제목·카드가 locale 반영. My View 에 **언어 토글(한국어/English)**.
+  - 하드코딩 UI 문구는 translations dict 로 이동(가능 범위).
+- **결과:** `tsc` + `expo export`(1036) 통과. 영어 데이터 없어도 fallback 으로 안 깨짐.
+- **다음:** Step 28 — Supabase 다국어 테이블(`thread_translations`/`viewpoints`/`users.preferred_locale`) 스키마.
+
 ## 2026-06-02 · D-018 · Day/Night 테마 시스템
 
 - **맥락:** 디자이너 타깃 + 어두운 탐험 톤. 전역 테마 필요(라이트=Day Silmaril, 다크=Night Silmaril).
