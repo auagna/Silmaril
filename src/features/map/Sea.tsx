@@ -13,43 +13,59 @@ import type { Thread, ThreadType, ThreadConnection } from "@/types/database";
 import { connections, getThreadTranslation } from "@/lib/dummy";
 import { useTheme, radius, font, type Palette } from "@/theme";
 import { useLocale } from "@/i18n";
-import { TYPE_GLYPH } from "./glyph";
 import { computeLayout, type GraphLayoutMode, type Pos } from "./layout";
 
-// Sea = Active Map. Obsidian식 유동 캔버스.
-//  step1: 팬 / 핀치 줌(0.5~3x) / 노드 길게눌러 드래그 / ⊕⊖줌·⌖리센터 / 탭=선택.
-//  step2: force 물리(척력+스프링+센터링) — useFrameCallback 으로 매 프레임 적분,
-//         운동에너지 낮으면 자동 정지(settle), 드래그 시 해당 노드 고정+재가열.
-//  노드 구성 = 분류 아이콘(흐리게) + 키워드 + 연결선. (저장됨 아이콘 없음.)
-const NODE_W = 100;
-const NODE_H = 44;
+// Sea = Active Map (Obsidian 구조 고도화).
+//  · 노드 = 차수(연결 수) 기반 원(dot). 발견=채운 원 / 미발견=빈 원. 분류=타입별 뮤트 컬러.
+//  · 라벨 = 줌 인 시 보이고 줌 아웃 시 페이드(text fade). 선택 노드는 항상 표시.
+//  · 선택 시 이웃·연결만 강조, 나머지 흐리게.
+//  · 4-force 물리: Center(밀집) · Repel(척력) · Link(관련성 스프링) · Link distance.
+//  · 차수 기반 질량(허브는 덜 흔들림) + 반지름 기반 충돌.
+const LABEL_W = 96;
 const CANVAS_H = 380;
-const MAX_NODES = 12;
+const MAX_NODES = 14;
 const MIN_SCALE = 0.5;
 const MAX_SCALE = 3;
+const DOT_BASE = 6; // 반지름 기본
+const DOT_STEP = 2.4; // 연결 1개당 증가
+const DOT_MAX = 22;
 
 // ── 물리 상수 (튜닝 포인트) ──
-const REPULSION = 6500; // 노드 간 척력 세기
-const CENTER = 0.022; // 중심으로 당기는 힘(↑ 더 모임)
-const DAMPING = 0.82; // 감쇠(클수록 더 오래 움직임)
-const MAX_SPEED = 34; // 프레임당 최대 속도
-const SETTLE_KE = 0.4; // 이 운동에너지 미만이면 정지
-const MAX_FRAMES = 600; // 안전 자동정지(~10s)
-const MIN_DIST = 16;
-const PAD = 30; // 캔버스 경계 여백 — 노드가 화면 밖으로 못 나가게(선 잘림 방지)
+const REPULSION = 6500;
+const CENTER = 0.022;
+const DAMPING = 0.82;
+const MAX_SPEED = 34;
+const SETTLE_KE = 0.4;
+const MAX_FRAMES = 600;
+const COLLIDE_GAP = 12; // 원끼리 최소 간격
 // 관련성(connection_tier) 기준 인력: tier1(사실)=가깝고 강하게, tier2(해석)=멀고 약하게.
-const SPRING_T1 = 0.085;
-const SPRING_T2 = 0.04;
-const IDEAL_T1 = 88; // 이상 거리(가까움)
-const IDEAL_T2 = 150; // 이상 거리(멀음)
+const SPRING_T1 = 0.09;
+const SPRING_T2 = 0.045;
+const IDEAL_T1 = 84;
+const IDEAL_T2 = 150;
 
+// 분류(타입) → 뮤트 컬러. Day/Night 양쪽 배경에서 읽히는 중간톤.
+const TYPE_COLOR: Record<ThreadType, string> = {
+  person: "#B5879B",
+  movement: "#8B9DC4",
+  work: "#C9A66B",
+  material: "#9AA68B",
+  concept: "#8FB0B5",
+  emotion: "#C58B8B",
+  form: "#A39BC4",
+  place: "#8FBF9F",
+  era: "#B0A38F",
+  organization: "#9FA8B0",
+};
+
+function dotRadius(degree: number): number {
+  return Math.min(DOT_BASE + degree * DOT_STEP, DOT_MAX);
+}
 function zeroVel(ids: string[]): Record<string, Pos> {
   const v: Record<string, Pos> = {};
   for (const id of ids) v[id] = { x: 0, y: 0 };
   return v;
 }
-
-// 연결을 관련성(tier) 기준 스프링 파라미터로 변환.
 function simEdge(e: ThreadConnection) {
   const t1 = e.connection_tier === 1;
   return {
@@ -86,10 +102,7 @@ export function Sea({
   const cx = width / 2;
   const cy = CANVAS_H / 2;
 
-  const nodes = useMemo(
-    () => [...litThreads, ...fogThreads].slice(0, MAX_NODES),
-    [litThreads, fogThreads],
-  );
+  const nodes = useMemo(() => [...litThreads, ...fogThreads].slice(0, MAX_NODES), [litThreads, fogThreads]);
   const litSet = useMemo(() => new Set(litThreads.map((t) => t.id)), [litThreads]);
   const nodeIds = useMemo(() => new Set(nodes.map((n) => n.id)), [nodes]);
 
@@ -98,22 +111,49 @@ export function Sea({
     [nodeIds],
   );
 
-  // 선택은 시드(레이아웃)를 리셋하지 않도록 ref 로 캡처(탭마다 물리 재시작 방지).
+  // 차수(연결 수) → 반지름·질량.
+  const degree = useMemo(() => {
+    const d: Record<string, number> = {};
+    for (const n of nodes) d[n.id] = 0;
+    for (const e of edges) {
+      d[e.from_thread_id] = (d[e.from_thread_id] ?? 0) + 1;
+      d[e.to_thread_id] = (d[e.to_thread_id] ?? 0) + 1;
+    }
+    return d;
+  }, [nodes, edges]);
+  const meta = useMemo(() => {
+    const m: Record<string, { m: number; r: number }> = {};
+    for (const n of nodes) {
+      const dg = degree[n.id] ?? 0;
+      m[n.id] = { m: 1 + dg * 0.5, r: dotRadius(dg) };
+    }
+    return m;
+  }, [nodes, degree]);
+
+  // 선택 노드의 이웃(강조/포커스용).
+  const neighborSet = useMemo(() => {
+    if (selectedId == null) return null;
+    const s = new Set<string>();
+    for (const e of edges) {
+      if (e.from_thread_id === selectedId) s.add(e.to_thread_id);
+      else if (e.to_thread_id === selectedId) s.add(e.from_thread_id);
+    }
+    return s;
+  }, [selectedId, edges]);
+
+  // 선택은 시드를 리셋하지 않도록 ref 캡처.
   const selectedRef = useRef(selectedId);
   selectedRef.current = selectedId;
-  // 시드 위치: 노드 집합 / 모드 / 폭 변할 때만 재계산.
   const seed = useMemo(
     () => computeLayout(layoutMode ?? "web", nodes, selectedRef.current, width, CANVAS_H),
     [nodes, layoutMode, width],
   );
 
-  // 노드 위치/속도(물리). 단일 shared value 맵 → 노드+엣지가 같이 구독.
   const positions = useSharedValue<Record<string, Pos>>(seed);
   const velocities = useSharedValue<Record<string, Pos>>(zeroVel(nodes.map((n) => n.id)));
   const idsSV = useSharedValue<string[]>(nodes.map((n) => n.id));
-  const edgesSV = useSharedValue<{ a: string; b: string; ideal: number; k: number }[]>(
-    edges.map(simEdge),
-  );
+  const edgesSV = useSharedValue<{ a: string; b: string; ideal: number; k: number }[]>(edges.map(simEdge));
+  const metaSV = useSharedValue<Record<string, { m: number; r: number }>>(meta);
   const draggingId = useSharedValue<string | null>(null);
   const frameCount = useSharedValue(0);
 
@@ -122,12 +162,13 @@ export function Sea({
     "worklet";
     const ids = idsSV.value;
     const eds = edgesSV.value;
+    const mta = metaSV.value;
     const n = ids.length;
     if (n < 2) return;
     const pos = positions.value;
     const vel = velocities.value;
     const dragId = draggingId.value;
-    if (!pos[ids[0]]) return; // 하이드레이션 전환 등 일시적 불일치 가드
+    if (!pos[ids[0]]) return;
     const dt = Math.min(Math.max((info.timeSincePreviousFrame ?? 16) / 16, 0.5), 2);
 
     const fx: Record<string, number> = {};
@@ -136,17 +177,20 @@ export function Sea({
       fx[ids[i]] = 0;
       fy[ids[i]] = 0;
     }
-    // 척력 (모든 쌍)
+    // 척력 (모든 쌍, 반지름 기반 충돌 간격)
     for (let i = 0; i < n; i++) {
       const a = pos[ids[i]];
       if (!a) continue;
+      const ra = mta[ids[i]] ? mta[ids[i]].r : 8;
       for (let j = i + 1; j < n; j++) {
         const b = pos[ids[j]];
         if (!b) continue;
+        const rb = mta[ids[j]] ? mta[ids[j]].r : 8;
         let dx = a.x - b.x;
         let dy = a.y - b.y;
         let dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < MIN_DIST) dist = MIN_DIST;
+        const minD = ra + rb + COLLIDE_GAP;
+        if (dist < minD) dist = minD;
         const f = REPULSION / (dist * dist);
         const ux = dx / dist;
         const uy = dy / dist;
@@ -156,7 +200,7 @@ export function Sea({
         fy[ids[j]] -= uy * f;
       }
     }
-    // 인력 (연결선 = 관련성 기준 스프링). tier1 가깝게/강하게, tier2 멀게/약하게.
+    // 인력 (연결선 = 관련성 스프링)
     for (let k = 0; k < eds.length; k++) {
       const a = pos[eds[k].a];
       const b = pos[eds[k].b];
@@ -164,8 +208,8 @@ export function Sea({
       let dx = b.x - a.x;
       let dy = b.y - a.y;
       let dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < MIN_DIST) dist = MIN_DIST;
-      const f = eds[k].k * (dist - eds[k].ideal); // dist>ideal → 당김
+      if (dist < 1) dist = 1;
+      const f = eds[k].k * (dist - eds[k].ideal);
       const ux = dx / dist;
       const uy = dy / dist;
       fx[eds[k].a] += ux * f;
@@ -180,25 +224,28 @@ export function Sea({
       fx[ids[i]] += (cx - p.x) * CENTER;
       fy[ids[i]] += (cy - p.y) * CENTER;
     }
-    // 적분
+    // 적분 (질량 = 차수 기반, 허브는 덜 흔들림) + 경계 클램프
     const newPos: Record<string, Pos> = {};
     const newVel: Record<string, Pos> = {};
     let ke = 0;
-    const maxX = width - PAD;
-    const maxY = CANVAS_H - PAD;
     for (let i = 0; i < n; i++) {
       const id = ids[i];
       const p = pos[id];
       if (!p) continue;
+      const r = mta[id] ? mta[id].r : 8;
+      const maxX = width - r - 4;
+      const maxY = CANVAS_H - r - 4;
+      const minX = r + 4;
+      const minY = r + 4;
       if (id === dragId) {
-        // 드래그 중인 노드는 고정 — 위치만 경계 안으로.
-        newPos[id] = { x: Math.min(Math.max(p.x, PAD), maxX), y: Math.min(Math.max(p.y, PAD), maxY) };
+        newPos[id] = { x: Math.min(Math.max(p.x, minX), maxX), y: Math.min(Math.max(p.y, minY), maxY) };
         newVel[id] = { x: 0, y: 0 };
         continue;
       }
+      const mass = mta[id] ? mta[id].m : 1;
       const v = vel[id] ?? { x: 0, y: 0 };
-      let vx = (v.x + fx[id] * dt) * DAMPING;
-      let vy = (v.y + fy[id] * dt) * DAMPING;
+      let vx = (v.x + (fx[id] * dt) / mass) * DAMPING;
+      let vy = (v.y + (fy[id] * dt) / mass) * DAMPING;
       const sp = Math.sqrt(vx * vx + vy * vy);
       if (sp > MAX_SPEED) {
         vx = (vx / sp) * MAX_SPEED;
@@ -206,18 +253,26 @@ export function Sea({
       }
       let nx = p.x + vx * dt;
       let ny = p.y + vy * dt;
-      // 경계 클램프 — 화면 밖으로 나가면 멈춤(선이 잘리지 않게).
-      if (nx < PAD) { nx = PAD; if (vx < 0) vx = 0; }
-      else if (nx > maxX) { nx = maxX; if (vx > 0) vx = 0; }
-      if (ny < PAD) { ny = PAD; if (vy < 0) vy = 0; }
-      else if (ny > maxY) { ny = maxY; if (vy > 0) vy = 0; }
+      if (nx < minX) {
+        nx = minX;
+        if (vx < 0) vx = 0;
+      } else if (nx > maxX) {
+        nx = maxX;
+        if (vx > 0) vx = 0;
+      }
+      if (ny < minY) {
+        ny = minY;
+        if (vy < 0) vy = 0;
+      } else if (ny > maxY) {
+        ny = maxY;
+        if (vy > 0) vy = 0;
+      }
       newVel[id] = { x: vx, y: vy };
       newPos[id] = { x: nx, y: ny };
       ke += vx * vx + vy * vy;
     }
     positions.value = newPos;
     velocities.value = newVel;
-
     frameCount.value += 1;
     if (ke < SETTLE_KE || frameCount.value > MAX_FRAMES) {
       runOnJS(settle)();
@@ -232,13 +287,13 @@ export function Sea({
     frame.setActive(false);
   }
 
-  // 시드(노드/모드/폭) 바뀌면 위치·속도 리셋 후 재가열.
   useEffect(() => {
     const ids = nodes.map((n) => n.id);
     positions.value = seed;
     velocities.value = zeroVel(ids);
     idsSV.value = ids;
     edgesSV.value = edges.map(simEdge);
+    metaSV.value = meta;
     energize();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seed]);
@@ -285,9 +340,7 @@ export function Sea({
   }));
 
   function zoom(factor: number) {
-    scale.value = withTiming(Math.min(Math.max(scale.value * factor, MIN_SCALE), MAX_SCALE), {
-      duration: 160,
-    });
+    scale.value = withTiming(Math.min(Math.max(scale.value * factor, MIN_SCALE), MAX_SCALE), { duration: 160 });
   }
   function recenter() {
     tx.value = withTiming(0, { duration: 220 });
@@ -303,20 +356,13 @@ export function Sea({
             {edges.map((e) => {
               const touches =
                 selectedId != null && (e.from_thread_id === selectedId || e.to_thread_id === selectedId);
-              const tier1 = e.connection_tier === 1; // 사실=관련성 강 → 또렷·굵게
+              const tier1 = e.connection_tier === 1;
               const dim = selectedId != null && !touches;
               const color = touches ? c.accentActive : tier1 ? c.textMuted : c.lineDefault;
               const thickness = touches ? 2 : tier1 ? 1.5 : 1;
-              const opacity = touches ? 1 : dim ? 0.18 : tier1 ? 0.95 : 0.7;
+              const opacity = touches ? 1 : dim ? 0.12 : tier1 ? 0.85 : 0.55;
               return (
-                <MapEdge
-                  key={e.id}
-                  edge={e}
-                  positions={positions}
-                  color={color}
-                  thickness={thickness}
-                  opacity={opacity}
-                />
+                <MapEdge key={e.id} edge={e} positions={positions} color={color} thickness={thickness} opacity={opacity} />
               );
             })}
 
@@ -324,10 +370,16 @@ export function Sea({
               const lit = litSet.has(n.id);
               const sel = selectedId === n.id;
               const rec = (recommendedIds?.has(n.id) ?? false) && !sel && !lit;
-              const visited = (visitedSet?.has(n.id) ?? false) && !sel && !lit;
+              const visited = (visitedSet?.has(n.id) ?? false) && !lit;
               const dimmed = typeFilter != null && n.type !== typeFilter;
-              const focusGlyph = sel || rec; // 선택/추천만 또렷, 나머지 분류아이콘은 흐리게
-              const color = rec ? c.accentRecommend : sel ? c.accentActive : c.textMuted;
+              const faded = selectedId != null && !sel && !(neighborSet?.has(n.id) ?? false);
+              const known = lit || visited;
+              const typeColor = TYPE_COLOR[n.type] ?? c.nodeDefault;
+              const fill = sel ? c.accentActive : rec ? c.accentRecommend : known ? typeColor : "transparent";
+              const border = sel ? c.accentActive : rec ? c.accentRecommend : typeColor;
+              const labelColor = sel ? c.accentActive : known ? c.textMain : c.textMuted;
+              const r = meta[n.id]?.r ?? DOT_BASE;
+              const opacity = dimmed ? 0.18 : faded ? 0.26 : known ? 1 : 0.82;
               return (
                 <MapNode
                   key={n.id}
@@ -336,12 +388,13 @@ export function Sea({
                   scaleSV={scale}
                   draggingId={draggingId}
                   onEnergize={energize}
+                  radius={r}
+                  fill={fill}
+                  border={border}
+                  hollow={!sel && !rec && !known}
                   selected={sel}
-                  lit={lit}
-                  visited={visited}
-                  dimmed={dimmed}
-                  glyphColor={color}
-                  glyphOpacity={focusGlyph ? 1 : 0.4}
+                  labelColor={labelColor}
+                  containerOpacity={opacity}
                   label={getThreadTranslation(n.id, locale).title}
                   onSelect={onSelect}
                   styles={styles}
@@ -352,7 +405,6 @@ export function Sea({
         </Animated.View>
       </GestureDetector>
 
-      {/* 컨트롤 오버레이 (변환 영향 없음) */}
       <View style={styles.controls} pointerEvents="box-none">
         <Pressable style={styles.ctrlBtn} onPress={() => zoom(1.3)} hitSlop={6}>
           <Text style={styles.ctrlText}>＋</Text>
@@ -368,7 +420,7 @@ export function Sea({
   );
 }
 
-// ── 연결선: 두 노드 위치(shared)에서 기하 계산, 물리/드래그 시 실시간 추종 ──
+// ── 연결선: transform 전용(Fabric). 1px 바를 중심 기준 회전+가로 스케일 ──
 function MapEdge({
   edge,
   positions,
@@ -382,8 +434,6 @@ function MapEdge({
   thickness: number;
   opacity: number;
 }) {
-  // ⚠️ New Architecture(Fabric)에서 useAnimatedStyle 의 레이아웃 prop(left/top/width)은
-  // 반영이 안 됨 → 노드처럼 transform 전용으로. 1px 바를 중심으로 회전 + 가로 스케일.
   const geom = useAnimatedStyle(() => {
     const a = positions.value[edge.from_thread_id];
     const b = positions.value[edge.to_thread_id];
@@ -404,27 +454,25 @@ function MapEdge({
   return (
     <Animated.View
       pointerEvents="none"
-      style={[
-        { position: "absolute", left: 0, top: 0, width: 1, height: thickness, backgroundColor: color, opacity },
-        geom,
-      ]}
+      style={[{ position: "absolute", left: 0, top: 0, width: 1, height: thickness, backgroundColor: color, opacity }, geom]}
     />
   );
 }
 
-// ── 노드: 분류 아이콘(흐리게) + 키워드. 길게눌러 드래그(물리 재가열), 탭=선택 ──
+// ── 노드: 차수 기반 원(dot) + 줌 연동 라벨. 길게눌러 드래그(물리 재가열), 탭=선택 ──
 function MapNode({
   node,
   positions,
   scaleSV,
   draggingId,
   onEnergize,
+  radius: r,
+  fill,
+  border,
+  hollow,
   selected,
-  lit,
-  visited,
-  dimmed,
-  glyphColor,
-  glyphOpacity,
+  labelColor,
+  containerOpacity,
   label,
   onSelect,
   styles,
@@ -434,21 +482,31 @@ function MapNode({
   scaleSV: SharedValue<number>;
   draggingId: SharedValue<string | null>;
   onEnergize: () => void;
+  radius: number;
+  fill: string;
+  border: string;
+  hollow: boolean;
   selected: boolean;
-  lit: boolean;
-  visited: boolean;
-  dimmed: boolean;
-  glyphColor: string;
-  glyphOpacity: number;
+  labelColor: string;
+  containerOpacity: number;
   label: string;
   onSelect: (id: string) => void;
   styles: ReturnType<typeof makeStyles>;
 }) {
   const start = useSharedValue<Pos>({ x: 0, y: 0 });
 
+  // 컨테이너(폭 LABEL_W, 원이 상단)를 노드 좌표에 정렬: 원 중심이 (p.x, p.y).
   const aStyle = useAnimatedStyle(() => {
     const p = positions.value[node.id] ?? { x: 0, y: 0 };
-    return { transform: [{ translateX: p.x - NODE_W / 2 }, { translateY: p.y - NODE_H / 2 }] };
+    return { transform: [{ translateX: p.x - LABEL_W / 2 }, { translateY: p.y - r }] };
+  });
+  // 줌 아웃 시 라벨 페이드(선택 노드는 항상 표시).
+  const labelStyle = useAnimatedStyle(() => {
+    if (selected) return { opacity: 1 };
+    let o = (scaleSV.value - 0.72) / 0.25;
+    if (o < 0) o = 0;
+    if (o > 1) o = 1;
+    return { opacity: o };
   });
 
   const drag = Gesture.Pan()
@@ -479,21 +537,24 @@ function MapNode({
   const gesture = Gesture.Exclusive(drag, tap);
 
   return (
-    <Animated.View
-      style={[
-        { position: "absolute", left: 0, top: 0, width: NODE_W, alignItems: "center", opacity: dimmed ? 0.25 : visited ? 0.6 : 1 },
-        aStyle,
-      ]}
-    >
+    <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: LABEL_W, alignItems: "center", opacity: containerOpacity }, aStyle]}>
       <GestureDetector gesture={gesture}>
-        <View style={{ width: NODE_W, alignItems: "center" }}>
-          <Text style={[styles.glyph, { color: glyphColor, opacity: glyphOpacity }]}>{TYPE_GLYPH[node.type]}</Text>
-          <View style={[styles.label, selected && styles.labelSel]}>
-            <Text style={[styles.labelText, selected && styles.labelTextSel]} numberOfLines={1}>
+        <View style={{ width: LABEL_W, alignItems: "center" }}>
+          <View
+            style={{
+              width: r * 2,
+              height: r * 2,
+              borderRadius: r,
+              backgroundColor: fill,
+              borderWidth: hollow ? 1.5 : selected ? 2 : 0,
+              borderColor: border,
+            }}
+          />
+          <Animated.View style={[{ marginTop: 4 }, labelStyle]}>
+            <Text style={[styles.labelText, { color: labelColor, fontWeight: selected ? "700" : "600" }]} numberOfLines={1}>
               {label}
             </Text>
-          </View>
-          {!lit && !visited && <Text style={styles.fogSub}>미발견</Text>}
+          </Animated.View>
         </View>
       </GestureDetector>
     </Animated.View>
@@ -504,12 +565,7 @@ const makeStyles = (c: Palette) =>
   StyleSheet.create({
     canvas: { backgroundColor: c.bgMap, borderRadius: radius.lg, borderWidth: 1, borderColor: c.lineDefault, overflow: "hidden" },
     gestureLayer: { flex: 1 },
-    glyph: { fontSize: 18, lineHeight: 20, marginBottom: 1 },
-    label: { borderRadius: radius.pill, paddingHorizontal: 7, paddingVertical: 1, maxWidth: NODE_W },
-    labelSel: { backgroundColor: c.accentActive },
-    labelText: { color: c.textMain, fontSize: font.tiny, fontWeight: "600" },
-    labelTextSel: { color: c.onAccent },
-    fogSub: { color: c.textMuted, fontSize: 9, marginTop: 1, opacity: 0.7 },
+    labelText: { fontSize: font.tiny, maxWidth: LABEL_W, textAlign: "center" },
     controls: { position: "absolute", right: 10, bottom: 10, gap: 6, alignItems: "center" },
     ctrlBtn: {
       width: 34,

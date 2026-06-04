@@ -11,7 +11,19 @@
 
 ## 현재 상태 (2026-06-04)
 
-**🟢 이번 세션 (2026-06-04, 이어서) — 연결선 안 보임 진짜 원인 수정 (Fabric).**
+**🟢 이번 세션 (2026-06-04, 이어서) — Map Obsidian 구조 고도화.**
+- Obsidian Graph view 분석(공식 도움말): ① node size = 링크 수 ② 단색 원 + 라벨 줌 페이드 ③ 4-force(Center/Repel/Link/Link distance). → 적용:
+  - **노드 = 차수(연결 수) 기반 원(dot)** — 이모지 글리프 제거. `dotRadius = 6 + degree*2.4`(max 22). 발견(저장/방문)=채운 원 / **미발견=빈 원(테두리만)**. 분류 = `TYPE_COLOR`(타입별 뮤트 컬러, Day/Night 공용 중간톤). 선택=주황·추천=금.
+  - **라벨 줌 연동 페이드**(`scale` 0.72~0.97 보간), 선택 노드는 항상. 캡슐 제거(텍스트만, 중앙정렬).
+  - **선택 포커스:** 이웃 아닌 노드 흐리게(0.26) + 연결만 강조.
+  - **물리 고도화:** 차수 기반 **질량**(허브 덜 흔들림, `m=1+deg*0.5`) + **반지름 기반 충돌 간격**(`r_i+r_j+12`), 인력↑(tier1 ideal84/k0.09). `MAX_NODES` 12→14.
+- 튜너블은 `Sea.tsx` 상단(REPULSION/CENTER/SPRING_T1·T2/IDEAL_T1·T2/DOT_BASE·STEP·MAX/COLLIDE_GAP). `TYPE_COLOR` 맵으로 분류 색 조정.
+- 검증: `tsc` clean · jest 16/16 · `expo export ios`(4.38MB). JS만 변경 → **Reload**.
+- 참고: `glyph.ts`(TYPE_GLYPH)는 Sea에서 미사용(다른 화면 사용 여지로 보존).
+
+---
+
+**🟢 이전 (2026-06-04) — 연결선 안 보임 진짜 원인 수정 (Fabric).**
 - **근본 원인:** Expo SDK 54 = New Architecture(Fabric). Reanimated `useAnimatedStyle` 에서 **레이아웃 prop(left/top/width)은 Fabric에서 반영 안 됨**. 노드는 transform(translateX/Y)이라 보였고, `MapEdge` 는 left/top/width 라 안 보였던 것. (경계 클램프·관련성 인력 변경은 별개로 유효했지만 가시성 문제의 핵심은 아니었음.)
 - **수정:** `MapEdge` 를 **transform 전용**으로 재구현 — base `width:1, height:thickness` 바를, `translateX(mx-0.5) · translateY(my-thickness/2) · rotateZ(ang) · scaleX(len)` 로 두 노드 사이에 그림(중심 회전). 노드와 동일한 transform 경로라 Fabric에서 안정적.
 - **교훈(중요):** 이 프로젝트는 Fabric → **애니메이션 스타일은 transform/opacity 만** 사용할 것. left/top/width/height 를 useAnimatedStyle 로 바꾸지 말 것.
