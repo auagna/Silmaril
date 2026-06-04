@@ -5,6 +5,7 @@
 ## 2026-06-04
 
 ### Changes
+- fix(Map 연결선, 진짜 원인): New Architecture(Fabric)에서 `useAnimatedStyle` 의 **레이아웃 prop(left/top/width)이 반영 안 됨** → 노드(transform)는 보이고 연결선(left/top/width)만 안 보였음. `MapEdge` 를 **transform 전용**(1px 바를 중심 기준 translate+rotateZ+scaleX)으로 재구현. tsc+ios export 통과. (이전 클램프/관련성 변경은 유효하나 가시성의 근본 원인은 이것.)
 - fix(Map 물리): 연결선이 안 보이던 문제 = 인력<척력 + 경계 없음으로 노드가 캔버스 밖으로 퍼져 선이 잘림. 해결: 경계 클램프(PAD=30, 화면 안 유지) + 척력↓(6500)/센터링↑(0.022). **관련성(connection_tier) 기준 인력 고도화** — tier1(사실) ideal 88·k 0.085(가깝고 강하게), tier2(해석) ideal 150·k 0.04(멀고 약하게). 연결선 시각도 tier별(tier1 또렷·1.5px, tier2 옅게·1px). 하이드레이션 일시 불일치 가드 추가. tsc+jest16+ios export 통과.
 - feat(PHASE 49 step2, D-020): Map force 물리. `useFrameCallback`(UI 스레드)로 척력+스프링+센터링 매 프레임 적분, 운동에너지<임계/600프레임이면 자동 settle, 노드 드래그 시 고정+재가열(이웃 출렁). 시드는 노드/모드/폭 변경 시에만(탭 리셋 없음). 물리 상수 Sea.tsx 상단 모음. tsc+jest16+ios export 통과.
 - change(Map 시각): 저장됨(🔖) 아이콘 제거. 노드 = 분류 아이콘(흐리게 opacity 0.4)+키워드+연결선. 선택(주황)/추천(금)만 또렷. ★ 추천 글리프 대신 분류 아이콘 금색.

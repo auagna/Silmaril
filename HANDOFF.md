@@ -11,7 +11,15 @@
 
 ## 현재 상태 (2026-06-04)
 
-**🟢 이번 세션 (2026-06-04, 이어서) — 연결선 복구 + 관련성 기준 인력 고도화.**
+**🟢 이번 세션 (2026-06-04, 이어서) — 연결선 안 보임 진짜 원인 수정 (Fabric).**
+- **근본 원인:** Expo SDK 54 = New Architecture(Fabric). Reanimated `useAnimatedStyle` 에서 **레이아웃 prop(left/top/width)은 Fabric에서 반영 안 됨**. 노드는 transform(translateX/Y)이라 보였고, `MapEdge` 는 left/top/width 라 안 보였던 것. (경계 클램프·관련성 인력 변경은 별개로 유효했지만 가시성 문제의 핵심은 아니었음.)
+- **수정:** `MapEdge` 를 **transform 전용**으로 재구현 — base `width:1, height:thickness` 바를, `translateX(mx-0.5) · translateY(my-thickness/2) · rotateZ(ang) · scaleX(len)` 로 두 노드 사이에 그림(중심 회전). 노드와 동일한 transform 경로라 Fabric에서 안정적.
+- **교훈(중요):** 이 프로젝트는 Fabric → **애니메이션 스타일은 transform/opacity 만** 사용할 것. left/top/width/height 를 useAnimatedStyle 로 바꾸지 말 것.
+- 검증: `tsc` clean · `expo export ios`(4.38MB). JS만 변경 → 앱 **Reload**.
+
+---
+
+**🟢 이전 (2026-06-04) — 연결선 복구(클램프) + 관련성 기준 인력 고도화.**
 - **증상:** 연결선이 안 보임 + "척력만 있는 듯". **원인:** 인력(스프링)이 척력 대비 약하고 경계 제한이 없어 노드가 캔버스 밖으로 퍼져 선이 잘림.
 - **수정(`Sea.tsx`):**
   1. **경계 클램프**(`PAD=30`) — 노드가 화면 밖으로 못 나감(드래그 노드도 클램프). → 선 잘림 해소.

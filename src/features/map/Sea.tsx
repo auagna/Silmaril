@@ -382,25 +382,32 @@ function MapEdge({
   thickness: number;
   opacity: number;
 }) {
+  // ⚠️ New Architecture(Fabric)에서 useAnimatedStyle 의 레이아웃 prop(left/top/width)은
+  // 반영이 안 됨 → 노드처럼 transform 전용으로. 1px 바를 중심으로 회전 + 가로 스케일.
   const geom = useAnimatedStyle(() => {
     const a = positions.value[edge.from_thread_id];
     const b = positions.value[edge.to_thread_id];
-    if (!a || !b) return { opacity: 0 };
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const len = Math.hypot(dx, dy);
-    const ang = Math.atan2(dy, dx);
+    if (!a || !b) return { transform: [{ scaleX: 0 }] };
+    const mx = (a.x + b.x) / 2;
+    const my = (a.y + b.y) / 2;
+    const len = Math.hypot(b.x - a.x, b.y - a.y);
+    const ang = Math.atan2(b.y - a.y, b.x - a.x);
     return {
-      left: (a.x + b.x) / 2 - len / 2,
-      top: (a.y + b.y) / 2,
-      width: len,
-      transform: [{ rotateZ: `${ang}rad` }],
+      transform: [
+        { translateX: mx - 0.5 },
+        { translateY: my - thickness / 2 },
+        { rotateZ: `${ang}rad` },
+        { scaleX: len },
+      ],
     };
   });
   return (
     <Animated.View
       pointerEvents="none"
-      style={[{ position: "absolute", height: thickness, backgroundColor: color, opacity }, geom]}
+      style={[
+        { position: "absolute", left: 0, top: 0, width: 1, height: thickness, backgroundColor: color, opacity },
+        geom,
+      ]}
     />
   );
 }
