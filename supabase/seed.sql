@@ -32,7 +32,7 @@ on conflict (slug) do nothing;
 -- ── 2. thread_translations (ko/en) ──────────────────────────────
 -- helper: slug → id 는 subselect.
 insert into public.thread_translations (thread_id, locale, title, summary)
-select id, v.locale, v.title, v.summary from public.threads t
+select id, v.locale::locale_type, v.title, v.summary from public.threads t
 join (values
   ('mies-van-der-rohe','ko','미스 반 데어 로에','구조적 명료성과 절제로 “Less is More”의 태도를 보여준 근대 건축가.'),
   ('mies-van-der-rohe','en','Mies van der Rohe','A modern architect of structural clarity and restraint — “Less is More.”'),
@@ -111,7 +111,7 @@ on conflict (from_thread_id, to_thread_id, relation_type) do nothing;
 
 -- ── 4. viewpoints (큐레이터, 예시) ──────────────────────────────
 insert into public.viewpoints (thread_id, locale, author_type, title, body)
-select t.id, v.locale, 'curator', v.title, v.body from public.threads t
+select t.id, v.locale::locale_type, 'curator'::viewpoint_author, v.title, v.body from public.threads t
 join (values
   ('tadao-ando','ko','빛이 먼저다','안도의 공간은 콘크리트가 아니라 빛으로 기억된다.'),
   ('light','en','Light connects','From Kahn to Ando, the shared thread is light.'),
