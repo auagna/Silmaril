@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { searchThreads, getThreadTranslation } from "@/lib/dummy";
+import { searchThreads, getThreadTranslation, useHydration } from "@/lib/dummy";
 import { threadTypeLabel } from "@/types/database";
 import { useExplore } from "@/features/explore/store";
 import { useTheme, space, radius, font, type Palette } from "@/theme";
@@ -16,9 +16,10 @@ export default function SearchScreen() {
   const { t, locale } = useLocale();
   const styles = useMemo(() => makeStyles(c), [c]);
   const { setSelected } = useExplore();
+  const { version } = useHydration(); // 실데이터 hydrate 시 결과 갱신
   const [q, setQ] = useState("");
 
-  const results = useMemo(() => (q.trim() === "" ? [] : searchThreads(q)), [q]);
+  const results = useMemo(() => (q.trim() === "" ? [] : searchThreads(q)), [q, version]);
 
   function pick(id: string) {
     setSelected(id); // Map의 selectedKeyword 변경

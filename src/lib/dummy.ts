@@ -1,5 +1,7 @@
 // MVP 더미 데이터 — Thread(canonical) + ko/en 번역 + 관점 + 관계.
-// 스키마(supabase/schema.sql)와 동일 필드명. EXP4에서 Supabase service/seed 로 대체.
+// 스키마(supabase/schema.sql)와 동일 필드명.
+// PHASE 47: 앱 시작 시 Supabase 데이터로 hydrate 가능(live binding). 실패 시 더미 유지.
+import { useSyncExternalStore } from "react";
 import type {
   Thread,
   ThreadConnection,
@@ -31,7 +33,7 @@ function t(id: string, title: string, type: ThreadType): Thread {
   };
 }
 
-export const threads: Thread[] = [
+export let threads: Thread[] = [
   t("mies-van-der-rohe", "Mies van der Rohe", "person"),
   t("tadao-ando", "Tadao Ando", "person"),
   t("bauhaus", "Bauhaus", "movement"),
@@ -48,7 +50,7 @@ function tr(thread_id: string, locale: Locale, title: string, summary: string): 
   return { id: `${thread_id}-${locale}`, thread_id, locale, title, summary };
 }
 
-export const threadTranslations: ThreadTranslation[] = [
+export let threadTranslations: ThreadTranslation[] = [
   tr("mies-van-der-rohe", "ko", "미스 반 데어 로에", "근대 건축의 핵심 인물. 구조적 명료성과 절제로 “Less is More”라는 태도를 보여준 건축가."),
   tr("mies-van-der-rohe", "en", "Mies van der Rohe", "A central figure of modern architecture, known for structural clarity, restraint, and the attitude “Less is More.”"),
   tr("tadao-ando", "ko", "안도 다다오", "빛, 노출 콘크리트, 침묵, 여백을 주요한 공간 언어로 쓰는 일본의 건축가."),
@@ -71,7 +73,7 @@ export const threadTranslations: ThreadTranslation[] = [
   tr("church-of-the-light", "en", "Church of the Light", "Ando’s signature work, where a cruciform slit lets light pour through a concrete wall."),
 ];
 
-export const viewpoints: Viewpoint[] = [
+export let viewpoints: Viewpoint[] = [
   {
     id: "vp-ando-user-ko", thread_id: "tadao-ando", locale: "ko", author_type: "user",
     title: "빛이 먼저다", body: "안도의 공간은 콘크리트가 아니라 빛으로 기억된다.",
@@ -97,7 +99,7 @@ function conn(from: string, to: string, relation_type: RelationType, tier: Conne
   };
 }
 
-export const connections: ThreadConnection[] = [
+export let connections: ThreadConnection[] = [
   conn("mies-van-der-rohe", "tadao-ando", "influenced", 1),
   conn("mies-van-der-rohe", "bauhaus", "belongs_to", 1),
   conn("mies-van-der-rohe", "less-is-more", "shares_theme", 2),
@@ -184,3 +186,43 @@ export const exploreProgress = [
   { label: "Modernism", pct: 24 },
   { label: "Japan", pct: 18 },
 ];
+
+// ── 하이드레이션 (PHASE 47) ─────────────────────────────────
+// 앱 시작 시 Supabase 데이터로 위 배열들을 교체(live binding). 구독한 화면은 재렌더.
+export type DataSource = "dummy" | "supabase";
+let _source: DataSource = "dummy";
+let _version = 0;
+const _subs = new Set<() => void>();
+
+export function hydrate(data: {
+  threads?: Thread[];
+  translations?: ThreadTranslation[];
+  connections?: ThreadConnection[];
+  viewpoints?: Viewpoint[];
+  source?: DataSource;
+}) {
+  if (data.threads && data.threads.length) threads = data.threads;
+  if (data.translations) threadTranslations = data.translations;
+  if (data.connections) connections = data.connections;
+  if (data.viewpoints) viewpoints = data.viewpoints;
+  if (data.source) _source = data.source;
+  _version += 1;
+  for (const f of _subs) f();
+}
+
+export function dataSource(): DataSource {
+  return _source;
+}
+
+/** 화면이 hydrate 시 재렌더하도록 구독. */
+export function useHydration(): { version: number; source: DataSource } {
+  const version = useSyncExternalStore(
+    (cb) => {
+      _subs.add(cb);
+      return () => _subs.delete(cb);
+    },
+    () => _version,
+    () => _version,
+  );
+  return { version, source: _source };
+}

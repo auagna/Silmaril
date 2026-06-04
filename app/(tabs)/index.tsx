@@ -9,7 +9,7 @@ import { useSaves } from "@/features/saves/store";
 import { useExplore } from "@/features/explore/store";
 import { recommendNext } from "@/features/explore/recommend";
 import { type GraphLayoutMode } from "@/features/map/layout";
-import { threads, undiscovered, exploreProgress, recommendedIds } from "@/lib/dummy";
+import { threads, undiscovered, exploreProgress, recommendedIds, useHydration } from "@/lib/dummy";
 import { useTheme, space, radius, font, type Palette } from "@/theme";
 import { useLocale } from "@/i18n";
 
@@ -30,6 +30,7 @@ export default function MapScreen() {
   const styles = useMemo(() => makeStyles(c), [c]);
   const { savedSet } = useSaves();
   const { selectedId, setSelected, visitedSet } = useExplore();
+  const { source } = useHydration(); // 실데이터 hydrate 시 재렌더
   const [typeFilter, setTypeFilter] = useState<ThreadType | null>(null);
   const [layoutMode, setLayoutMode] = useState<GraphLayoutMode>("web");
 
@@ -53,7 +54,10 @@ export default function MapScreen() {
         <View style={styles.skyTop}>
           <View>
             <Text style={styles.wordmark}>Silmaril</Text>
-            <Text style={styles.subtitle}>{t("illuminating")}</Text>
+            <Text style={styles.subtitle}>
+              {t("illuminating")}
+              {source === "supabase" ? "  · live" : ""}
+            </Text>
           </View>
           <Pressable style={styles.searchBtn} onPress={() => router.push("/search")} hitSlop={8}>
             <Text style={styles.searchIcon}>⌕</Text>

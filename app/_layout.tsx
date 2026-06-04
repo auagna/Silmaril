@@ -1,13 +1,22 @@
+import { useEffect } from "react";
 import { Stack } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { ThemeProvider, useTheme } from "@/theme";
 import { LocaleProvider } from "@/i18n";
 import { AuthProvider } from "@/features/auth/AuthContext";
+import { loadRealData } from "@/features/data/bootstrap";
 
 function ThemedStatusBar() {
   const { isNight } = useTheme();
   return <StatusBar style={isNight ? "light" : "dark"} />;
+}
+
+function DataBootstrap() {
+  useEffect(() => {
+    loadRealData();
+  }, []);
+  return null;
 }
 
 export default function RootLayout() {
@@ -17,6 +26,7 @@ export default function RootLayout() {
         <AuthProvider>
           <SafeAreaProvider>
             <ThemedStatusBar />
+            <DataBootstrap />
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="search" options={{ presentation: "modal" }} />

@@ -4,7 +4,7 @@ import { Screen } from "@/components/ui/Screen";
 import { H1, Chip, Muted, Thumb } from "@/components/ui";
 import { ThreadCard } from "@/components/cards/ThreadCard";
 import { useSaves } from "@/features/saves/store";
-import { threads } from "@/lib/dummy";
+import { threads, useHydration } from "@/lib/dummy";
 import { useTheme, space, radius, font, type Palette } from "@/theme";
 import { useLocale } from "@/i18n";
 
@@ -21,6 +21,7 @@ export default function ArchiveScreen() {
   const { t } = useLocale();
   const styles = useMemo(() => makeStyles(c), [c]);
   const { savedSet, isSaved, toggle } = useSaves();
+  useHydration(); // 실데이터 hydrate 시 재렌더
   const [tab, setTab] = useState<Tab>("saved");
   const savedThreads = threads.filter((th) => savedSet.has(th.id));
 

@@ -2,6 +2,12 @@
 
 > 교대(Claude Code ↔ Codex) 작업의 시간순 기록. 단일 기준점은 GitHub. 최신이 위.
 
+## 2026-06-04
+
+### Changes
+- feat(PHASE 47): 화면 실데이터 hydrate. Supabase에 `reset/schema/seed.sql` 적용 완료(threads=20/translations=40/connections=23/viewpoints=3). `src/lib/dummy.ts` 배열을 live binding(`export let`)으로 + `hydrate()`/`useHydration()`(useSyncExternalStore). 새 `src/features/data/bootstrap.ts`(`loadRealData`: 시작 시 supabase→hydrate, 실패/빈DB/미설정 시 더미 유지). `app/_layout.tsx`에 `DataBootstrap`. Map/Archive/Search 구독, Map 부제에 `· live`. tsc clean + jest 16/16 + ios export 통과.
+- fix(seed): `thread_translations`/`viewpoints` insert 의 enum 캐스트 — `v.locale::locale_type`, `'curator'::viewpoint_author` (ERROR 42804 해소).
+
 ## 2026-06-02
 
 ### Changes

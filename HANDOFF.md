@@ -9,7 +9,15 @@
 - 시작 시 git pull, 종료 시 커밋(+push). 원격: https://github.com/auagna/Silmaril
 - 한 세션 = `## Now` 의 첫 미완료 항목 하나.
 
-## 현재 상태 (2026-06-02)
+## 현재 상태 (2026-06-04)
+
+**🟢 이번 세션 (2026-06-04) — 실데이터 연결 완료 (PHASE 47).**
+- 사용자가 Supabase에 `reset.sql` → `schema.sql` → `seed.sql` 적용 완료. supabase-js 확인: **threads=20 / translations=40 / connections=23 / viewpoints=3.** (seed enum 캐스트 버그 `v.locale::locale_type` / `'curator'::viewpoint_author` fix 후 성공.)
+- **PHASE 47 = 화면 실데이터 hydrate (최소 침습).** `src/lib/dummy.ts` 의 `threads/threadTranslations/connections/viewpoints` 를 `export let`(live binding)으로 바꾸고 `hydrate()` + `useHydration()`(useSyncExternalStore) 추가. 새 `src/features/data/bootstrap.ts` 의 `loadRealData()` 가 앱 시작 시 Supabase에서 읽어 `hydrate({…, source:"supabase"})`. **실패/빈DB/미설정 시 더미 유지**(앱 안 깨짐). `app/_layout.tsx` 에 `<DataBootstrap/>`. Map/Archive/Search 가 `useHydration()` 구독 → 로드 후 재렌더. Map 부제에 데이터가 실DB면 `· live` 표시.
+- 검증: `tsc --noEmit` clean · `jest` 16/16 · `expo export --platform ios` 번들 성공.
+- **다음 후보:** 46 RLS(`policies.sql` 신규, 현재 RLS off) → 48 Create 실제 제출(reviewStore→DB) → 기기에서 `· live` 육안 확인. (법무 게이트: 37/38/39 외부 소스 어댑터.)
+
+---
 
 **현 트랙: Expo RN MVP (D-014, iPhone-first).** 웹은 `legacy-web/` 로 보존.
 **완료:** 문서 세트(roadmap/taxonomy/feature-matrix/erd/api-spec) · Expo 골격(5탭+auth+thread/[id], 더미) · **MVP Supabase 스키마(`supabase/schema.sql`)**.
@@ -31,7 +39,7 @@
 - **✅ Step 28:** schema.sql 에 `thread_translations`·`viewpoints`·`thread_connection_translations`(선택)·`users.preferred_locale` + enum(locale_type/viewpoint_author) + 인덱스. erd 동기화. RLS 제외(추후).
 - **✅ PHASE 52 테스트 (2026-06-02):** jest-expo + 순수 로직 16테스트(`npm test` 통과, legacy-web 제외) + `QA_CHECKLIST.md`. jest 29.7/jest-expo 54.
 - **✅ PHASE 45 Auth (2026-06-02):** `useAuth`/AuthProvider(세션·guest fallback) + login/signup 테마화 + My View 로그인/로그아웃. 비로그인도 탐험 가능.
-- **⚠️ 실데이터 블로커:** DB 확인 결과 **threads=0행(seed 미적용)** + 최신 i18n/소스 테이블 미적용. → 사용자가 **최신 `supabase/schema.sql`(상단 RESET) + `supabase/seed.sql`** 을 SQL Editor 에 적용해야 함. (앱은 그동안 더미 fallback 으로 정상.) 적용 후 PHASE 47(화면 service 교체)로 실데이터 표시.
+- **✅ 실데이터 블로커 해소 (2026-06-04):** `reset.sql`→`schema.sql`→`seed.sql` 적용 완료(20/40/23/3). **PHASE 47 hydrate 로 화면이 실DB 표시**(미설정/실패 시 더미 fallback 유지). 상단 "이번 세션" 참조.
 - **✅ A/B/C (2026-06-02):** **A** service layer(supabase-ready·더미 fallback)+`seed.sql`(20키워드). **B** 그래프 레이아웃 모드(Web/Focus/Flow/Branch, `layout.ts`). **C** Source/Review/AI **구조(mock/placeholder)** — `src/features/sources/*` + `ingestionService`/`aiDraftService` + schema(source_documents/source_claims/review_candidates). 전부 tsc+export(1041) 통과. ⚠️ C는 실수집·크롤링·API·자동활성 **없음**(법무 게이트). 화면은 아직 더미 직접 사용(service 교체=PHASE47/EXP4).
 - **✅ 클라이언트 MVP 기능완성 (2026-06-02):** PHASE 16 추천+방문 · 35 검색(모달) · 34 타입필터 · 30+31 노드 아이콘/관계선 문법 · 19 Create 폼(목). 전역 `useExplore`(selected+visited). 전부 tsc+export(1040) 통과. → **더미 기반으로는 탐험/검색/추천/생성-입력까지 동작.**
 - **⛔ 자율 진행 경계:** 남은 PHASE 는 (a) **백엔드/환경**: Supabase 실연결(47)·Auth(45)·RLS(46)·Create 실제 제출(48) → 사용자가 스키마 적용+키+기기 검증 필요. (b) **법무**: Source Adapter/ingestion/AI(36~44, 특히 나무위키) → ToS/저작권 검토 전 활성화 금지. (c) **대형 인프라**: 그래프 레이아웃/Flow(32/33)·pan·zoom(49)·web/tablet(50)·테스트(52)·배포(54). 각각 별도 진행.

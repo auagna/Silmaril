@@ -50,9 +50,10 @@
 - [x] **Track C(구조)** — Source 어댑터 인터페이스+Mock+NamuWiki(candidate_only)+confidence+ingestion(mock)+reviewStore+aiDraft(mock)+schema(source_documents/source_claims/review_candidates). (PHASE36/39/40/41/42/43/44 골격.)
 - [x] **PHASE 52. 테스트/QA** — jest-expo + 순수로직 16테스트(confidence/translation/recommend/connections/undiscovered/layout) + `QA_CHECKLIST.md`. `npm test` 통과.
 - [x] **PHASE 45. Auth** — `AuthContext`/`useAuth`(세션, guest fallback), AuthProvider, login/signup 테마화, My View 로그인/로그아웃. (users 테이블 존재 → 동작.)
-- [ ] **⚠️ 사용자 액션 필요 — 실데이터:** Supabase에 **최신 `schema.sql`(RESET 블록) + `seed.sql` 적용** 필요. (DB 확인 결과 threads=0행, 최신 i18n/소스 테이블 미적용.) 적용 확인되면 PHASE 47(화면 service 교체)로 실데이터 표시.
+- [x] **실데이터 적용 (사용자 1회).** Supabase에 `reset.sql` → `schema.sql` → `seed.sql` 적용 완료. supabase-js 확인: threads=20 / translations=40 / connections=23 / viewpoints=3. (seed enum 캐스트 버그 fix 후 성공.)
+- [x] **PHASE 47. 화면 실데이터 hydrate.** `src/lib/dummy.ts` 배열을 `export let`(live binding)으로 + `hydrate()`/`useHydration()`(useSyncExternalStore). `src/features/data/bootstrap.ts`(`loadRealData`: supabase→hydrate, 실패/빈DB/미설정 시 더미 유지). `app/_layout.tsx`에 `DataBootstrap`. Map/Archive/Search 구독, Map에 `· live` 표시. tsc+16테스트+ios export 통과.
 - [ ] **남은 단계 = 환경/결정/법무 필요:**
-      · **사용자/환경:** 47 화면 service 교체(seed 적용 후) · 46 RLS · 48 Create 실제 제출(reviewStore→DB) · 기기 검증.
+      · **사용자/환경:** 46 RLS · 48 Create 실제 제출(reviewStore→DB) · 기기 검증.
       · **법무:** 37/38 Wikidata/Wikipedia 실어댑터 · 39 나무위키 활성화 — ToS/저작권 검토 후.
       · **대형 인프라:** 33 Flow 시간축 정밀 · 49 pan/zoom · 50 web/tablet · 52 테스트 · 53 privacy · 54 배포 · 55 feedback.
 - [x] **Step 28. Supabase 다국어 테이블** — schema.sql 에 `thread_translations`(unique thread_id,locale) · `viewpoints`(locale) · `thread_connection_translations`(선택) · `users.preferred_locale` + enum(locale_type/viewpoint_author) + 인덱스. erd 동기화. (RLS 제외.)
