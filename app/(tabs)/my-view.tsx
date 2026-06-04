@@ -5,14 +5,19 @@ import { Screen } from "@/components/ui/Screen";
 import { H1, H2, Muted, SectionLabel, Card, Thumb, Chip } from "@/components/ui";
 import { useSaves } from "@/features/saves/store";
 import { useAuth } from "@/features/auth/AuthContext";
-import { useTheme, space, font, type Palette } from "@/theme";
+import { useTheme, space, font, type Palette, type ThemeMode } from "@/theme";
 import { useLocale } from "@/i18n";
 
 // My View = 나. 내 지도 / 취향 키워드 / 탐험 통계 / 리포트(자리) + 언어 토글.
 export default function MyViewScreen() {
   const router = useRouter();
-  const c = useTheme().colors;
+  const { colors: c, mode, setMode } = useTheme();
   const { t, locale, setLocale } = useLocale();
+  const themeModes: { m: ThemeMode; label: string }[] = [
+    { m: "system", label: t("themeSystem") },
+    { m: "light", label: t("themeLight") },
+    { m: "dark", label: t("themeDark") },
+  ];
   const styles = useMemo(() => makeStyles(c), [c]);
   const { count } = useSaves();
   const { user, handle, signOut } = useAuth();
@@ -61,6 +66,15 @@ export default function MyViewScreen() {
       <SectionLabel>{t("tasteKeywords")}</SectionLabel>
       <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
         {keywords.map((k) => <Chip key={k} label={k} />)}
+      </View>
+
+      <SectionLabel>{t("theme")}</SectionLabel>
+      <View style={{ flexDirection: "row", gap: space.sm }}>
+        {themeModes.map((tm) => (
+          <Pressable key={tm.m} onPress={() => setMode(tm.m)} style={[styles.lang, mode === tm.m && styles.langOn]}>
+            <Text style={[styles.langText, mode === tm.m && styles.langTextOn]}>{tm.label}</Text>
+          </Pressable>
+        ))}
       </View>
 
       <SectionLabel>{t("language")}</SectionLabel>

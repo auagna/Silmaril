@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Screen } from "@/components/ui/Screen";
@@ -6,12 +6,15 @@ import { H1, Muted, SectionLabel, Card, SaveButton, Thumb } from "@/components/u
 import { useSaves } from "@/features/saves/store";
 import { getThreadById, connectionsOf } from "@/lib/dummy";
 import { THREAD_TYPE_LABEL, RELATION_LABEL } from "@/types/database";
-import { colors, space, radius, font } from "@/constants/theme";
+import { space, radius, font } from "@/constants/theme";
+import { useTheme, type Palette } from "@/theme";
 
 export default function ThreadDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { isSaved, toggle } = useSaves();
+  const c = useTheme().colors;
+  const styles = useMemo(() => makeStyles(c), [c]);
   const [open, setOpen] = useState(false);
 
   const thread = id ? getThreadById(id) : undefined;
@@ -80,21 +83,20 @@ export default function ThreadDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  pills: { flexDirection: "row", gap: 6, marginTop: 6, alignItems: "center" },
-  typePill: { backgroundColor: colors.line2, borderRadius: radius.pill, paddingHorizontal: 8, paddingVertical: 2 },
-  typeText: { fontSize: font.tiny, color: colors.ink500 },
-  aiPill: { backgroundColor: "#e6f4f0", borderRadius: radius.pill, paddingHorizontal: 7, paddingVertical: 2 },
-  aiText: { fontSize: font.tiny, color: colors.accent, fontWeight: "700" },
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    pills: { flexDirection: "row", gap: 6, marginTop: 6, alignItems: "center" },
+    typePill: { backgroundColor: c.line2, borderRadius: radius.pill, paddingHorizontal: 8, paddingVertical: 2 },
+    typeText: { fontSize: font.tiny, color: c.textMuted },
 
-  conn: { flexDirection: "row", alignItems: "center", gap: space.sm, paddingVertical: 10, paddingHorizontal: space.sm },
-  connBorder: { borderBottomWidth: 1, borderBottomColor: colors.line2 },
-  rel: { backgroundColor: "#8a8f98", borderRadius: 5, paddingHorizontal: 6, paddingVertical: 1 },
-  relTier2: { backgroundColor: colors.accent },
-  relText: { fontSize: 10, color: "#fff" },
-  connName: { fontSize: font.body, fontWeight: "600", color: colors.ink900 },
-  chev: { marginLeft: "auto", color: colors.ink400, fontSize: 18 },
+    conn: { flexDirection: "row", alignItems: "center", gap: space.sm, paddingVertical: 10, paddingHorizontal: space.sm },
+    connBorder: { borderBottomWidth: 1, borderBottomColor: c.line2 },
+    rel: { backgroundColor: c.textMuted, borderRadius: 5, paddingHorizontal: 6, paddingVertical: 1 },
+    relTier2: { backgroundColor: c.accentActive },
+    relText: { fontSize: 10, color: "#FFFFFF" },
+    connName: { fontSize: font.body, fontWeight: "600", color: c.textMain },
+    chev: { marginLeft: "auto", color: c.textMuted, fontSize: 18 },
 
-  quote: { fontSize: font.body, fontWeight: "600", color: colors.ink900, lineHeight: 22 },
-  saveBar: { marginTop: space.xl, alignItems: "flex-start" },
-});
+    quote: { fontSize: font.body, fontWeight: "600", color: c.textMain, lineHeight: 22 },
+    saveBar: { marginTop: space.xl, alignItems: "flex-start" },
+  });

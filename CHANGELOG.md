@@ -5,6 +5,7 @@
 ## 2026-06-04
 
 ### Changes
+- feat(테마 Light/Dark/System): 테마 모드를 **AsyncStorage 영속화**(`silmaril.themeMode`, 재시작 유지) + **My View 에 시스템/라이트/다크 스위처**(i18n 키 theme/themeSystem/Light/Dark). 기본=시스템(`useColorScheme` 추종, OS 변경 실시간 반영). `thread/[id]` 상세 화면을 정적 Day 색(`@/constants/theme`)에서 **테마 팔레트**로 전환(다크에서 깨지던 화면 수정). tsc+jest16+ios export 통과.
 - feat(Map Obsidian 고도화): 노드를 **차수(연결 수) 기반 원(dot)** 으로(이모지 글리프 제거) — 많이 연결될수록 큰 원. 발견=채운 원/미발견=빈 원, 분류=타입별 뮤트 컬러. 라벨은 **줌 아웃 시 페이드**(scale<0.72~0.97), 선택 노드는 항상 표시. **선택 시 이웃·연결만 강조, 나머지 흐리게(0.26)**. 물리에 **차수 기반 질량**(허브 덜 흔들림)+**반지름 기반 충돌 간격** 추가, 인력↑(tier1 ideal84/k0.09). MAX_NODES 12→14. tsc+jest16+ios export 통과. (분석 근거: Obsidian Graph view — node size by links, text fade, 4-force.)
 - fix(Map 연결선, 진짜 원인): New Architecture(Fabric)에서 `useAnimatedStyle` 의 **레이아웃 prop(left/top/width)이 반영 안 됨** → 노드(transform)는 보이고 연결선(left/top/width)만 안 보였음. `MapEdge` 를 **transform 전용**(1px 바를 중심 기준 translate+rotateZ+scaleX)으로 재구현. tsc+ios export 통과. (이전 클램프/관련성 변경은 유효하나 가시성의 근본 원인은 이것.)
 - fix(Map 물리): 연결선이 안 보이던 문제 = 인력<척력 + 경계 없음으로 노드가 캔버스 밖으로 퍼져 선이 잘림. 해결: 경계 클램프(PAD=30, 화면 안 유지) + 척력↓(6500)/센터링↑(0.022). **관련성(connection_tier) 기준 인력 고도화** — tier1(사실) ideal 88·k 0.085(가깝고 강하게), tier2(해석) ideal 150·k 0.04(멀고 약하게). 연결선 시각도 tier별(tier1 또렷·1.5px, tier2 옅게·1px). 하이드레이션 일시 불일치 가드 추가. tsc+jest16+ios export 통과.

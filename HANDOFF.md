@@ -11,7 +11,18 @@
 
 ## 현재 상태 (2026-06-04)
 
-**🟢 이번 세션 (2026-06-04, 이어서) — Map Obsidian 구조 고도화.**
+**🟢 이번 세션 (2026-06-04, 이어서) — 테마 Light/Dark/System 완성.**
+- 기존: 팔레트(Day/Night)+`useTheme`는 있었으나 **바꿀 UI 없음 + 재시작 시 리셋**.
+- 추가:
+  - `src/theme/index.tsx` — `setMode` 가 **AsyncStorage(`silmaril.themeMode`) 영속**, 마운트 시 저장값 로드. 기본=시스템(`useColorScheme`, OS 변경 실시간).
+  - `app/(tabs)/my-view.tsx` — **테마 스위처(시스템/라이트/다크)** 추가(언어 토글 위). i18n 키 `theme/themeSystem/themeLight/themeDark`(ko/en).
+  - `app/thread/[id].tsx` — 정적 Day 색(`@/constants/theme` 의 `colors.ink*`)을 **테마 팔레트(makeStyles(c))** 로 전환 → 다크에서 깨지던 상세 화면 수정. (미사용 aiPill/aiText 제거.)
+- 검증: `tsc` clean · jest 16/16 · `expo export ios`(4.38MB). JS만 변경 → **Reload**. My View 에서 다크/라이트/시스템 전환 → 즉시 반영 + 앱 재시작해도 유지.
+- 남은 부채: `auth/*` 는 이미 테마(PHASE45). 영속은 테마만 적용(언어 토글은 아직 비영속 — 필요 시 동일 패턴으로 확장 가능).
+
+---
+
+**🟢 이전 (2026-06-04) — Map Obsidian 구조 고도화.**
 - Obsidian Graph view 분석(공식 도움말): ① node size = 링크 수 ② 단색 원 + 라벨 줌 페이드 ③ 4-force(Center/Repel/Link/Link distance). → 적용:
   - **노드 = 차수(연결 수) 기반 원(dot)** — 이모지 글리프 제거. `dotRadius = 6 + degree*2.4`(max 22). 발견(저장/방문)=채운 원 / **미발견=빈 원(테두리만)**. 분류 = `TYPE_COLOR`(타입별 뮤트 컬러, Day/Night 공용 중간톤). 선택=주황·추천=금.
   - **라벨 줌 연동 페이드**(`scale` 0.72~0.97 보간), 선택 노드는 항상. 캡슐 제거(텍스트만, 중앙정렬).
