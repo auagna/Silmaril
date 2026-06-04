@@ -29,20 +29,35 @@ const MIN_SCALE = 0.5;
 const MAX_SCALE = 3;
 
 // ── 물리 상수 (튜닝 포인트) ──
-const IDEAL = 116; // 연결선 이상 길이
-const REPULSION = 9000; // 노드 간 척력 세기
-const SPRING = 0.05; // 연결선 스프링 강성
-const CENTER = 0.015; // 중심으로 당기는 힘
-const DAMPING = 0.8; // 감쇠(클수록 더 오래 움직임)
-const MAX_SPEED = 36; // 프레임당 최대 속도
+const REPULSION = 6500; // 노드 간 척력 세기
+const CENTER = 0.022; // 중심으로 당기는 힘(↑ 더 모임)
+const DAMPING = 0.82; // 감쇠(클수록 더 오래 움직임)
+const MAX_SPEED = 34; // 프레임당 최대 속도
 const SETTLE_KE = 0.4; // 이 운동에너지 미만이면 정지
 const MAX_FRAMES = 600; // 안전 자동정지(~10s)
-const MIN_DIST = 14;
+const MIN_DIST = 16;
+const PAD = 30; // 캔버스 경계 여백 — 노드가 화면 밖으로 못 나가게(선 잘림 방지)
+// 관련성(connection_tier) 기준 인력: tier1(사실)=가깝고 강하게, tier2(해석)=멀고 약하게.
+const SPRING_T1 = 0.085;
+const SPRING_T2 = 0.04;
+const IDEAL_T1 = 88; // 이상 거리(가까움)
+const IDEAL_T2 = 150; // 이상 거리(멀음)
 
 function zeroVel(ids: string[]): Record<string, Pos> {
   const v: Record<string, Pos> = {};
   for (const id of ids) v[id] = { x: 0, y: 0 };
   return v;
+}
+
+// 연결을 관련성(tier) 기준 스프링 파라미터로 변환.
+function simEdge(e: ThreadConnection) {
+  const t1 = e.connection_tier === 1;
+  return {
+    a: e.from_thread_id,
+    b: e.to_thread_id,
+    ideal: t1 ? IDEAL_T1 : IDEAL_T2,
+    k: t1 ? SPRING_T1 : SPRING_T2,
+  };
 }
 
 export function Sea({
@@ -96,8 +111,8 @@ export function Sea({
   const positions = useSharedValue<Record<string, Pos>>(seed);
   const velocities = useSharedValue<Record<string, Pos>>(zeroVel(nodes.map((n) => n.id)));
   const idsSV = useSharedValue<string[]>(nodes.map((n) => n.id));
-  const edgesSV = useSharedValue<{ a: string; b: string }[]>(
-    edges.map((e) => ({ a: e.from_thread_id, b: e.to_thread_id })),
+  const edgesSV = useSharedValue<{ a: string; b: string; ideal: number; k: number }[]>(
+    edges.map(simEdge),
   );
   const draggingId = useSharedValue<string | null>(null);
   const frameCount = useSharedValue(0);
@@ -112,6 +127,7 @@ export function Sea({
     const pos = positions.value;
     const vel = velocities.value;
     const dragId = draggingId.value;
+    if (!pos[ids[0]]) return; // 하이드레이션 전환 등 일시적 불일치 가드
     const dt = Math.min(Math.max((info.timeSincePreviousFrame ?? 16) / 16, 0.5), 2);
 
     const fx: Record<string, number> = {};
@@ -123,8 +139,10 @@ export function Sea({
     // 척력 (모든 쌍)
     for (let i = 0; i < n; i++) {
       const a = pos[ids[i]];
+      if (!a) continue;
       for (let j = i + 1; j < n; j++) {
         const b = pos[ids[j]];
+        if (!b) continue;
         let dx = a.x - b.x;
         let dy = a.y - b.y;
         let dist = Math.sqrt(dx * dx + dy * dy);
@@ -138,7 +156,7 @@ export function Sea({
         fy[ids[j]] -= uy * f;
       }
     }
-    // 스프링 (연결선)
+    // 인력 (연결선 = 관련성 기준 스프링). tier1 가깝게/강하게, tier2 멀게/약하게.
     for (let k = 0; k < eds.length; k++) {
       const a = pos[eds[k].a];
       const b = pos[eds[k].b];
@@ -147,7 +165,7 @@ export function Sea({
       let dy = b.y - a.y;
       let dist = Math.sqrt(dx * dx + dy * dy);
       if (dist < MIN_DIST) dist = MIN_DIST;
-      const f = SPRING * (dist - IDEAL);
+      const f = eds[k].k * (dist - eds[k].ideal); // dist>ideal → 당김
       const ux = dx / dist;
       const uy = dy / dist;
       fx[eds[k].a] += ux * f;
@@ -158,6 +176,7 @@ export function Sea({
     // 센터링
     for (let i = 0; i < n; i++) {
       const p = pos[ids[i]];
+      if (!p) continue;
       fx[ids[i]] += (cx - p.x) * CENTER;
       fy[ids[i]] += (cy - p.y) * CENTER;
     }
@@ -165,15 +184,19 @@ export function Sea({
     const newPos: Record<string, Pos> = {};
     const newVel: Record<string, Pos> = {};
     let ke = 0;
+    const maxX = width - PAD;
+    const maxY = CANVAS_H - PAD;
     for (let i = 0; i < n; i++) {
       const id = ids[i];
       const p = pos[id];
-      const v = vel[id] ?? { x: 0, y: 0 };
+      if (!p) continue;
       if (id === dragId) {
-        newPos[id] = { x: p.x, y: p.y };
+        // 드래그 중인 노드는 고정 — 위치만 경계 안으로.
+        newPos[id] = { x: Math.min(Math.max(p.x, PAD), maxX), y: Math.min(Math.max(p.y, PAD), maxY) };
         newVel[id] = { x: 0, y: 0 };
         continue;
       }
+      const v = vel[id] ?? { x: 0, y: 0 };
       let vx = (v.x + fx[id] * dt) * DAMPING;
       let vy = (v.y + fy[id] * dt) * DAMPING;
       const sp = Math.sqrt(vx * vx + vy * vy);
@@ -181,8 +204,15 @@ export function Sea({
         vx = (vx / sp) * MAX_SPEED;
         vy = (vy / sp) * MAX_SPEED;
       }
+      let nx = p.x + vx * dt;
+      let ny = p.y + vy * dt;
+      // 경계 클램프 — 화면 밖으로 나가면 멈춤(선이 잘리지 않게).
+      if (nx < PAD) { nx = PAD; if (vx < 0) vx = 0; }
+      else if (nx > maxX) { nx = maxX; if (vx > 0) vx = 0; }
+      if (ny < PAD) { ny = PAD; if (vy < 0) vy = 0; }
+      else if (ny > maxY) { ny = maxY; if (vy > 0) vy = 0; }
       newVel[id] = { x: vx, y: vy };
-      newPos[id] = { x: p.x + vx * dt, y: p.y + vy * dt };
+      newPos[id] = { x: nx, y: ny };
       ke += vx * vx + vy * vy;
     }
     positions.value = newPos;
@@ -208,7 +238,7 @@ export function Sea({
     positions.value = seed;
     velocities.value = zeroVel(ids);
     idsSV.value = ids;
-    edgesSV.value = edges.map((e) => ({ a: e.from_thread_id, b: e.to_thread_id }));
+    edgesSV.value = edges.map(simEdge);
     energize();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seed]);
@@ -273,16 +303,19 @@ export function Sea({
             {edges.map((e) => {
               const touches =
                 selectedId != null && (e.from_thread_id === selectedId || e.to_thread_id === selectedId);
-              const base = e.connection_tier === 2 ? c.textMuted : c.lineDefault;
+              const tier1 = e.connection_tier === 1; // 사실=관련성 강 → 또렷·굵게
+              const dim = selectedId != null && !touches;
+              const color = touches ? c.accentActive : tier1 ? c.textMuted : c.lineDefault;
+              const thickness = touches ? 2 : tier1 ? 1.5 : 1;
+              const opacity = touches ? 1 : dim ? 0.18 : tier1 ? 0.95 : 0.7;
               return (
                 <MapEdge
                   key={e.id}
                   edge={e}
                   positions={positions}
-                  emphasized={touches}
-                  dim={selectedId != null && !touches}
-                  base={base}
-                  accent={c.accentActive}
+                  color={color}
+                  thickness={thickness}
+                  opacity={opacity}
                 />
               );
             })}
@@ -339,17 +372,15 @@ export function Sea({
 function MapEdge({
   edge,
   positions,
-  emphasized,
-  dim,
-  base,
-  accent,
+  color,
+  thickness,
+  opacity,
 }: {
   edge: ThreadConnection;
   positions: SharedValue<Record<string, Pos>>;
-  emphasized: boolean;
-  dim: boolean;
-  base: string;
-  accent: string;
+  color: string;
+  thickness: number;
+  opacity: number;
 }) {
   const geom = useAnimatedStyle(() => {
     const a = positions.value[edge.from_thread_id];
@@ -369,15 +400,7 @@ function MapEdge({
   return (
     <Animated.View
       pointerEvents="none"
-      style={[
-        {
-          position: "absolute",
-          height: emphasized ? 2 : 1,
-          backgroundColor: emphasized ? accent : base,
-          opacity: emphasized ? 1 : dim ? 0.25 : 1,
-        },
-        geom,
-      ]}
+      style={[{ position: "absolute", height: thickness, backgroundColor: color, opacity }, geom]}
     />
   );
 }

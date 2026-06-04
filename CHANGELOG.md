@@ -5,6 +5,7 @@
 ## 2026-06-04
 
 ### Changes
+- fix(Map 물리): 연결선이 안 보이던 문제 = 인력<척력 + 경계 없음으로 노드가 캔버스 밖으로 퍼져 선이 잘림. 해결: 경계 클램프(PAD=30, 화면 안 유지) + 척력↓(6500)/센터링↑(0.022). **관련성(connection_tier) 기준 인력 고도화** — tier1(사실) ideal 88·k 0.085(가깝고 강하게), tier2(해석) ideal 150·k 0.04(멀고 약하게). 연결선 시각도 tier별(tier1 또렷·1.5px, tier2 옅게·1px). 하이드레이션 일시 불일치 가드 추가. tsc+jest16+ios export 통과.
 - feat(PHASE 49 step2, D-020): Map force 물리. `useFrameCallback`(UI 스레드)로 척력+스프링+센터링 매 프레임 적분, 운동에너지<임계/600프레임이면 자동 settle, 노드 드래그 시 고정+재가열(이웃 출렁). 시드는 노드/모드/폭 변경 시에만(탭 리셋 없음). 물리 상수 Sea.tsx 상단 모음. tsc+jest16+ios export 통과.
 - change(Map 시각): 저장됨(🔖) 아이콘 제거. 노드 = 분류 아이콘(흐리게 opacity 0.4)+키워드+연결선. 선택(주황)/추천(금)만 또렷. ★ 추천 글리프 대신 분류 아이콘 금색.
 - feat(PHASE 49 step1, D-020): Map 인터랙티브화. gesture-handler+reanimated(+worklets) 추가, babel worklets 플러그인, 루트 GestureHandlerRootView. `Sea.tsx` 재작성 — 팬·핀치줌(0.5~3x, 중심기준)·노드 길게눌러 드래그(연결선 실시간 추종)·⊕⊖줌/⌖리센터·탭=선택. 위치는 단일 useSharedValue 맵으로 노드+엣지 공유. props 불변(호출부 무변경). tsc+jest16+ios export(4.37MB) 통과. ⚠️ 사용자 Expo `-c` 재시작 필요. 다음=step2 force 물리.

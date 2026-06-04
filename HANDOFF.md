@@ -11,7 +11,20 @@
 
 ## 현재 상태 (2026-06-04)
 
-**🟢 이번 세션 (2026-06-04, 이어서) — Map force 물리 step2 + 시각 정리 (PHASE 49 / D-020).**
+**🟢 이번 세션 (2026-06-04, 이어서) — 연결선 복구 + 관련성 기준 인력 고도화.**
+- **증상:** 연결선이 안 보임 + "척력만 있는 듯". **원인:** 인력(스프링)이 척력 대비 약하고 경계 제한이 없어 노드가 캔버스 밖으로 퍼져 선이 잘림.
+- **수정(`Sea.tsx`):**
+  1. **경계 클램프**(`PAD=30`) — 노드가 화면 밖으로 못 나감(드래그 노드도 클램프). → 선 잘림 해소.
+  2. **척력↓(6500)/센터링↑(0.022)** 로 재균형, 더 모이게.
+  3. **관련성(connection_tier) 기준 인력**: tier1(사실)=`ideal 88, k 0.085`(가깝고 강하게), tier2(해석)=`ideal 150, k 0.04`(멀고 약하게). → 더 관련 있는 노드가 더 가까이.
+  4. **연결선 시각도 tier별**: tier1 또렷(textMuted, 1.5px, op0.95) / tier2 옅게(lineDefault, 1px, op0.7) / 선택 연결 주황 2px.
+  5. 하이드레이션 전환 시 위치 누락 가드(`if(!pos[ids[0]]) return`, 루프 내 `if(!a)continue`).
+- 검증: `tsc` clean · jest 16/16 · `expo export ios`(4.38MB).
+- ⚠️ JS만 변경 → 앱 **Reload**면 반영. 튜닝 상수는 `Sea.tsx` 상단(REPULSION/CENTER/SPRING_T1·T2/IDEAL_T1·T2/PAD/DAMPING).
+
+---
+
+**🟢 이전 (2026-06-04) — Map force 물리 step2 + 시각 정리 (PHASE 49 / D-020).**
 - **시각 정리(사용자 요청):** 저장됨(🔖) 아이콘 제거. 노드 = **분류 아이콘(흐리게, opacity 0.4) + 키워드 + 연결선**. 선택(주황)·추천(금)만 또렷. (★ 추천 글리프 대신 분류 아이콘을 금색으로.)
 - **PHASE 49 step2 force 물리:** `src/features/map/Sea.tsx` 에 `useFrameCallback`(UI 스레드) 시뮬레이션 — 척력(노드쌍 9000/d²) + 스프링(연결선, ideal 116) + 약한 센터링(0.015), 감쇠 0.8, 속도캡 36. 운동에너지<0.4 또는 600프레임이면 `frame.setActive(false)`로 **자동 정지(배터리 절약)**. 노드 드래그 시 `draggingId` 로 고정 + `energize()` 재가열 → 이웃이 따라 출렁(Obsidian 느낌). `velocities`/`idsSV`/`edgesSV` shared value. **시드는 노드/모드/폭 변경 시에만**(selectedId 는 ref 캡처 → 탭마다 물리 리셋 안 됨).
 - 물리 상수는 Sea.tsx 상단에 모음(IDEAL/REPULSION/SPRING/CENTER/DAMPING/MAX_SPEED/SETTLE_KE/MAX_FRAMES). 폰에서 너무 출렁/느리면 여기서 튜닝.
