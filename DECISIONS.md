@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-06-04 · D-020 · Map 인터랙티브화 — gesture-handler + reanimated (PHASE 49)
+
+- **맥락:** 사용자 요청 = "맵이 옵시디언처럼 유동성이 있었으면, 확대축소도". 기존 Sea 는 정적 절대좌표 배치(드래그/줌/팬 없음). 레퍼런스 조사: SkyView 별자리(팬·줌·선택), c82 네트워크 그래프(줌 +/− · 리셋), 지도앱 리센터 버튼. 표준 스택 = react-native-gesture-handler + reanimated(Expo SDK 포함, Expo Go 동작, UI 스레드).
+- **결정 (사용자 선택 = "단계적"):**
+  - 네이티브 의존성 추가: `react-native-gesture-handler ~2.28` + `react-native-reanimated ~4.1` + (4의 peer) `react-native-worklets ~0.5`. babel `plugins: ['react-native-worklets/plugin']`(마지막). 루트 `GestureHandlerRootView` 래핑.
+  - **PHASE 49 step1 (이번):** Sea 를 제스처 캔버스로 재작성 — 한 손가락 팬 / 두 손가락 핀치 줌(0.5~3x, 중심 기준) / 노드 길게눌러(180ms) 드래그(연결선 실시간 추종) / 우하단 ⊕⊖ 줌·⌖ 리센터 / 탭=선택. 위치는 단일 `useSharedValue<Record<id,Pos>>` 맵으로 노드+엣지가 같이 구독. **props 인터페이스 불변** → Map 화면 등 호출부 무변경.
+  - **step2 (다음):** force 물리(척력+스프링) 시뮬레이션으로 "떠다니는" 유동성. 모바일 성능 위해 마운트/데이터변경 시 N회 반복 후 settle, 드래그 시 잠깐 재가열.
+- **결과:** `tsc` clean · jest 16/16 · `expo export ios` 성공(번들 3.13→4.37MB, reanimated/gesture-handler 추가분). ⚠️ babel 변경 + 네이티브 의존성이라 **사용자는 Expo 를 `-c`(캐시 클리어)로 재시작해야** 반영됨.
+- **재고할 시점:** step2 force 물리가 20+노드에서 프레임 드랍이면 노드 수 상한/시뮬 iteration 조정 또는 settle-only.
+
 ## 2026-06-02 · D-019 · 다국어(ko/en) — Thread + i18n 레이어 (Keyword=Thread)
 
 - **맥락:** Step 26~28이 `Keyword` 모델 + 다국어를 요구. 사용자 결정: **Thread 모델 유지 + i18n 레이어만 추가** (Keyword=Thread 매핑).

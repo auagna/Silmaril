@@ -11,6 +11,16 @@
 
 ## 현재 상태 (2026-06-04)
 
+**🟢 이번 세션 (2026-06-04, 이어서) — Map 인터랙티브화 step1 (PHASE 49 / D-020).**
+- 사용자 요청: "맵이 옵시디언처럼 유동성 + 확대축소". 레퍼런스 조사(Lazyweb: SkyView 별자리·c82 그래프 줌컨트롤 / web: gesture-handler+reanimated). 사용자 선택 = **단계적**.
+- 추가: `react-native-gesture-handler ~2.28`, `react-native-reanimated ~4.1`, `react-native-worklets ~0.5`(reanimated4 peer). `babel.config.js` plugins=`['react-native-worklets/plugin']`(마지막). `app/_layout.tsx` 루트 `GestureHandlerRootView` 래핑.
+- **`src/features/map/Sea.tsx` 재작성:** 다크 캔버스 + 한손가락 팬 / 두손가락 핀치 줌(0.5~3x, 중심 기준) + 노드 **길게눌러(180ms) 드래그**(연결선 실시간 추종) + 우하단 ⊕⊖ 줌·⌖ 리센터 + 탭=선택. 위치는 단일 `useSharedValue<Record<id,Pos>>` 맵(노드+엣지 공유 구독). `MapNode`/`MapEdge` 내부 컴포넌트. **props 인터페이스 불변** → `app/(tabs)/index.tsx` 등 호출부 무변경.
+- 검증: `tsc` clean · jest 16/16 · `expo export ios` 성공(번들 3.13→4.37MB).
+- ⚠️ **사용자 액션:** babel 변경 + 네이티브 의존성이라 **Expo 를 `npx expo start -c`(캐시 클리어)로 재시작**해야 반영됨. (env: `set REACT_NATIVE_PACKAGER_HOSTNAME=172.20.10.2` + `set EXPO_NO_DEPENDENCY_VALIDATION=1` 후 `-c`.)
+- **다음 = PHASE 49 step2:** force 물리(척력+스프링) 시뮬레이션으로 떠다니는 유동성. settle 후 정지·드래그 시 재가열·모바일 성능 튜닝.
+
+---
+
 **🟢 이번 세션 (2026-06-04) — 실데이터 연결 완료 (PHASE 47).**
 - 사용자가 Supabase에 `reset.sql` → `schema.sql` → `seed.sql` 적용 완료. supabase-js 확인: **threads=20 / translations=40 / connections=23 / viewpoints=3.** (seed enum 캐스트 버그 `v.locale::locale_type` / `'curator'::viewpoint_author` fix 후 성공.)
 - **PHASE 47 = 화면 실데이터 hydrate (최소 침습).** `src/lib/dummy.ts` 의 `threads/threadTranslations/connections/viewpoints` 를 `export let`(live binding)으로 바꾸고 `hydrate()` + `useHydration()`(useSyncExternalStore) 추가. 새 `src/features/data/bootstrap.ts` 의 `loadRealData()` 가 앱 시작 시 Supabase에서 읽어 `hydrate({…, source:"supabase"})`. **실패/빈DB/미설정 시 더미 유지**(앱 안 깨짐). `app/_layout.tsx` 에 `<DataBootstrap/>`. Map/Archive/Search 가 `useHydration()` 구독 → 로드 후 재렌더. Map 부제에 데이터가 실DB면 `· live` 표시.
