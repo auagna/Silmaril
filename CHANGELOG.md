@@ -5,6 +5,8 @@
 ## 2026-06-04
 
 ### Changes
+- feat(PHASE 49 step2, D-020): Map force 물리. `useFrameCallback`(UI 스레드)로 척력+스프링+센터링 매 프레임 적분, 운동에너지<임계/600프레임이면 자동 settle, 노드 드래그 시 고정+재가열(이웃 출렁). 시드는 노드/모드/폭 변경 시에만(탭 리셋 없음). 물리 상수 Sea.tsx 상단 모음. tsc+jest16+ios export 통과.
+- change(Map 시각): 저장됨(🔖) 아이콘 제거. 노드 = 분류 아이콘(흐리게 opacity 0.4)+키워드+연결선. 선택(주황)/추천(금)만 또렷. ★ 추천 글리프 대신 분류 아이콘 금색.
 - feat(PHASE 49 step1, D-020): Map 인터랙티브화. gesture-handler+reanimated(+worklets) 추가, babel worklets 플러그인, 루트 GestureHandlerRootView. `Sea.tsx` 재작성 — 팬·핀치줌(0.5~3x, 중심기준)·노드 길게눌러 드래그(연결선 실시간 추종)·⊕⊖줌/⌖리센터·탭=선택. 위치는 단일 useSharedValue 맵으로 노드+엣지 공유. props 불변(호출부 무변경). tsc+jest16+ios export(4.37MB) 통과. ⚠️ 사용자 Expo `-c` 재시작 필요. 다음=step2 force 물리.
 - feat(PHASE 47): 화면 실데이터 hydrate. Supabase에 `reset/schema/seed.sql` 적용 완료(threads=20/translations=40/connections=23/viewpoints=3). `src/lib/dummy.ts` 배열을 live binding(`export let`)으로 + `hydrate()`/`useHydration()`(useSyncExternalStore). 새 `src/features/data/bootstrap.ts`(`loadRealData`: 시작 시 supabase→hydrate, 실패/빈DB/미설정 시 더미 유지). `app/_layout.tsx`에 `DataBootstrap`. Map/Archive/Search 구독, Map 부제에 `· live`. tsc clean + jest 16/16 + ios export 통과.
 - fix(seed): `thread_translations`/`viewpoints` insert 의 enum 캐스트 — `v.locale::locale_type`, `'curator'::viewpoint_author` (ERROR 42804 해소).

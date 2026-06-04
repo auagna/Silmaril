@@ -11,7 +11,17 @@
 
 ## 현재 상태 (2026-06-04)
 
-**🟢 이번 세션 (2026-06-04, 이어서) — Map 인터랙티브화 step1 (PHASE 49 / D-020).**
+**🟢 이번 세션 (2026-06-04, 이어서) — Map force 물리 step2 + 시각 정리 (PHASE 49 / D-020).**
+- **시각 정리(사용자 요청):** 저장됨(🔖) 아이콘 제거. 노드 = **분류 아이콘(흐리게, opacity 0.4) + 키워드 + 연결선**. 선택(주황)·추천(금)만 또렷. (★ 추천 글리프 대신 분류 아이콘을 금색으로.)
+- **PHASE 49 step2 force 물리:** `src/features/map/Sea.tsx` 에 `useFrameCallback`(UI 스레드) 시뮬레이션 — 척력(노드쌍 9000/d²) + 스프링(연결선, ideal 116) + 약한 센터링(0.015), 감쇠 0.8, 속도캡 36. 운동에너지<0.4 또는 600프레임이면 `frame.setActive(false)`로 **자동 정지(배터리 절약)**. 노드 드래그 시 `draggingId` 로 고정 + `energize()` 재가열 → 이웃이 따라 출렁(Obsidian 느낌). `velocities`/`idsSV`/`edgesSV` shared value. **시드는 노드/모드/폭 변경 시에만**(selectedId 는 ref 캡처 → 탭마다 물리 리셋 안 됨).
+- 물리 상수는 Sea.tsx 상단에 모음(IDEAL/REPULSION/SPRING/CENTER/DAMPING/MAX_SPEED/SETTLE_KE/MAX_FRAMES). 폰에서 너무 출렁/느리면 여기서 튜닝.
+- 검증: `tsc` clean · jest 16/16 · `expo export ios`(4.37MB) 통과.
+- ⚠️ **사용자:** step1에서 이미 deps/babel 반영됐다면 이번 변경은 **JS만** → 앱 **Reload**로 충분(`-c` 불필요). 아직 step1 적용 전이면 `-c` 재시작 필요. (PowerShell env 는 `$env:NAME="값"`, cmd 는 `set NAME=값`.)
+- **다음 후보:** 폰 검증 후 물리 상수 튜닝, 또는 46 RLS / 48 Create 실제 제출.
+
+---
+
+**🟢 이전 (2026-06-04) — Map 인터랙티브화 step1 (PHASE 49 / D-020).**
 - 사용자 요청: "맵이 옵시디언처럼 유동성 + 확대축소". 레퍼런스 조사(Lazyweb: SkyView 별자리·c82 그래프 줌컨트롤 / web: gesture-handler+reanimated). 사용자 선택 = **단계적**.
 - 추가: `react-native-gesture-handler ~2.28`, `react-native-reanimated ~4.1`, `react-native-worklets ~0.5`(reanimated4 peer). `babel.config.js` plugins=`['react-native-worklets/plugin']`(마지막). `app/_layout.tsx` 루트 `GestureHandlerRootView` 래핑.
 - **`src/features/map/Sea.tsx` 재작성:** 다크 캔버스 + 한손가락 팬 / 두손가락 핀치 줌(0.5~3x, 중심 기준) + 노드 **길게눌러(180ms) 드래그**(연결선 실시간 추종) + 우하단 ⊕⊖ 줌·⌖ 리센터 + 탭=선택. 위치는 단일 `useSharedValue<Record<id,Pos>>` 맵(노드+엣지 공유 구독). `MapNode`/`MapEdge` 내부 컴포넌트. **props 인터페이스 불변** → `app/(tabs)/index.tsx` 등 호출부 무변경.

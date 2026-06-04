@@ -53,7 +53,8 @@
 - [x] **실데이터 적용 (사용자 1회).** Supabase에 `reset.sql` → `schema.sql` → `seed.sql` 적용 완료. supabase-js 확인: threads=20 / translations=40 / connections=23 / viewpoints=3. (seed enum 캐스트 버그 fix 후 성공.)
 - [x] **PHASE 47. 화면 실데이터 hydrate.** `src/lib/dummy.ts` 배열을 `export let`(live binding)으로 + `hydrate()`/`useHydration()`(useSyncExternalStore). `src/features/data/bootstrap.ts`(`loadRealData`: supabase→hydrate, 실패/빈DB/미설정 시 더미 유지). `app/_layout.tsx`에 `DataBootstrap`. Map/Archive/Search 구독, Map에 `· live` 표시. tsc+16테스트+ios export 통과.
 - [x] **PHASE 49 step1. Map 인터랙티브화 (D-020).** gesture-handler+reanimated(+worklets) 추가, babel worklets 플러그인, 루트 `GestureHandlerRootView`. `Sea.tsx` 재작성: 팬·핀치줌(0.5~3x)·노드 길게눌러 드래그(연결선 실시간 추종)·⊕⊖줌/⌖리센터·탭=선택. props 불변. tsc+16테스트+ios export(4.37MB) 통과. ⚠️ 사용자: Expo `-c` 재시작 필요.
-- [ ] **PHASE 49 step2. Map force 물리.** 척력+스프링 시뮬으로 "떠다니는" 유동성. settle 후 정지, 드래그 시 재가열. 모바일 성능 튜닝.
+- [x] **PHASE 49 step2. Map force 물리.** `useFrameCallback`(UI 스레드)로 척력+스프링+센터링 매 프레임 적분, 운동에너지<임계 또는 600프레임이면 자동 settle, 드래그 시 해당 노드 고정+재가열. 시드는 노드/모드/폭 변할 때만(선택 탭으로 리셋 안 됨). tsc+16테스트+ios export 통과.
+- [x] **Map 시각 정리.** 저장됨(🔖) 아이콘 제거, 노드 = 분류 아이콘(흐리게 opacity 0.4)+키워드+연결선. 선택/추천만 또렷(주황/금).
 - [ ] **남은 단계 = 환경/결정/법무 필요:**
       · **사용자/환경:** 46 RLS · 48 Create 실제 제출(reviewStore→DB) · 기기 검증.
       · **법무:** 37/38 Wikidata/Wikipedia 실어댑터 · 39 나무위키 활성화 — ToS/저작권 검토 후.
