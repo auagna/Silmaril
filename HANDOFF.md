@@ -9,9 +9,20 @@
 - 시작 시 git pull, 종료 시 커밋(+push). 원격: https://github.com/auagna/Silmaril
 - 한 세션 = `## Now` 의 첫 미완료 항목 하나.
 
-## 현재 상태 (2026-06-04)
+## 현재 상태 (2026-06-13)
 
-**🟢 이번 세션 (2026-06-04, 이어서) — Map 보기 모드 고도화 (맥락/시간/계보).**
+**🟢 이번 세션 (2026-06-13) — Roadmap V2 채택 + Storage Model(Markdown-first).**
+- **Roadmap V2 (D-022):** 사용자 제시 PHASE 0~14 채택, `docs/roadmap.md`에 현황표. 제시문 "현재 0~3"과 달리 **레포 실측 = PHASE 11~12 완료, 13(MVP Build) 진행 중.** 문서 갭(0/2/5/6)은 병행 보강 태스크.
+- **Storage Model (D-021, 핵심 철학 전환):** **Markdown 파일=원본, Supabase=동기화/공유/관계 색인, Silmaril=탐험 UI.** 파일명은 사용자 기준(강제 ❌), 구조는 frontmatter(id/type/related_threads/visibility/created_at). 정본 `docs/storage-model.md`.
+  - v0.1 구현체: `src/features/vault/markdown.ts` — `serializeFrontmatter`/`parseFrontmatter`(자체 subset), `sanitizeFileName`(OS 금지문자만 제거, 한국어/공백 보존), `exportFileName`(사용자 지정 우선), `viewpointToMarkdown`/`threadToMarkdown`. 테스트 5개(라운드트립/파일명) — **jest 21/21.**
+  - **앞으로 모든 기록 기능은 "Markdown 한 파일로 떨어지는가" 체크** 후 설계할 것 (Quick Perspective 제출 시 이 모듈 사용).
+- **Taxonomy v2 (D-022):** `thread-taxonomy.md` 3계층 — MVP 핵심 6 / 구현됨 확장 4(material·emotion·form·era, **축소 없음**) / V2 예정 5(method·publication·event·region·school). 코드/스키마 무변경.
+- **다음 구현 = IA v2.1:** Create 탭 제거 → 3탭, 관점 작성 = Land 시트 **Quick Perspective** (제출 = review_candidates + markdown export 구조). 그 후 저장 영속(실DB) → RLS(46) → 시드 확장 → TestFlight(54).
+- 검증: tsc clean · jest 21/21. (UI 무변경 — 문서+유틸만.)
+
+---
+
+**🟢 이전 (2026-06-04) — Map 보기 모드 고도화 (맥락/시간/계보).**
 - 문제: force 물리(PHASE49 step2) 추가 후 **모든 모드가 같은 힘-그래프로 뭉개짐**(computeLayout 시드를 물리가 즉시 덮어씀). 집중은 탭 강조와 중복.
 - 사용자 결정: **맥락 + 시간 + 계보**(집중 제거).
 - 해결(핵심): 모드가 **물리를 덮어쓰지 않고 한 축을 고정**.

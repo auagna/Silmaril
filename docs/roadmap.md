@@ -15,7 +15,41 @@
 
 > 기존 Next.js 웹 MVP(인증·Create Thread)는 문서/스키마/UX를 검증한 디딤돌. 코드는 보존하되 모바일이 본진. (legacy 처리 → HANDOFF 참고)
 
-## 2. 개발 순서 (이 로드맵의 핵심)
+## 2. Roadmap V2 — 단계와 현황 (2026-06-13 채택 · D-022)
+
+> 새 정본 순서: World Model → Map Experience → IA → Thread Taxonomy → **Storage Model** → Canonical Knowledge Model → Discovery → Seed → Feature Matrix → ERD → API → Expo UI → Supabase → MVP Build → Beta.
+> **실제 현재 위치 = PHASE 13 (MVP Build 진행 중).** 문서 갭은 병행 보강.
+
+| PHASE | 산출물 | 상태 |
+|---|---|---|
+| 0 World Model | `world-model.md` · `design-system.md` | △ `silmaril-v2-direction.md`가 세계관 커버 — 정식 파일 미작성 |
+| 1 Map Experience | `map-experience.md` | ✅ (Quick Perspective 반영 보강 필요) |
+| 2 IA v2 | `information-architecture-v2.md` | △ 문서 존재 — **V2 = 3탭(Create 탭 제거, 관점 작성=시트 내부)**, 현 앱은 4탭 → IA v2.1 구현 태스크 |
+| 3 Navigation Flow | `navigation-flow.md` | ✅ |
+| 4 Thread Taxonomy v2 | `thread-taxonomy.md` | ✅ v2 3계층 반영 (D-022) |
+| 4.5 **Storage Model** | `storage-model.md` | ✅ 신규 — **Markdown-first** (D-021) + `src/features/vault/markdown.ts` |
+| 5 Canonical Knowledge Model | `canonical-knowledge-model.md` | △ 존재 — V2 연결타입(`part_of`·`contemporary_of`) 정합 필요 |
+| 6 Discovery System | `discovery-system.md` | △ `exploration-logic.md`가 추천/미발견/새 흔적 커버 — 관점 충돌·랜덤 항해·Compass 미정의 |
+| 7 Seed Strategy | `seed-dataset-strategy.md` | ✅ (500–1000 threads 목표) |
+| 8 Feature Matrix | `feature-matrix.md` | ✅ |
+| 9 ERD | `erd.md` + `supabase/schema.sql` | ✅ DB 적용 완료 |
+| 10 API | `api-spec.md` | ✅ |
+| 11 Expo Skeleton | 앱 골격 | ✅ 초과 달성 — 그래프 물리·3모드(맥락/시간/계보)·테마·i18n |
+| 12 Supabase Integration | 실데이터 | ✅ hydration (threads=20 live) |
+| 13 **MVP Build** | TestFlight 수준 | 🔶 **진행 중** — 저장 영속(실DB) · Quick Perspective 제출 · RLS · 시드 확장 · EAS/TestFlight |
+| 14 Beta | 큐레이터 20 · 탐험가 100 | ❌ |
+
+### 저장 철학 (Roadmap V2 핵심 수정 · D-021)
+
+```
+Obsidian / GitHub = 저장 구조 (원본 = Markdown 파일)
+Silmaril          = 탐험 UI
+Supabase          = 동기화 / 공유 / 관계 색인
+```
+
+정본: [storage-model.md](./storage-model.md). v0.1 export-ready → v0.2 앱 내 Vault → v0.3 GitHub/Obsidian sync → v1.0 file-first.
+
+## 2b. (이력) 초기 개발 순서 v1
 
 ### Phase 1 — Thread Taxonomy v1  ✅(문서)
 `docs/thread-taxonomy.md`. MVP 타입 확정 (**concept 포함**).

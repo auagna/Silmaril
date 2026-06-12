@@ -55,6 +55,11 @@
 - [x] **PHASE 49 step1. Map 인터랙티브화 (D-020).** gesture-handler+reanimated(+worklets) 추가, babel worklets 플러그인, 루트 `GestureHandlerRootView`. `Sea.tsx` 재작성: 팬·핀치줌(0.5~3x)·노드 길게눌러 드래그(연결선 실시간 추종)·⊕⊖줌/⌖리센터·탭=선택. props 불변. tsc+16테스트+ios export(4.37MB) 통과. ⚠️ 사용자: Expo `-c` 재시작 필요.
 - [x] **PHASE 49 step2. Map force 물리.** `useFrameCallback`(UI 스레드)로 척력+스프링+센터링 매 프레임 적분, 운동에너지<임계 또는 600프레임이면 자동 settle, 드래그 시 해당 노드 고정+재가열. 시드는 노드/모드/폭 변할 때만(선택 탭으로 리셋 안 됨). tsc+16테스트+ios export 통과.
 - [x] **Map 시각 정리.** 저장됨(🔖) 아이콘 제거, 노드 = 분류 아이콘(흐리게 opacity 0.4)+키워드+연결선. 선택/추천만 또렷(주황/금).
+- [x] **Map 보기 모드 고도화.** 4→3개(맥락/시간/계보, 집중 제거). 모드가 물리를 덮지 않고 한 축 고정(`buildModeLayout` 시드+핀): 시간=x 연도(`THREAD_YEAR`), 계보=y 세대(`computeDepths`), 맥락=자유.
+- [x] **Roadmap V2 채택 + 현황 체크 (D-022).** `roadmap.md` V2 단계표 — **실위치 = PHASE 13(MVP Build)**. taxonomy v2 3계층(`thread-taxonomy.md`).
+- [x] **Storage Model (D-021).** `docs/storage-model.md`(Markdown-first: 파일=원본/DB=색인/파일명 사용자 기준/frontmatter 규칙/단계 v0.1~v1.0) + v0.1 구현체 `src/features/vault/markdown.ts` + 테스트 5(라운드트립/파일명). jest 21/21.
+- [ ] **IA v2.1 구현.** Create 탭 제거 → 3탭(Map/Archive/My View), 관점 작성 = Land 시트 **Quick Perspective**(작성 시 Markdown export 구조 준수). ← 다음 구현
+- [ ] **문서 갭 보강.** world-model.md + design-system.md · discovery-system.md(관점 충돌/랜덤 항해/Compass) · canonical-knowledge-model V2 정합(part_of/contemporary_of).
 - [ ] **남은 단계 = 환경/결정/법무 필요:**
       · **사용자/환경:** 46 RLS · 48 Create 실제 제출(reviewStore→DB) · 기기 검증.
       · **법무:** 37/38 Wikidata/Wikipedia 실어댑터 · 39 나무위키 활성화 — ToS/저작권 검토 후.

@@ -4,6 +4,26 @@
 
 ---
 
+## 2026-06-13 · D-021 · 저장 철학 — Markdown-first (파일=원본, DB=색인)
+
+- **맥락:** Roadmap V2 — Silmaril은 DB 중심 위키가 아니라 **파일 기반 개인 아카이브 위에 탐험 UI를 얹는 구조**. Obsidian/GitHub=저장, Silmaril=탐험 UI, Supabase=동기화/공유/관계 색인.
+- **결정:**
+  - **Markdown 파일이 원본.** 구조화 데이터는 YAML frontmatter(`id`/`type`/`related_threads`/`visibility`/`created_at`). **파일명은 사용자 기준**(강제 ❌, OS 금지 문자만 제거) — 식별자는 파일명이 아니라 `id`.
+  - 단계: **v0.1 = sync 없음, export-ready 구조만 보장** → v0.2 앱 내 Vault(expo-file-system) → v0.3 GitHub/Obsidian sync(파일 우선 충돌 정책) → v1.0 file-first 전환.
+  - 정본 문서 `docs/storage-model.md`. v0.1 구현체 `src/features/vault/markdown.ts`(frontmatter 직렬화/파싱 + `threadToMarkdown`/`viewpointToMarkdown` + `exportFileName`) + 라운드트립 테스트 5개.
+  - **새 기능 설계 체크리스트:** "이 데이터는 Markdown 파일 하나로 떨어지는가?"
+- **결과:** tsc clean · jest 21/21(신규 5 포함).
+
+## 2026-06-13 · D-022 · Roadmap V2 채택 + 현재 위치 재평가
+
+- **맥락:** 사용자가 PHASE 0~14 로드맵 V2 제시(Storage Model 삽입, IA 3탭, Taxonomy v2, Discovery System). 제시문은 "현재 PHASE 0~3"이라 했으나 **레포 실측: PHASE 11~12 완료, 13 진행 중**(그래프 물리/3모드/테마/i18n/실데이터 hydration까지 동작).
+- **결정:**
+  - `docs/roadmap.md`에 V2 순서+현황표 채택. **실위치=PHASE 13 (MVP Build).**
+  - **Taxonomy v2 = 3계층:** MVP 핵심 6(person/work/movement/concept/place/organization) · 구현됨 확장 4(material/emotion/form/era — **축소 없음**, 데이터 보존) · V2 예정 5(method/publication/event/region/school).
+  - 문서 갭은 태스크 큐로: world-model/design-system · discovery-system(관점 충돌/랜덤 항해/Compass) · canonical-knowledge-model V2 정합(part_of/contemporary_of).
+  - **IA v2.1**(Create 탭 제거 → 3탭, 관점 작성 = Land 시트 Quick Perspective)은 별도 구현 태스크 — 이번에 같이 안 함(한 번에 하나).
+- **결과:** 기존 구현 파괴 없음. 다음 구현 우선순위 = PHASE 13 잔여(저장 영속 → Quick Perspective 제출 → RLS → 시드 확장 → TestFlight).
+
 ## 2026-06-04 · D-020 · Map 인터랙티브화 — gesture-handler + reanimated (PHASE 49)
 
 - **맥락:** 사용자 요청 = "맵이 옵시디언처럼 유동성이 있었으면, 확대축소도". 기존 Sea 는 정적 절대좌표 배치(드래그/줌/팬 없음). 레퍼런스 조사: SkyView 별자리(팬·줌·선택), c82 네트워크 그래프(줌 +/− · 리셋), 지도앱 리센터 버튼. 표준 스택 = react-native-gesture-handler + reanimated(Expo SDK 포함, Expo Go 동작, UI 스레드).

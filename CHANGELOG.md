@@ -2,6 +2,12 @@
 
 > 교대(Claude Code ↔ Codex) 작업의 시간순 기록. 단일 기준점은 GitHub. 최신이 위.
 
+## 2026-06-13
+
+### Changes
+- docs(D-021): **Storage Model — Markdown-first.** `docs/storage-model.md` 신설(파일=원본/DB=색인/UI=표현, Vault 구조, 파일명 사용자 기준, frontmatter 규칙, v0.1~v1.0 단계). v0.1 구현체 `src/features/vault/markdown.ts`(frontmatter 직렬화·파싱 + thread/viewpoint→Markdown + 파일명 보존) + 테스트 5. jest 21/21.
+- docs(D-022): **Roadmap V2 채택 + 현황 체크.** `roadmap.md`에 PHASE 0~14 현황표(실위치=**PHASE 13 MVP Build**). `thread-taxonomy.md` v2 3계층(MVP 6/구현확장 4 유지/예정 5). IA v2.1(Create 탭 제거+Quick Perspective)·문서 갭(world-model/discovery-system/canonical 정합)은 태스크 큐잉.
+
 ## 2026-06-04
 
 ### Changes

@@ -1,9 +1,18 @@
-# Thread Taxonomy v1
+# Thread Taxonomy v2
 
 > Thread = 실마리 = 탐험의 단위. **실마리는 하나, 관점은 여러 개.** (같은 대상에 페이지 둘 ❌)
 > 정본 방향: [silmaril-v2-direction.md](./silmaril-v2-direction.md) · 스키마: [erd.md](./erd.md).
 
-> **PHASE 29 — Node Type System v1 적용:** 타입 확장 = MVP 우선 `person·movement·work·material·concept·emotion` + 보조 `form·place·era` + 호환 `organization`. `subtype`(보조 분류) 필드 추가. (type=큰 분류=시각/탐구 기준, subtype/태그=세부.) 아래 6종 설명은 기본 골격이며 material/emotion/form/era 는 같은 규칙을 따른다.
+> **Taxonomy v2 — 3계층 (Roadmap V2 · D-022, 2026-06-13):**
+> | 계층 | 타입 | 상태 |
+> |---|---|---|
+> | **MVP 핵심** | `person · work · movement · concept · place · organization` | ✅ 구현 |
+> | **확장(구현됨, 유지)** | `material · emotion · form · era` | ✅ v1(PHASE 29)에서 코드/스키마에 존재 — **축소하지 않는다**(데이터 보존) |
+> | **V2 예정** | `method · publication · event · region · school` | ❌ 미구현 — 스키마 enum 확장으로 추가 |
+>
+> **차별화 핵심 = `concept` / `material` / `method`** — "나는 왜 이것을 좋아하는가"를 답하는 축.
+
+> **PHASE 29 — Node Type System v1 적용(이력):** 타입 확장 = MVP 우선 `person·movement·work·material·concept·emotion` + 보조 `form·place·era` + 호환 `organization`. `subtype`(보조 분류) 필드 추가. (type=큰 분류=시각/탐구 기준, subtype/태그=세부.) 아래 6종 설명은 기본 골격이며 material/emotion/form/era 는 같은 규칙을 따른다.
 
 ## MVP Thread Types (확장: Node Type System v1)
 
