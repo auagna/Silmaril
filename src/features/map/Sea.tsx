@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -13,7 +13,7 @@ import type { Thread, ThreadType, ThreadConnection } from "@/types/database";
 import { connections, getThreadTranslation } from "@/lib/dummy";
 import { useTheme, radius, font, type Palette } from "@/theme";
 import { useLocale } from "@/i18n";
-import { computeLayout, type GraphLayoutMode, type Pos } from "./layout";
+import { buildModeLayout, type GraphLayoutMode, type Pos, type Pin } from "./layout";
 
 // Sea = Active Map (Obsidian 구조 고도화).
 //  · 노드 = 차수(연결 수) 기반 원(dot). 발견=채운 원 / 미발견=빈 원. 분류=타입별 뮤트 컬러.
@@ -141,12 +141,11 @@ export function Sea({
     return s;
   }, [selectedId, edges]);
 
-  // 선택은 시드를 리셋하지 않도록 ref 캡처.
-  const selectedRef = useRef(selectedId);
-  selectedRef.current = selectedId;
-  const seed = useMemo(
-    () => computeLayout(layoutMode ?? "web", nodes, selectedRef.current, width, CANVAS_H),
-    [nodes, layoutMode, width],
+  // 모드별 시드 + 핀(축 고정). 선택은 시드를 바꾸지 않음.
+  //  맥락=핀 없음(자유) / 시간=x 연도 고정 / 계보=y 세대 고정.
+  const { seed, pins } = useMemo(
+    () => buildModeLayout(layoutMode ?? "web", nodes, edges, width, CANVAS_H),
+    [nodes, layoutMode, width, edges],
   );
 
   const positions = useSharedValue<Record<string, Pos>>(seed);
@@ -154,6 +153,7 @@ export function Sea({
   const idsSV = useSharedValue<string[]>(nodes.map((n) => n.id));
   const edgesSV = useSharedValue<{ a: string; b: string; ideal: number; k: number }[]>(edges.map(simEdge));
   const metaSV = useSharedValue<Record<string, { m: number; r: number }>>(meta);
+  const pinsSV = useSharedValue<Record<string, Pin>>(pins);
   const draggingId = useSharedValue<string | null>(null);
   const frameCount = useSharedValue(0);
 
@@ -163,6 +163,7 @@ export function Sea({
     const ids = idsSV.value;
     const eds = edgesSV.value;
     const mta = metaSV.value;
+    const pinm = pinsSV.value;
     const n = ids.length;
     if (n < 2) return;
     const pos = positions.value;
@@ -238,7 +239,14 @@ export function Sea({
       const minX = r + 4;
       const minY = r + 4;
       if (id === dragId) {
-        newPos[id] = { x: Math.min(Math.max(p.x, minX), maxX), y: Math.min(Math.max(p.y, minY), maxY) };
+        let dgx = Math.min(Math.max(p.x, minX), maxX);
+        let dgy = Math.min(Math.max(p.y, minY), maxY);
+        const pn = pinm[id];
+        if (pn) {
+          if (pn.px != null) dgx = pn.px;
+          if (pn.py != null) dgy = pn.py;
+        }
+        newPos[id] = { x: dgx, y: dgy };
         newVel[id] = { x: 0, y: 0 };
         continue;
       }
@@ -267,6 +275,18 @@ export function Sea({
         ny = maxY;
         if (vy > 0) vy = 0;
       }
+      // 모드 핀: 고정된 축은 힘 무시(시간=x, 계보=y).
+      const pn = pinm[id];
+      if (pn) {
+        if (pn.px != null) {
+          nx = pn.px;
+          vx = 0;
+        }
+        if (pn.py != null) {
+          ny = pn.py;
+          vy = 0;
+        }
+      }
       newVel[id] = { x: vx, y: vy };
       newPos[id] = { x: nx, y: ny };
       ke += vx * vx + vy * vy;
@@ -294,6 +314,7 @@ export function Sea({
     idsSV.value = ids;
     edgesSV.value = edges.map(simEdge);
     metaSV.value = meta;
+    pinsSV.value = pins;
     energize();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seed]);

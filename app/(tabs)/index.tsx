@@ -16,9 +16,8 @@ import { useLocale } from "@/i18n";
 const RECOMMENDED = new Set(recommendedIds);
 const MODES: { key: GraphLayoutMode; ko: string; en: string }[] = [
   { key: "web", ko: "맥락", en: "Web" },
-  { key: "focus", ko: "집중", en: "Focus" },
-  { key: "flow", ko: "시간", en: "Flow" },
-  { key: "branch", ko: "계보", en: "Branch" },
+  { key: "flow", ko: "시간", en: "Time" },
+  { key: "branch", ko: "계보", en: "Lineage" },
 ];
 
 // Map = 핵심 경험. Sky(나침반) / Sea(Active Map) / Land(상세 시트). (D-017)
@@ -117,7 +116,17 @@ export default function MapScreen() {
           layoutMode={layoutMode}
           onSelect={select}
         />
-        <Text style={styles.hint}>{t("mapHint")}</Text>
+        <Text style={styles.hint}>
+          {layoutMode === "flow"
+            ? locale === "en"
+              ? "Horizontal axis = era (year)"
+              : "가로축 = 시대(연도)"
+            : layoutMode === "branch"
+              ? locale === "en"
+                ? "Top → down = lineage of influence"
+                : "위 → 아래 = 영향의 계보"
+              : t("mapHint")}
+        </Text>
       </ScrollView>
 
       <LandSheet threadId={selectedId} onClose={() => setSelected(null)} onSelectThread={(id) => select(id)} />

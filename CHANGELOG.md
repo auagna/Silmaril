@@ -5,6 +5,7 @@
 ## 2026-06-04
 
 ### Changes
+- feat(Map 보기 모드 고도화): 4개(맥락/집중/시간/계보)→**3개(맥락/시간/계보)**, 집중 제거(탭 강조와 중복). 핵심: 모드가 **물리를 덮어쓰지 않고 한 축을 고정**하도록 `buildModeLayout`(layout.ts)이 시드+핀 반환 → Sea 물리 worklet이 핀 적용. **시간(flow)**=가로축 연도 고정(`THREAD_YEAR` 9개 시드, 연도 없는 노드는 연결로 끌려감), **계보(branch)**=세로축 세대 깊이 고정(`computeDepths`: influenced/created/derived_from/belongs_to 방향성 longest-path), **맥락(web)**=자유. 모드별 안내문구. tsc+jest16+ios export 통과. (이전엔 물리가 모든 모드를 같은 그래프로 뭉갰음.)
 - feat(테마 Light/Dark/System): 테마 모드를 **AsyncStorage 영속화**(`silmaril.themeMode`, 재시작 유지) + **My View 에 시스템/라이트/다크 스위처**(i18n 키 theme/themeSystem/Light/Dark). 기본=시스템(`useColorScheme` 추종, OS 변경 실시간 반영). `thread/[id]` 상세 화면을 정적 Day 색(`@/constants/theme`)에서 **테마 팔레트**로 전환(다크에서 깨지던 화면 수정). tsc+jest16+ios export 통과.
 - feat(Map Obsidian 고도화): 노드를 **차수(연결 수) 기반 원(dot)** 으로(이모지 글리프 제거) — 많이 연결될수록 큰 원. 발견=채운 원/미발견=빈 원, 분류=타입별 뮤트 컬러. 라벨은 **줌 아웃 시 페이드**(scale<0.72~0.97), 선택 노드는 항상 표시. **선택 시 이웃·연결만 강조, 나머지 흐리게(0.26)**. 물리에 **차수 기반 질량**(허브 덜 흔들림)+**반지름 기반 충돌 간격** 추가, 인력↑(tier1 ideal84/k0.09). MAX_NODES 12→14. tsc+jest16+ios export 통과. (분석 근거: Obsidian Graph view — node size by links, text fade, 4-force.)
 - fix(Map 연결선, 진짜 원인): New Architecture(Fabric)에서 `useAnimatedStyle` 의 **레이아웃 prop(left/top/width)이 반영 안 됨** → 노드(transform)는 보이고 연결선(left/top/width)만 안 보였음. `MapEdge` 를 **transform 전용**(1px 바를 중심 기준 translate+rotateZ+scaleX)으로 재구현. tsc+ios export 통과. (이전 클램프/관련성 변경은 유효하나 가시성의 근본 원인은 이것.)

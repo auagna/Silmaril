@@ -11,7 +11,21 @@
 
 ## 현재 상태 (2026-06-04)
 
-**🟢 이번 세션 (2026-06-04, 이어서) — 테마 Light/Dark/System 완성.**
+**🟢 이번 세션 (2026-06-04, 이어서) — Map 보기 모드 고도화 (맥락/시간/계보).**
+- 문제: force 물리(PHASE49 step2) 추가 후 **모든 모드가 같은 힘-그래프로 뭉개짐**(computeLayout 시드를 물리가 즉시 덮어씀). 집중은 탭 강조와 중복.
+- 사용자 결정: **맥락 + 시간 + 계보**(집중 제거).
+- 해결(핵심): 모드가 **물리를 덮어쓰지 않고 한 축을 고정**.
+  - `src/features/map/layout.ts` — `buildModeLayout(mode, nodes, edges, w, h)` 가 `{seed, pins}` 반환. `Pin = {px|null, py|null}`. `THREAD_YEAR`(연도 9개), `computeDepths`(방향성 연결 longest-path 세대).
+  - `Sea.tsx` — `pinsSV` 추가, 물리 worklet 적분 후 **핀 축 고정**(시간=x, 계보=y; 드래그 노드도 핀 적용). `computeLayout`→`buildModeLayout`, selectedRef 제거.
+  - **시간(flow)**=가로축 연도(연도 없는 개념/재료는 자유→연결로 끌려감). **계보(branch)**=세로축 세대(influenced/created/derived_from/belongs_to). **맥락(web)**=자유.
+  - `app/(tabs)/index.tsx` — MODES 3개(맥락/시간=Time/계보=Lineage), 모드별 안내문구(가로축=시대 / 위→아래=계보).
+- 튜너블: `layout.ts` 의 `THREAD_YEAR`(연도 추가/수정), `parentChild`(계보 방향 규칙), padX/padY.
+- 검증: `tsc` clean · jest 16/16(computeLayout 테스트 유지) · `expo export ios`(4.38MB). JS만 변경 → **Reload**.
+- 참고: `GraphLayoutMode` 타입엔 focus 잔존(computeLayout/테스트 호환), UI에선 미노출.
+
+---
+
+**🟢 이전 (2026-06-04) — 테마 Light/Dark/System 완성.**
 - 기존: 팔레트(Day/Night)+`useTheme`는 있었으나 **바꿀 UI 없음 + 재시작 시 리셋**.
 - 추가:
   - `src/theme/index.tsx` — `setMode` 가 **AsyncStorage(`silmaril.themeMode`) 영속**, 마운트 시 저장값 로드. 기본=시스템(`useColorScheme`, OS 변경 실시간).
